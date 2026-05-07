@@ -3,11 +3,6 @@
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <!-- Apply theme before first paint to avoid flash -->
   <script>(function(){var s=localStorage.getItem('wh_theme');var p=window.matchMedia('(prefers-color-scheme:dark)').matches;if(s?s==='dark':p)document.documentElement.classList.add('dark');})()</script>
-  <!-- Vercel Speed Insights -->
-  <script>
-    window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
-  </script>
-  <script defer src="/_vercel/speed-insights/script.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -432,7 +427,18 @@
 
     /* Surplus circles */
     .sc-row { display: flex; gap: 8px; justify-content: space-between; }
-    .sc-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+    .sc-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; position: relative; }
+    .sc-item[data-tip]:hover::after {
+      content: attr(data-tip);
+      position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+      background: var(--foreground); color: var(--background);
+      font-size: 11px; font-weight: 500; white-space: nowrap;
+      padding: 4px 8px; border-radius: 6px; pointer-events: none; z-index: 100;
+    }
+    .sc-item[data-tip]:hover::before {
+      content: ''; position: absolute; bottom: calc(100% + 1px); left: 50%; transform: translateX(-50%);
+      border: 5px solid transparent; border-top-color: var(--foreground); pointer-events: none; z-index: 100;
+    }
     .sc-dot { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center;
       justify-content: center; font-size: 12px; font-weight: 700; letter-spacing: -.01em; }
     .sc-dot.neutral { background: var(--muted); color: var(--muted-fg); border: 1px solid var(--border); }
@@ -707,49 +713,58 @@
     .shift-tp-btn:hover { background: rgba(0,0,0,.07); color: var(--foreground); }
     .dark .shift-tp-btn:hover { background: rgba(255,255,255,.09); }
 
-    /* ── Design-system time picker modal ── */
+    /* ── Wheel time picker modal ── */
     .tp-modal {
       position: fixed; z-index: 1200; background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; box-shadow: 0 10px 40px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.08);
-      padding: 16px; width: 212px; display: none; flex-direction: column; gap: 14px;
-      pointer-events: all;
+      border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.08);
+      width: 256px; display: none; flex-direction: column; overflow: hidden; pointer-events: all;
     }
     .tp-modal.open { display: flex; }
-    .tp-time-row { display: flex; align-items: center; gap: 4px; justify-content: center; }
-    .tp-unit { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .tp-num-wrap { display: flex; align-items: center; gap: 3px; }
-    .tp-step-btn {
-      width: 24px; height: 22px; display: flex; align-items: center; justify-content: center;
-      border: 1px solid var(--border); border-radius: 5px; background: var(--muted);
-      color: var(--muted-fg); cursor: pointer; font-size: 9px; line-height: 1;
-      transition: background .1s, color .1s; user-select: none; flex-shrink: 0;
+    .tp-modal-header {
+      padding: 11px 16px 10px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
     }
-    .tp-step-btn:hover { background: var(--border); color: var(--foreground); }
-    .tp-step-btn:active { background: var(--foreground); color: var(--background); transform: scale(.95); }
-    .tp-num {
-      font-size: 30px; font-weight: 700; color: var(--foreground); font-variant-numeric: tabular-nums;
-      letter-spacing: -1px; width: 48px; text-align: center;
-      border: none; background: transparent; outline: none;
-      -webkit-appearance: none; appearance: none; font-family: var(--font);
+    .tp-modal-title {
+      font-size: 11px; font-weight: 600; color: var(--muted-fg);
+      letter-spacing: .07em; text-transform: uppercase;
     }
-    .tp-num:focus { color: var(--blue); }
-    .tp-sep { font-size: 26px; font-weight: 700; color: var(--muted-fg); margin: 0 1px; line-height: 1; padding-bottom: 4px; }
-    .tp-ampm { display: flex; gap: 5px; }
-    .tp-ampm-btn {
-      flex: 1; height: 32px; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--muted); color: var(--muted-fg); font-size: 12px; font-weight: 600;
-      font-family: var(--font); cursor: pointer; transition: all .12s;
+    .tp-wheels-wrap { position: relative; height: 200px; overflow: hidden; }
+    .tp-wheels { display: flex; height: 100%; }
+    .tp-wheel {
+      flex: 1; overflow-y: scroll; scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      padding-top: 78px; padding-bottom: 78px;
     }
-    .tp-ampm-btn.active { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
-    .tp-footer { display: flex; gap: 6px; }
+    .tp-wheel::-webkit-scrollbar { display: none; }
+    .tp-wheel-item {
+      height: 44px; display: flex; align-items: center; justify-content: center;
+      scroll-snap-align: center; font-size: 19px; font-weight: 600;
+      color: var(--muted-fg); cursor: pointer; user-select: none;
+      font-variant-numeric: tabular-nums; transition: color .1s, opacity .1s;
+    }
+    .tp-wheel-item.active { color: var(--foreground); }
+    .tp-center-bar {
+      position: absolute; pointer-events: none; top: 50%; transform: translateY(-50%);
+      left: 0; right: 0; height: 44px;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .tp-fade-top {
+      position: absolute; top: 0; left: 0; right: 0; height: 78px; pointer-events: none;
+      background: linear-gradient(to bottom, var(--card) 30%, transparent);
+    }
+    .tp-fade-bot {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 78px; pointer-events: none;
+      background: linear-gradient(to top, var(--card) 30%, transparent);
+    }
+    .tp-footer { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--border); }
     .tp-cancel-btn {
-      flex: 1; height: 32px; border-radius: 7px; border: 1px solid var(--border);
+      flex: 1; height: 34px; border-radius: 8px; border: 1px solid var(--border);
       background: var(--muted); color: var(--foreground); font-size: 13px; font-weight: 500;
       font-family: var(--font); cursor: pointer; transition: background .12s;
     }
     .tp-cancel-btn:hover { background: var(--border); }
     .tp-set-btn {
-      flex: 1; height: 32px; border-radius: 7px; border: none;
+      flex: 1; height: 34px; border-radius: 8px; border: none;
       background: var(--foreground); color: var(--background); font-size: 13px; font-weight: 600;
       font-family: var(--font); cursor: pointer; transition: opacity .12s;
     }
@@ -890,7 +905,7 @@
             <span class="section-label" id="rcDayLabel">Today</span>
           </div>
           <div class="badge badge-neutral" id="leaveChip">
-            Leave at&nbsp;<strong id="leaveAt" style="color:var(--foreground)">—</strong>
+            <strong id="leaveAt" style="color:var(--foreground)">—</strong>
           </div>
         </div>
         <div class="rc-body">
@@ -944,9 +959,9 @@
           <button type="button" class="shift-tp-btn" id="loginTpBtn" onclick="openTpModal('loginInput',event)" title="Pick start time">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </button>
-          <input class="shift-combo-input" id="loginInput" type="text" placeholder="Custom Start Time" autocomplete="off" spellcheck="false">
+          <input class="shift-combo-input" id="loginInput" type="text" placeholder="Enter Time" autocomplete="off" spellcheck="false">
           <span class="shift-combo-active-label" id="shiftActiveLabel">—</span>
-          <button class="shift-combo-btn" id="calcBtn">Start Shift</button>
+          <button class="shift-combo-btn" id="calcBtn">Quick Start</button>
         </div>
         <!-- Resume row (after End Session or auto-stop) -->
         <div class="shift-resume-row" id="resumeRow" style="display:none">
@@ -1149,7 +1164,6 @@
           <div class="toggle-row">
             <div>
               <div class="form-label">Weekly Target</div>
-              <div class="form-sub">Carry-over &amp; early Fridays</div>
             </div>
             <label class="toggle">
               <input type="checkbox" id="inpWeeklyOn" checked="">
@@ -1304,24 +1318,20 @@
   <!-- Import/Export Toast -->
   <div class="ie-toast" id="ieToast"></div>
 
-  <!-- ── Design-system Time Picker Modal ── -->
+  <!-- ── Wheel Time Picker Modal ── -->
   <div id="tpModal" class="tp-modal">
-    <div class="tp-time-row">
-      <div class="tp-unit">
-        <button class="tp-step-btn" onclick="tpStep('h',1)" tabindex="-1">▲</button>
-        <input class="tp-num" id="tpH" value="12" maxlength="2" inputmode="numeric" oninput="tpSyncFromInput('h')" onfocus="this.select()">
-        <button class="tp-step-btn" onclick="tpStep('h',-1)" tabindex="-1">▼</button>
-      </div>
-      <div class="tp-sep">:</div>
-      <div class="tp-unit">
-        <button class="tp-step-btn" onclick="tpStep('m',1)" tabindex="-1">▲</button>
-        <input class="tp-num" id="tpM" value="00" maxlength="2" inputmode="numeric" oninput="tpSyncFromInput('m')" onfocus="this.select()">
-        <button class="tp-step-btn" onclick="tpStep('m',-1)" tabindex="-1">▼</button>
-      </div>
+    <div class="tp-modal-header">
+      <span class="tp-modal-title" id="tpModalTitle">Set Time</span>
     </div>
-    <div class="tp-ampm">
-      <button class="tp-ampm-btn active" id="tpAM" onclick="tpSetAmPm('AM')">AM</button>
-      <button class="tp-ampm-btn" id="tpPM" onclick="tpSetAmPm('PM')">PM</button>
+    <div class="tp-wheels-wrap">
+      <div class="tp-wheels">
+        <div class="tp-wheel" id="tpWheelH"></div>
+        <div class="tp-wheel" id="tpWheelM"></div>
+        <div class="tp-wheel" id="tpWheelAp"></div>
+      </div>
+      <div class="tp-center-bar"></div>
+      <div class="tp-fade-top"></div>
+      <div class="tp-fade-bot"></div>
     </div>
     <div class="tp-footer">
       <button class="tp-cancel-btn" onclick="closeTpModal()">Cancel</button>
@@ -1963,30 +1973,20 @@
       const clockSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
 
       const ioHtml = `<div class="rc-io-row">
-        <div class="rc-io-box${loginDate ? ' editable' : ''}" id="inTimeBox" ${loginDate ? 'onclick="toggleInTimeEdit()"' : ''}>
-          <div class="rc-io-label">Logged In</div>
+        <div class="rc-io-box${loginDate ? ' editable' : ''}" id="inTimeBox" ${loginDate ? `onclick="openTpModal('inTimeEditInput',event,'Log In',()=>saveInTimeEdit())"` : ''}>
+          <div class="rc-io-label">Log In</div>
           <div class="rc-io-val-row">
             <div class="rc-io-val" id="metaLogin">${inVal}</div>
           </div>
-          <div class="rc-io-inline-edit" id="inTimeEditWrap" style="position:relative;margin-top:5px">
-            <input class="rc-io-inline-input" id="inTimeEditInput" type="text" placeholder="${short(loginDate||new Date())}" autocomplete="off" onclick="event.stopPropagation()">
-            <button class="tp-icon-btn" style="position:relative;right:auto;top:auto;transform:none;width:24px;height:24px;flex-shrink:0" onclick="event.stopPropagation();openTpModal('inTimeEditInput',event)" title="Pick time">${clockSvg}</button>
-            <button class="rc-io-save-btn" onclick="event.stopPropagation();saveInTimeEdit()">Save</button>
-            <button class="rc-io-cancel-btn" onclick="event.stopPropagation();toggleInTimeEdit()" title="Cancel">✕</button>
-          </div>
+          <input type="hidden" id="inTimeEditInput" value="${inVal}">
         </div>
-        <div class="rc-io-box editable" id="outTimeBox" onclick="toggleOutTargetEdit()">
+        <div class="rc-io-box editable" id="outTimeBox" onclick="openTpModal('outTargetEditInput',event,'${outLabel}',()=>saveOutTargetEdit())">
           <div class="rc-io-label">${outLabel}</div>
           <div class="rc-io-val-row">
             <div class="rc-io-val" id="metaTarget" style="${earlyTarget ? 'color:var(--blue)' : ''}">${outVal}</div>
             ${earlyTarget ? `<button class="rc-io-edit-btn" title="Clear target" onclick="event.stopPropagation();clearOutTarget()" style="color:var(--muted-fg)">✕</button>` : ''}
           </div>
-          <div class="rc-io-inline-edit" id="outTargetEditWrap" style="position:relative;margin-top:5px">
-            <input class="rc-io-inline-input" id="outTargetEditInput" type="text" placeholder="e.g. 5:30 PM" autocomplete="off" value="${earlyTarget||''}" onclick="event.stopPropagation()">
-            <button class="tp-icon-btn" style="position:relative;right:auto;top:auto;transform:none;width:24px;height:24px;flex-shrink:0" onclick="event.stopPropagation();openTpModal('outTargetEditInput',event)" title="Pick time">${clockSvg}</button>
-            <button class="rc-io-save-btn" onclick="event.stopPropagation();saveOutTargetEdit()" style="background:var(--blue)">Set</button>
-            <button class="rc-io-cancel-btn" onclick="event.stopPropagation();toggleOutTargetEdit()" title="Cancel">✕</button>
-          </div>
+          <input type="hidden" id="outTargetEditInput" value="${earlyTarget||''}">
           ${eltStatusHtml ? `<div style="margin-top:4px">${eltStatusHtml}</div>` : ''}
         </div>
       </div>`;
@@ -2015,44 +2015,90 @@
       };
     }
 
-    // ── DESIGN-SYSTEM TIME PICKER MODAL ─────────────────
-    let _tpTargetId = null, _tpH = 12, _tpM = 0, _tpAp = 'AM';
+    // ── WHEEL TIME PICKER ────────────────────────────────
+    let _tpTargetId = null, _tpCallback = null;
+    let _tpHIdx = 11, _tpMIdx = 0, _tpApIdx = 0;
+    const TP_HOURS = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+    const TP_MINS  = Array.from({length:60}, (_, i) => String(i).padStart(2, '0'));
+    const TP_AMPM  = ['AM', 'PM'];
+    const TP_ITEM_H = 44;
 
-    function openTpModal(targetInputId, event) {
+    function _tpPopulateWheel(id, items, selectedIdx) {
+      const wheel = el(id);
+      if (!wheel) return;
+      wheel.innerHTML = items.map((v, i) =>
+        `<div class="tp-wheel-item${i === selectedIdx ? ' active' : ''}" data-idx="${i}">${v}</div>`
+      ).join('');
+      requestAnimationFrame(() => { wheel.scrollTop = selectedIdx * TP_ITEM_H; });
+    }
+
+    function _tpInitWheels() {
+      ['tpWheelH', 'tpWheelM', 'tpWheelAp'].forEach(wheelId => {
+        const wheel = el(wheelId);
+        if (!wheel) return;
+        let _snapTimer;
+        wheel.addEventListener('scroll', () => {
+          clearTimeout(_snapTimer);
+          _snapTimer = setTimeout(() => {
+            const items = wheelId === 'tpWheelH' ? TP_HOURS : wheelId === 'tpWheelM' ? TP_MINS : TP_AMPM;
+            const idx = Math.max(0, Math.min(items.length - 1, Math.round(wheel.scrollTop / TP_ITEM_H)));
+            wheel.scrollTo({ top: idx * TP_ITEM_H, behavior: 'smooth' });
+            wheel.querySelectorAll('.tp-wheel-item').forEach(item =>
+              item.classList.toggle('active', +item.dataset.idx === idx));
+            if (wheelId === 'tpWheelH')  _tpHIdx  = idx;
+            if (wheelId === 'tpWheelM')  _tpMIdx  = idx;
+            if (wheelId === 'tpWheelAp') _tpApIdx = idx;
+          }, 80);
+        }, { passive: true });
+        // Click to scroll
+        wheel.addEventListener('click', e => {
+          const item = e.target.closest('.tp-wheel-item');
+          if (!item) return;
+          wheel.scrollTo({ top: +item.dataset.idx * TP_ITEM_H, behavior: 'smooth' });
+        });
+      });
+    }
+
+    function openTpModal(targetInputId, event, title, onConfirm) {
       if (event) { event.stopPropagation(); event.preventDefault(); }
       _tpTargetId = targetInputId;
+      _tpCallback = onConfirm || null;
       const modal = el('tpModal');
       if (!modal) return;
+
+      const titleEl = el('tpModalTitle');
+      if (titleEl) titleEl.textContent = title || 'Set Time';
 
       // Pre-fill from current field value
       const inp = el(targetInputId);
       if (inp) {
-        const parsed = parse(inp.value.trim());
+        const parsed = parse((inp.value || '').trim());
         if (parsed) {
-          let h = parsed.getHours(), m = parsed.getMinutes();
-          _tpAp = h >= 12 ? 'PM' : 'AM';
-          _tpH  = h % 12 || 12;
-          _tpM  = m;
-        } else { _tpH = 12; _tpM = 0; _tpAp = 'AM'; }
+          const h = parsed.getHours(), m = parsed.getMinutes();
+          _tpApIdx = h >= 12 ? 1 : 0;
+          _tpHIdx  = (h % 12 || 12) - 1;
+          _tpMIdx  = m;
+        } else { _tpHIdx = 11; _tpMIdx = 0; _tpApIdx = 0; }
       }
-      tpSyncUI();
 
-      // Position below the triggering element's input
-      const inpEl = el(targetInputId);
-      const refRect = inpEl ? inpEl.getBoundingClientRect()
-                     : (event?.currentTarget || event?.target)?.getBoundingClientRect();
+      // Position
+      const refEl = el(targetInputId) || event?.currentTarget || event?.target;
+      const refRect = refEl?.getBoundingClientRect();
       if (refRect) {
-        const mW = 212, mH = 180;
-        let top  = refRect.bottom + 6;
-        let left = refRect.left;
+        const mW = 256, mH = 310;
+        let top = refRect.bottom + 6, left = refRect.left;
         if (left + mW > window.innerWidth - 8) left = window.innerWidth - mW - 8;
         if (left < 8) left = 8;
         if (top + mH > window.innerHeight - 8) top = refRect.top - mH - 6;
-        modal.style.top  = top + 'px';
-        modal.style.left = left + 'px';
+        modal.style.top = top + 'px'; modal.style.left = left + 'px';
       }
       modal.classList.add('open');
-      // Close when clicking outside
+
+      // Populate wheels after modal is visible
+      _tpPopulateWheel('tpWheelH',  TP_HOURS, _tpHIdx);
+      _tpPopulateWheel('tpWheelM',  TP_MINS,  _tpMIdx);
+      _tpPopulateWheel('tpWheelAp', TP_AMPM,  _tpApIdx);
+
       setTimeout(() => document.addEventListener('mousedown', _tpOutsideClick), 10);
     }
 
@@ -2060,8 +2106,7 @@
       const modal = el('tpModal');
       if (modal && modal.classList.contains('open') && !modal.contains(e.target)) {
         closeTpModal();
-      } else if (modal && modal.contains(e.target)) {
-        // re-attach
+      } else if (modal?.contains(e.target)) {
         setTimeout(() => document.addEventListener('mousedown', _tpOutsideClick), 10);
       }
       document.removeEventListener('mousedown', _tpOutsideClick);
@@ -2070,49 +2115,24 @@
     function closeTpModal() {
       el('tpModal')?.classList.remove('open');
       document.removeEventListener('mousedown', _tpOutsideClick);
-      _tpTargetId = null;
+      _tpTargetId = null; _tpCallback = null;
     }
 
     function confirmTpModal() {
       if (!_tpTargetId) { closeTpModal(); return; }
       const inp = el(_tpTargetId);
       if (inp) {
-        const h24 = _tpAp === 'PM' ? (_tpH === 12 ? 12 : _tpH + 12) : (_tpH === 12 ? 0 : _tpH);
-        const d = new Date(); d.setHours(h24, _tpM, 0, 0);
+        const h = _tpHIdx + 1, m = _tpMIdx, ap = TP_AMPM[_tpApIdx];
+        const h24 = ap === 'PM' ? (h === 12 ? 12 : h + 12) : (h === 12 ? 0 : h);
+        const d = new Date(); d.setHours(h24, m, 0, 0);
         inp.value = short(d);
         inp.dispatchEvent(new Event('input',  { bubbles: true }));
         inp.dispatchEvent(new Event('change', { bubbles: true }));
       }
+      const cb = _tpCallback;
       closeTpModal();
+      if (cb) cb();
     }
-
-    function tpSyncUI() {
-      const hEl = el('tpH'), mEl = el('tpM');
-      if (hEl) hEl.value = String(_tpH).padStart(2, '0');
-      if (mEl) mEl.value = String(_tpM).padStart(2, '0');
-      el('tpAM')?.classList.toggle('active', _tpAp === 'AM');
-      el('tpPM')?.classList.toggle('active', _tpAp === 'PM');
-    }
-
-    function tpStep(unit, dir) {
-      if (unit === 'h') { _tpH = ((_tpH - 1 + dir + 12) % 12) + 1; }
-      else { _tpM = ((_tpM + dir * 5) % 60 + 60) % 60; }
-      tpSyncUI();
-    }
-
-    function tpSyncFromInput(unit) {
-      if (unit === 'h') {
-        let v = parseInt(el('tpH')?.value, 10);
-        if (isNaN(v) || v < 1) v = 1; if (v > 12) v = 12;
-        _tpH = v;
-      } else {
-        let v = parseInt(el('tpM')?.value, 10);
-        if (isNaN(v) || v < 0) v = 0; if (v > 59) v = 59;
-        _tpM = v;
-      }
-    }
-
-    function tpSetAmPm(ap) { _tpAp = ap; tpSyncUI(); }
 
     // ── EDITABLE IN TIME (today, active session) ──────
     function toggleInTimeEdit() {
@@ -2264,6 +2284,13 @@
       return `Stay till ${short(leaveTimeToday)} today · leave at ${short(targetDayLeave)} on ${targetDayName}.`;
     }
 
+    // ── TODAY DATE CHIP ───────────────────────────────
+    function _setTodayDateChip() {
+      const d = new Date();
+      const chip = el('leaveAt');
+      if (chip) chip.textContent = DAYS[d.getDay()].slice(0,3) + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate();
+    }
+
     // ── EMPTY STATE ────────────────────────────────────
     function renderEmptyState() {
       const eff = effSecs();
@@ -2271,13 +2298,13 @@
       el('rcWorked').textContent = '—';
       el('rcWorked').style.color = 'var(--muted-fg)';
       el('rcElapsedLabel').textContent = 'Not Started';
-      el('leaveAt').textContent = _logE.earlyLeaveTarget || '—';
+      _setTodayDateChip();
       el('rcRightCol').style.display = 'block';
       el('rcRemaining').textContent = dur(eff);
       el('rcRemaining').style.color = 'var(--muted-fg)';
       el('progFill').style.width = '0%';
       el('progFill').classList.remove('done');
-      el('progLabel').textContent = 'Start Shift to Begin Tracking';
+      el('progLabel').textContent = '';
       el('rcToday').innerHTML = buildTargetHtml(eff);
       el('stayHint').style.display = 'none';
       el('otBanner').classList.remove('show');
@@ -2342,7 +2369,7 @@
       // "Leave at" badge: prefer personal Out Time target if set
       const _tkNow = todayKey(), _logNow = dayLog(_tkNow) || {};
       const _earlyTarget = _logNow.earlyLeaveTarget;
-      el('leaveAt').textContent = _earlyTarget ? _earlyTarget : (eff > 0 ? short(leaveDate) : 'Now');
+      _setTodayDateChip();
 
       if (!isDone && eff > 0) {
         el('rcRemaining').textContent = dur(eff - worked);
@@ -2558,7 +2585,7 @@
         el('rcWorked').textContent = 'All Day Leave';
         el('rcWorked').style.color = '#3b82f6';
         el('rcRightCol').style.display = 'none';
-        el('leaveAt').textContent = '—';
+        _setTodayDateChip();
         el('progFill').style.width = '0%';
         el('progFill').classList.remove('done');
         el('progLabel').textContent = 'Day marked as All Day Leave';
@@ -2573,7 +2600,7 @@
         el('rcWorked').textContent = 'Holiday';
         el('rcWorked').style.color = '#22c55e';
         el('rcRightCol').style.display = 'none';
-        el('leaveAt').textContent = '—';
+        _setTodayDateChip();
         el('progFill').style.width = '0%';
         el('progFill').classList.remove('done');
         el('progLabel').textContent = 'Day marked as Holiday';
@@ -2586,12 +2613,12 @@
 
       if (!log || log.hoursWorked == null) {
         el('rcWorked').textContent = '—'; el('rcWorked').style.color = 'var(--muted-fg)';
-        el('leaveAt').textContent = '—';
+        _setTodayDateChip();
         el('rcRightCol').style.display = 'block';
         el('rcRemaining').textContent = dur(target); el('rcRemaining').style.color = 'var(--muted-fg)';
         el('progFill').style.width = '0%'; el('progFill').classList.remove('done');
         el('progLabel').textContent = 'No data logged for this day';
-        el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">Today's Target</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Logged In</div><div class="rc-io-val" id="metaLogin">—</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">—</div></div></div>`;
+        el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">Today's Target</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">—</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">—</div></div></div>`;
         el('stayHint').style.display = 'none';
         el('otBanner').classList.remove('show'); el('doneBanner').classList.remove('show');
         return;
@@ -2617,11 +2644,11 @@
       el('progFill').style.width = pct.toFixed(1) + '%';
       el('progFill').classList.toggle('done', isDone);
       el('progLabel').textContent = isDone ? `Target reached · ${dur(worked)} logged` : `${Math.floor(pct)}% complete`;
-      el('leaveAt').textContent = log.checkoutDisplay || '—';
+      _setTodayDateChip();
       el('stayHint').style.display = 'none';
       const loginDisp = log.loginDisplay || '—';
       const outDisp   = log.checkoutDisplay || '—';
-      el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">Today's Target</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Logged In</div><div class="rc-io-val" id="metaLogin">${loginDisp}</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">${outDisp}</div></div></div>`;
+      el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">Today's Target</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">${loginDisp}</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">${outDisp}</div></div></div>`;
     }
 
     // ── HISTORY CARD ───────────────────────────────────
@@ -2667,7 +2694,7 @@
           // Override config
           const OV_CFG = {
             holiday: { label: 'Holiday',       color: '#22c55e', bg: 'rgba(34,197,94,.12)',  border: 'rgba(34,197,94,.3)'  },
-            leave:   { label: 'All Day Leave',  color: '#3b82f6', bg: 'rgba(59,130,246,.12)', border: 'rgba(59,130,246,.3)' },
+            leave:   { label: 'On Leave',        color: '#3b82f6', bg: 'rgba(59,130,246,.12)', border: 'rgba(59,130,246,.3)' },
             halfday: { label: 'Half Day',       color: '#a855f7', bg: 'rgba(168,85,247,.12)', border: 'rgba(168,85,247,.3)' },
           };
           const { label, color, bg, border } = OV_CFG[ov];
@@ -2732,8 +2759,8 @@
             // Centered "Missing Data" badge like override rows
             row.style.position = 'relative';
             const missBadge = document.createElement('div');
-            missBadge.style.cssText = 'position:absolute;left:50%;transform:translateX(-50%);font-size:11px;font-weight:600;color:var(--muted-fg);background:var(--muted);border:1px dashed var(--border);padding:2px 10px;border-radius:20px;letter-spacing:.2px;pointer-events:none;font-style:italic';
-            missBadge.textContent = 'Missing Data';
+            missBadge.style.cssText = 'position:absolute;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:var(--destructive);background:var(--destructive-bg);border:1px solid var(--destructive-border);padding:2px 12px;border-radius:20px;letter-spacing:.3px;pointer-events:none';
+            missBadge.textContent = 'Missing Entry';
             row.appendChild(missBadge);
             // add edit button (created inline here since editBtn hasn't been declared yet)
             const missEditBtn = document.createElement('button');
@@ -2997,10 +3024,10 @@
       // Pizza icon (Lucide) for holiday
       const pizzaSvg = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 11h.01"/><path d="M11 15h.01"/><path d="M16 16h.01"/><path d="m2 16 20 6-6-20A20 20 0 0 0 2 16"/><path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"/></svg>`;
 
-      function ringItem(dayName, pct, strokeColor, trackColor, labelHtml, extraStyle='') {
+      function ringItem(dayName, pct, strokeColor, trackColor, labelHtml, extraStyle='', tip='') {
         const dash   = CIRC * Math.max(0, Math.min(1, pct));
         const offset = CIRC - dash;
-        return `<div class="sc-item">
+        return `<div class="sc-item"${tip ? ` data-tip="${tip}"` : ''}>
           <div style="position:relative;width:52px;height:52px${extraStyle}">
             <svg width="52" height="52" viewBox="0 0 44 44" style="position:absolute;inset:0;overflow:visible">
               <circle cx="22" cy="22" r="20" fill="none" stroke="${trackColor}" stroke-width="3"/>
@@ -3025,21 +3052,22 @@
           const pct    = c.dailyH > 0 ? worked / (c.dailyH * 3600) : 0;
           return ringItem(dName, pct, 'var(--success)', 'var(--success-border)',
             `<div class="dot-live"></div>`,
-            ';animation:blink 1.6s ease-in-out infinite');
+            ';animation:blink 1.6s ease-in-out infinite',
+            `Live · ${dur(worked)}`);
         }
 
         // Holiday → pizza icon, no ring
         if (log?.override === 'holiday') {
-          return `<div class="sc-item">
+          return `<div class="sc-item" data-tip="Holiday">
             <div style="width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(34,197,94,.1);border:1.5px solid rgba(34,197,94,.3);color:#22c55e">${pizzaSvg}</div>
             <div class="sc-day-label">${dName.slice(0,3)}</div>
           </div>`;
         }
 
-        // All Day Leave → flat muted circle, no stroke
+        // All Day Leave → flat blue-tinted circle with "Leave" label
         if (log?.override === 'leave') {
-          return `<div class="sc-item">
-            <div style="width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--muted);border:1.5px solid var(--border);font-size:8px;font-weight:700;color:var(--muted-fg);letter-spacing:.05em;text-align:center;line-height:1.2">ALL<br>DAY</div>
+          return `<div class="sc-item" data-tip="On Leave">
+            <div style="width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(59,130,246,.1);border:1.5px solid rgba(59,130,246,.3);font-size:9px;font-weight:700;color:#3b82f6;letter-spacing:.04em;text-align:center">Leave</div>
             <div class="sc-day-label">${dName.slice(0,3)}</div>
           </div>`;
         }
@@ -3048,7 +3076,8 @@
         if (log?.override === 'halfday') {
           const halfDash   = CIRC / 2;
           const halfOffset = CIRC - halfDash;
-          return `<div class="sc-item">
+          const hdWorked   = log?.hoursWorked ? dur(log.hoursWorked * 3600) : 'Half day';
+          return `<div class="sc-item" data-tip="Half Day · ${hdWorked}">
             <div style="position:relative;width:52px;height:52px">
               <svg width="52" height="52" viewBox="0 0 44 44" style="position:absolute;inset:0;overflow:visible">
                 <circle cx="22" cy="22" r="20" fill="none" stroke="rgba(168,85,247,.2)" stroke-width="3"/>
@@ -3073,18 +3102,21 @@
             const half  = (extra - whole) >= 0.4 && (extra - whole) < 0.9;
             const lbl   = half ? `+${whole}.5H` : `+${whole}H`;
             return ringItem(dName, 1, 'var(--success)', 'var(--success-border)',
-              `<span style="font-size:9px;font-weight:700;color:var(--success);letter-spacing:-.2px">${lbl}</span>`);
+              `<span style="font-size:9px;font-weight:700;color:var(--success);letter-spacing:-.2px">${lbl}</span>`,
+              '', `${dur(log.hoursWorked * 3600)} logged · +${dur(diff)} surplus`);
           } else if (diff < -300) {
             return ringItem(dName, pct, 'var(--destructive)', 'var(--destructive-bg)',
-              `<span style="font-size:10px;font-weight:700;color:var(--destructive)">!</span>`);
+              `<span style="font-size:10px;font-weight:700;color:var(--destructive)">!</span>`,
+              '', `${dur(log.hoursWorked * 3600)} logged · ${dur(Math.abs(diff))} short`);
           } else {
             return ringItem(dName, pct, 'var(--foreground)', 'var(--border)',
-              `<span style="font-size:12px;font-weight:700;color:var(--foreground)">✓</span>`);
+              `<span style="font-size:12px;font-weight:700;color:var(--foreground)">✓</span>`,
+              '', `${dur(log.hoursWorked * 3600)} logged`);
           }
         }
 
         // No data
-        return `<div class="sc-item">
+        return `<div class="sc-item" data-tip="No entry">
           <div style="position:relative;width:52px;height:52px">
             <svg width="52" height="52" viewBox="0 0 44 44" style="position:absolute;inset:0">
               <circle cx="22" cy="22" r="20" fill="none" stroke="var(--border)" stroke-width="3"/>
@@ -3247,32 +3279,12 @@
 
         _penaltyData = penalties;
 
-        const warnHtml = (() => {
-          if (!currentWk) return '';
-          const currentWkDays = currentWk.days.map(d => ({ key: dateKey(d), date: d }));
-          const adjTarget  = adjustedWeeklyTarget(currentWkDays);
-          const adjH       = (adjTarget / 3600).toFixed(1).replace(/\.0$/, '');
-          const remaining  = adjTarget - currentWkSecs;
-          if (remaining <= 0) return `<div class="penalty-row" style="padding:10px 16px;display:flex;align-items:center;gap:8px;background:var(--success-bg);border-bottom:1px solid var(--success-border)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size:12px;color:var(--success);font-weight:500">This week's target met — ${dur(currentWkSecs)} logged</span></div>`;
-          return `<div class="penalty-row" style="padding:10px 16px;display:flex;align-items:center;gap:8px;background:var(--blue-bg);border-bottom:1px solid var(--blue-border)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span style="font-size:12px;color:var(--blue);font-weight:500">This week: ${dur(currentWkSecs)} of ${adjH}h — ${dur(Math.abs(remaining))} remaining</span></div>`;
-        })();
-
         if (!penalties.length) {
-          container.innerHTML = `
-            <div class="penalty-row" style="background:var(--muted);padding:10px 16px">
-              <span class="section-label">Weekly Penalty Report · ${now.toLocaleString('default',{month:'long'})} ${now.getFullYear()}</span>
-            </div>` +
-            warnHtml +
-            '<div class="penalty-empty">No weekly penalties this month.</div>';
+          container.innerHTML = '<div class="penalty-empty">No weekly penalties this month.</div>';
           return;
         }
 
-        container.innerHTML = `
-          <div class="penalty-row" style="background:var(--muted);padding:10px 16px">
-            <span class="section-label">Weekly Penalty Report · ${now.toLocaleString('default',{month:'long'})} ${now.getFullYear()}</span>
-          </div>` +
-          warnHtml +
-          penalties.map(p => {
+        container.innerHTML = penalties.map(p => {
             const dateStr = `Week of ${p.rangeStr}`;
             const adjH = ((adjustedWeeklyTarget(p.wkDays.map(d=>({key:dateKey(d),date:d}))))/3600).toFixed(1).replace(/\.0$/,'');
             const desc = `${dur(p.totalSecs)} logged — ${dur(p.deficit)} short of ${adjH}h adjusted target`;
@@ -4229,6 +4241,8 @@ ${c.name || '[Your Name]'}`;
 
     // ── INIT ───────────────────────────────────────────
     (function init() {
+      _tpInitWheels();
+      _setTodayDateChip();
       setInterval(tickHeader, 1000);
       tickHeader();
 
