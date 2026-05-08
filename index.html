@@ -7,7 +7,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>WH Calculator</title>
+  <title>WH Tracker</title>
   <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='%2309090b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='3' width='20' height='14' rx='2'/%3E%3Cpath d='M8 21h8m-4-4v4'/%3E%3Ccircle cx='12' cy='10' r='3' fill='%2309090b' stroke='none'/%3E%3Cpath d='M9 10c0-.8.4-1.5 1-2M15 10c0-.8-.4-1.5-1-2' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link href="./WH Calculator_files/css2" rel="stylesheet">
@@ -477,6 +477,8 @@
     .penalty-date { font-size: 13px; font-weight: 600; color: var(--foreground); }
     .penalty-delta { font-size: 11px; color: var(--warning); font-weight: 500; }
     .penalty-empty { padding: 20px 16px; text-align: center; font-size: 13px; color: var(--muted-fg); }
+    @keyframes shimmer { 0%{opacity:.4} 50%{opacity:.8} 100%{opacity:.4} }
+    .skeleton-row { height: 44px; border-radius: 8px; background: var(--muted); margin: 6px 0; animation: shimmer 1.2s ease-in-out infinite; }
 
     /* Email modal */
     .email-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5);
@@ -1113,40 +1115,16 @@
       </div></div></div>
         <div class="wk-footer" id="wkFooter">
           <div class="wk-footer-row">
-            <span class="section-label">Week Total</span>
+            <span class="section-label">Total Hours</span>
             <span class="wk-footer-val" id="wkTotal">14h 57m / 45h</span>
+          </div>
+          <div class="wk-footer-row" style="margin-top:6px">
+            <span class="section-label" style="color:var(--muted-fg)">Surplus</span>
+            <span class="wk-footer-val" id="wkSurplus" style="color:var(--muted-fg)">+0m</span>
           </div>
         </div>
       </div>
 
-      <!-- Extra Hours (surplus circles) -->
-      <div class="analytics-card">
-        <div class="analytics-card-head">
-          <span class="analytics-card-title">Extra Hours</span>
-        </div>
-        <div class="analytics-card-body">
-          <div class="sc-row" id="surplusCircles"><div class="sc-item">
-          <div class="sc-dot deficit">–</div>
-          <div class="sc-day-label">Monday</div>
-        </div><div class="sc-item">
-          <div class="sc-dot surplus">14H</div>
-          <div class="sc-day-label">Tuesday</div>
-        </div><div class="sc-item">
-          <div class="sc-dot neutral">–</div>
-          <div class="sc-day-label">Wednesday</div>
-        </div><div class="sc-item">
-          <div class="sc-dot neutral">–</div>
-          <div class="sc-day-label">Thursday</div>
-        </div><div class="sc-item">
-          <div class="sc-dot neutral">–</div>
-          <div class="sc-day-label">Friday</div>
-        </div></div>
-          <div class="sc-total-row">
-            <span class="sc-total-label">Total Extra</span>
-            <span class="sc-total-val" id="scTotalVal" style="color: var(--success);">+5h 57m extra</span>
-          </div>
-        </div>
-      </div>
 
       <!-- Penalty Checker -->
       <div class="analytics-card">
@@ -2493,7 +2471,8 @@
       _setTodayDateChip();
 
       if (!isDone && eff > 0) {
-        el('rcRemaining').textContent = dur(eff - worked);
+        const rem = eff - worked;
+        el('rcRemaining').textContent = rem < 60 ? `${Math.max(0, rem)}s` : dur(rem);
         el('rcRightCol').style.display = 'block';
         el('otBanner').classList.remove('show');
       } else if (isDone) {
@@ -2533,6 +2512,15 @@
         el('doneBanner').classList.remove('show');
       }
 
+      if (isDone) {
+        if (el('calcBtn').dataset.state !== 'ending') {
+          el('calcBtn').textContent = 'End Shift';
+          el('calcBtn').dataset.state = 'ending';
+        }
+      } else if (el('calcBtn').dataset.state === 'ending') {
+        el('calcBtn').textContent = 'Pause';
+        el('calcBtn').dataset.state = 'running';
+      }
       if (isDone && !wasDone) wasDone = true;
       else if (!isDone) wasDone = false;
 
@@ -2790,7 +2778,7 @@
       const rows = el('wkRows');
       if (!rows) return;
       rows.innerHTML = '';
-      let totalSecs = 0;
+      let totalSecs = 0, totalSurplusSecs = 0;
 
       for (const day of wk) {
         const log = dayLog(day.key);
@@ -2814,9 +2802,9 @@
 
           // Override config
           const OV_CFG = {
-            holiday: { label: 'Holiday',       color: '#22c55e', bg: 'rgba(34,197,94,.12)',  border: 'rgba(34,197,94,.3)'  },
-            leave:   { label: 'On Leave',        color: '#3b82f6', bg: 'rgba(59,130,246,.12)', border: 'rgba(59,130,246,.3)' },
-            halfday: { label: 'Half Day',       color: '#a855f7', bg: 'rgba(168,85,247,.12)', border: 'rgba(168,85,247,.3)' },
+            holiday: { label: 'Holiday',  color: '#a855f7', bg: 'rgba(168,85,247,.12)', border: 'rgba(168,85,247,.3)' },
+            leave:   { label: 'On Leave', color: '#3b82f6', bg: 'rgba(59,130,246,.12)', border: 'rgba(59,130,246,.3)'  },
+            halfday: { label: 'Half Day', color: '#0ea5e9', bg: 'rgba(14,165,233,.12)', border: 'rgba(14,165,233,.3)'  },
           };
           const { label, color, bg, border } = OV_CFG[ov];
 
@@ -2851,9 +2839,7 @@
           // Normal rows
           const dayEl = document.createElement('div');
           dayEl.className = 'wk-day';
-          let tagHtml = '';
-          if (log?.sessionTag === 'edited') tagHtml = '<span class="tag-pill tag-edited">Edited</span>';
-          dayEl.innerHTML = (isToday ? `${day.name} (Today)` : day.name) + tagHtml;
+          dayEl.textContent = isToday ? `${day.name} (Today)` : day.name;
           row.appendChild(dayEl);
 
           const rightWrap = document.createElement('div');
@@ -2863,17 +2849,21 @@
           const isPastDay = !isToday && day.date < new Date();
           if (isToday && loginDate) {
             const ds = Math.max(0, Math.floor((new Date() - loginDate) / 1000));
-            pill.className = 'wk-pill live' + (early ? ' early' : '');
-            pill.innerHTML = (early ? ICON_RABBIT + ' ' : '') + `<span class="dot-live"></span>${dur(ds)}`;
+            pill.className = 'wk-pill live';
+            pill.innerHTML = `<span class="dot-live"></span>${dur(ds)}`;
             totalSecs += ds;
+            totalSurplusSecs += Math.max(0, ds - c.dailyH * 3600);
           } else if (log?.hoursWorked != null) {
             const diff = wSecs - c.dailyH * 3600;
-            let cls = 'wk-pill';
-            if (early && diff > 120) cls = 'wk-pill early';
-            else if (diff > 120) cls = 'wk-pill surplus';
-            else if (diff < -120) cls = 'wk-pill deficit';
-            pill.className = cls;
-            pill.innerHTML = (early ? ICON_RABBIT + ' ' : late ? ICON_SNAIL + ' ' : '') + dur(wSecs);
+            pill.className = 'wk-pill';
+            if (diff > 120) {
+              const surpH = Math.floor(diff / 3600), surpM = Math.floor((diff % 3600) / 60);
+              const surpStr = surpH > 0 ? `+${surpH}h${surpM > 0 ? ' ' + surpM + 'm' : ''}` : `+${Math.floor(diff/60)}m`;
+              pill.innerHTML = `${dur(wSecs)} <span style="color:var(--success);font-weight:600">${surpStr}</span>`;
+              totalSurplusSecs += diff;
+            } else {
+              pill.textContent = dur(wSecs);
+            }
             totalSecs += wSecs;
           } else if (isPastDay) {
             // Centered "Missing Data" badge like override rows
@@ -2914,6 +2904,18 @@
       el('wkTotal').textContent = c2.weeklyOn
         ? `${dur(totalSecs)} / ${adjH}h`
         : dur(totalSecs);
+
+      const surpEl = el('wkSurplus');
+      if (surpEl) {
+        if (totalSurplusSecs > 60) {
+          const sh = Math.floor(totalSurplusSecs / 3600), sm = Math.floor((totalSurplusSecs % 3600) / 60);
+          surpEl.textContent = sm > 0 ? `+${sh}h ${sm}m` : `+${sh}h`;
+          surpEl.style.color = 'var(--success)';
+        } else {
+          surpEl.textContent = '+0m';
+          surpEl.style.color = 'var(--muted-fg)';
+        }
+      }
 
       renderNotifs();
       // Refresh day-selector dots when history changes
@@ -3141,7 +3143,6 @@
       el('wkNavLabel').textContent = weekRangeLabel(analyticsWeekOffset);
       el('wkNextBtn').disabled = analyticsWeekOffset >= 0;
       renderHistory();
-      renderSurplusCircles();
       renderPenalties();
     }
 
@@ -3426,10 +3427,6 @@
             <span class="penalty-date">${dateStr}</span>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
-            ${isWeekly ? '' : `<button class="btn-sm" onclick="openDayEditModal('${p.key}')">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              Update Entry
-            </button>`}
             <button class="btn-sm" onclick="openEmailModal('${p.key}')">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
               Draft Email
@@ -3992,24 +3989,40 @@ ${c.name || '[Your Name]'}`;
             sessionTag: 'edited', override: null
           });
         } else { el('deErr').classList.add('show'); return; }
-      } else if (s && !e && isToday && loginDate) {
-        // Today, session active — end time optional; update login time only
-        const oldWorked = Math.max(0, Math.floor((new Date() - loginDate) / 1000)) + _sessionAccSecs;
-        loginDate = s;
-        const newCurrentSecs = Math.max(0, Math.floor((new Date() - loginDate) / 1000));
-        _sessionAccSecs = Math.max(0, oldWorked - newCurrentSecs);
-        el('shiftActiveLabel').textContent = `Started at ${short(s)}`;
+      } else if (s && !e && isToday) {
+        // Today — end time is optional (session may not be done yet)
+        if (loginDate) {
+          // Session active — update login time, preserve accumulated work
+          const oldWorked = Math.max(0, Math.floor((new Date() - loginDate) / 1000)) + _sessionAccSecs;
+          loginDate = s;
+          const newCurrentSecs = Math.max(0, Math.floor((new Date() - loginDate) / 1000));
+          _sessionAccSecs = Math.max(0, oldWorked - newCurrentSecs);
+          el('shiftActiveLabel').textContent = `Started at ${short(s)}`;
+          persistSession();
+        } else {
+          // No active session — start one from the given time
+          loginDate = s; wasDone = false; notifSent = false; autoStopped = false;
+          el('calcBtn').textContent = 'Pause';
+          el('calcBtn').classList.add('end-shift');
+          el('calcBtn').classList.remove('resume-shift');
+          el('calcBtn').dataset.state = 'running';
+          el('calcBtn').disabled = false;
+          el('shiftInputRow').classList.add('active-state');
+          el('shiftActiveLabel').textContent = `Started at ${short(s)}`;
+          persistSession();
+          if (ticker) clearInterval(ticker);
+          ticker = setInterval(render, 1000);
+        }
         saveDayLog(key, { ...ex,
           loginTime: `${s.getHours()}:${s.getMinutes()}:${s.getSeconds()}`,
           loginDisplay: short(s), sessionTag: 'edited',
           lastUpdated: new Date().toISOString(), override: null
         });
-        persistSession();
         el('deErr').classList.remove('show');
         persist();
         closeDayEditModal();
         renderHistory(); renderDaySelector();
-        if (loginDate) render(); else renderEmptyState();
+        render();
         return;
       } else {
         if (!s) { el('deErr').classList.add('show'); return; }
@@ -4201,8 +4214,8 @@ ${c.name || '[Your Name]'}`;
     }
 
     // ── THEME ──────────────────────────────────────────
-    const _faviconLight = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='%2309090b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='3' width='20' height='14' rx='2'/%3E%3Cpath d='M8 21h8m-4-4v4'/%3E%3Ccircle cx='12' cy='10' r='3' fill='%2309090b' stroke='none'/%3E%3Cpath d='M9 10c0-.8.4-1.5 1-2M15 10c0-.8-.4-1.5-1-2' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E";
-    const _faviconDark  = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='%23fafafa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='3' width='20' height='14' rx='2'/%3E%3Cpath d='M8 21h8m-4-4v4'/%3E%3Ccircle cx='12' cy='10' r='3' fill='%23fafafa' stroke='none'/%3E%3Cpath d='M9 10c0-.8.4-1.5 1-2M15 10c0-.8-.4-1.5-1-2' stroke='%2309090b' stroke-width='1'/%3E%3C/svg%3E";
+    const _faviconLight = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%2309090b'/%3E%3Crect x='2' y='3' width='20' height='14' rx='2' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8 21h8m-4-4v4' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='10' r='3' fill='%23ffffff'/%3E%3Cpath d='M9 10c0-.8.4-1.5 1-2M15 10c0-.8-.4-1.5-1-2' stroke='%2309090b' stroke-width='1' fill='none'/%3E%3C/svg%3E";
+    const _faviconDark  = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23fafafa'/%3E%3Crect x='2' y='3' width='20' height='14' rx='2' fill='none' stroke='%2309090b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8 21h8m-4-4v4' fill='none' stroke='%2309090b' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='10' r='3' fill='%2309090b'/%3E%3Cpath d='M9 10c0-.8.4-1.5 1-2M15 10c0-.8-.4-1.5-1-2' stroke='%23fafafa' stroke-width='1' fill='none'/%3E%3C/svg%3E";
     function applyTheme(d) {
       dark = d;
       document.documentElement.classList.toggle('dark', d);
@@ -4253,7 +4266,8 @@ ${c.name || '[Your Name]'}`;
     // Shift presets handled by renderShiftPresets() / applyShiftPreset()
     el('calcBtn').addEventListener('click', () => {
       const state = el('calcBtn').dataset.state || 'start';
-      if (state === 'running') endSession();
+      if (state === 'ending') checkout();
+      else if (state === 'running') endSession();
       else if (state === 'ended') resumeShift();
       else calculate();
     });
@@ -4270,7 +4284,11 @@ ${c.name || '[Your Name]'}`;
 
     // pastSaveBtn removed — editing now uses day edit modal
 
-    el('penaltiesCheck').addEventListener('click', renderPenalties);
+    el('penaltiesCheck').addEventListener('click', () => {
+      const container = el('penaltiesList');
+      container.innerHTML = '<div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>';
+      setTimeout(renderPenalties, 1000);
+    });
     el('emailModalClose').addEventListener('click', closeEmailModal);
     el('emailModalOverlay').addEventListener('click', e => { if (e.target === el('emailModalOverlay')) closeEmailModal(); });
     el('emailCopyBtn').addEventListener('click', () => {
