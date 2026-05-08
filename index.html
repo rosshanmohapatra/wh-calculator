@@ -211,8 +211,8 @@
 
     /* ── Shift combo (input + button inside) ── */
     .shift-cta { display: flex; flex-direction: column; gap: 10px; }
-    .shift-combo { display: flex; align-items: center; background: var(--input-bg);
-      border: 1.5px solid var(--input); border-radius: 12px; height: 52px;
+    .shift-combo { display: flex; align-items: center; background: var(--background);
+      border: 1.5px solid var(--border); border-radius: 12px; height: 52px;
       padding: 0 6px; gap: 8px; transition: border-color .15s; }
     .shift-combo:focus-within { border-color: var(--ring); }
     .shift-combo-input.err { color: var(--destructive); }
@@ -228,7 +228,7 @@
     .shift-combo-btn.end-shift { background: transparent; color: var(--destructive);
       border: 1.5px solid var(--destructive); }
     .shift-combo-btn.end-shift:hover { background: var(--destructive-bg); opacity: 1; }
-    .shift-combo-btn.pause-shift { background: var(--muted); color: var(--foreground); border: none; }
+    .shift-combo-btn.pause-shift { background: var(--muted); color: var(--foreground); border: 1.5px solid var(--border); }
     .shift-combo-btn.pause-shift:hover { opacity: .85; }
     .shift-combo-btn.resume-shift { background: var(--foreground); color: var(--background); border: none; }
     .shift-combo-btn.resume-shift:hover { opacity: .85; }
@@ -687,16 +687,25 @@
       transition:background .12s; }
     .elt-clear-btn:hover { background:var(--blue-border); }
 
-    /* ── Import/Export toast ── */
-    .ie-toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(70px);
-      padding:10px 18px; border-radius:10px; font-size:13px; font-weight:500;
-      box-shadow:0 4px 20px rgba(0,0,0,.18); transition:transform .28s ease, opacity .22s;
-      opacity:0; pointer-events:none; z-index:9999; white-space:nowrap;
-      display:flex; align-items:center; gap:8px; }
-    .ie-toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
-    .ie-toast.success { background:var(--success); color:#fff; }
-    .ie-toast.error   { background:var(--destructive); color:#fff; }
-    .ie-toast.info    { background:var(--foreground); color:var(--background); }
+    /* ── Toast (shadcn-style) ── */
+    .wh-toast { position:fixed; bottom:24px; right:24px; min-width:280px; max-width:360px;
+      background:var(--card); border:1px solid var(--border); border-radius:10px;
+      padding:14px 16px; box-shadow:0 4px 24px rgba(0,0,0,.22);
+      transition:transform .25s ease, opacity .2s; transform:translateY(12px); opacity:0;
+      pointer-events:none; z-index:9999; display:flex; align-items:flex-start; gap:10px; }
+    .wh-toast.show { transform:translateY(0); opacity:1; pointer-events:auto; }
+    .wh-toast-icon { width:16px; height:16px; flex-shrink:0; margin-top:1px; }
+    .wh-toast-body { flex:1; min-width:0; }
+    .wh-toast-title { font-size:13px; font-weight:600; color:var(--foreground); }
+    .wh-toast-desc { font-size:12px; color:var(--muted-fg); margin-top:2px; line-height:1.4; display:none; }
+    .wh-toast-desc.visible { display:block; }
+    .wh-toast-close { width:18px; height:18px; flex-shrink:0; background:transparent; border:none;
+      color:var(--muted-fg); cursor:pointer; font-size:14px; line-height:1; padding:0;
+      display:flex; align-items:center; justify-content:center; margin-top:-1px; }
+    .wh-toast-close:hover { color:var(--foreground); }
+    .wh-toast.success { border-left:3px solid var(--success); }
+    .wh-toast.error   { border-left:3px solid var(--destructive); }
+    .wh-toast.info    { border-left:3px solid var(--blue); }
 
     /* ── Footer label ── */
     .app-footer { position:fixed; bottom:14px; right:18px; font-size:11px; font-weight:500;
@@ -1171,18 +1180,6 @@
           </div>
         </div>
 
-        <!-- Push Notifications -->
-        <div class="toggle-row" style="border:1px solid var(--border);border-radius:8px;background:var(--background)">
-          <div>
-            <div class="form-label">Push Notifications</div>
-            <div class="form-sub">We'll notify you when your working hours are elapsed.</div>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" id="inpNotifOn">
-            <span class="toggle-track"></span>
-          </label>
-        </div>
-
         <!-- General Card -->
         <div class="settings-card">
           <div class="section-label">General</div>
@@ -1307,6 +1304,18 @@
           </div>
         </div><!-- /Advanced Card -->
 
+        <!-- Allow Notifications -->
+        <div class="toggle-row" style="border:1px solid var(--border);border-radius:8px;background:var(--background)">
+          <div>
+            <div class="form-label">Allow Notifications</div>
+            <div class="form-sub">We'll notify you when your working hours are elapsed.</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="inpNotifOn">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+
         <!-- Manage Data -->
         <div class="form-field" style="margin-top:4px">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
@@ -1335,8 +1344,15 @@
 
   <!-- App footer removed -->
 
-  <!-- Import/Export Toast -->
-  <div class="ie-toast" id="ieToast"></div>
+  <!-- Toast -->
+  <div class="wh-toast" id="ieToast">
+    <svg class="wh-toast-icon" id="toastIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+    <div class="wh-toast-body">
+      <div class="wh-toast-title" id="toastTitle"></div>
+      <div class="wh-toast-desc" id="toastDesc"></div>
+    </div>
+    <button class="wh-toast-close" onclick="document.getElementById('ieToast').classList.remove('show')">✕</button>
+  </div>
 
   <!-- ── Wheel Time Picker Modal ── -->
   <div id="tpModal" class="tp-modal">
@@ -1415,15 +1431,23 @@
 
   <!-- Import Confirm -->
   <div class="overlay" id="importConfirmOverlay">
-    <div class="dialog">
-      <div class="dialog-head" style="text-align:center">
-        <span class="co-emoji">⚠️</span>
-        <div class="dialog-title">Replace all data?</div>
-        <div class="dialog-desc">This will permanently erase your current logs and replace them with the uploaded file.</div>
+    <div class="dialog" style="max-width:380px">
+      <div class="dialog-head">
+        <div class="dialog-title">Are you sure?</div>
+        <div class="dialog-desc">This will replace your existing data.</div>
       </div>
-      <div class="dialog-foot" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
-        <button class="btn btn-primary" id="importConfirmBtn" style="background:var(--destructive,#ef4444);border-color:var(--destructive,#ef4444)">Yes, replace my data</button>
-        <button class="btn btn-cancel" id="importCancelBtn">Cancel</button>
+      <!-- File info card -->
+      <div id="importInfoCard" style="background:var(--muted);border-radius:8px;padding:12px 14px;margin:12px 0;display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:13px;font-weight:600;color:var(--foreground)" id="importInfoUser"></div>
+        <div style="font-size:12px;color:var(--muted-fg)" id="importInfoMeta"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <button class="btn-sm" id="importSaveLogBtn" style="height:34px;font-size:12px;padding:0 12px;flex-shrink:0">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save Log
+        </button>
+        <div style="flex:1"></div>
+        <button class="btn btn-cancel" id="importCancelBtn" style="width:auto;padding:0 16px;height:38px;font-size:13px">Cancel</button>
+        <button class="btn btn-primary" id="importConfirmBtn" style="width:auto;padding:0 16px;height:38px;font-size:13px">Import</button>
       </div>
     </div>
   </div>
@@ -2297,13 +2321,25 @@
 
     // ── TOAST ─────────────────────────────────────────
     let _toastTimer = null;
-    function showToast(msg, type = 'info') {
+    const _toastIcons = {
+      success: '<polyline points="20 6 9 17 4 12"/>',
+      error:   '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+      info:    '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+    };
+    const _toastColors = { success: 'var(--success)', error: 'var(--destructive)', info: 'var(--blue)' };
+    function showToast(title, type = 'info', desc = '') {
       const t = el('ieToast'); if (!t) return;
-      t.className = `ie-toast ${type}`;
-      t.textContent = msg;
+      t.className = `wh-toast ${type}`;
+      el('toastTitle').textContent = title;
+      const d = el('toastDesc');
+      d.textContent = desc;
+      d.classList.toggle('visible', !!desc);
+      const icon = el('toastIcon');
+      icon.innerHTML = _toastIcons[type] || _toastIcons.info;
+      icon.style.color = _toastColors[type] || _toastColors.info;
       t.classList.add('show');
       if (_toastTimer) clearTimeout(_toastTimer);
-      _toastTimer = setTimeout(() => { t.classList.remove('show'); }, 3200);
+      _toastTimer = setTimeout(() => t.classList.remove('show'), 3800);
     }
 
     // ── STAY HINT (Recommended action for target day) ──
@@ -3772,6 +3808,7 @@ ${c.name || '[Your Name]'}`;
             autoStopBuf:  wc.autoStopBufferHours,
             notifOn:      wc.notificationsEnabled,
             name:         snap.user?.name || legacyCfg?.name || '',
+            company:      snap.user?.company || legacyCfg?.company || '',
             tzOffset:     snap.user?.tzOffset !== undefined ? snap.user.tzOffset : (legacyCfg?.tzOffset || 330),
           };
           this.setCfg({ ...(legacyCfg || {}), ...restoredCfg });
@@ -3845,7 +3882,7 @@ ${c.name || '[Your Name]'}`;
       a.download = `wh_${name}_${date}.json`;
       document.body.appendChild(a); a.click();
       document.body.removeChild(a); URL.revokeObjectURL(url);
-      showToast('Log exported successfully', 'success');
+      showToast('Log exported', 'success', 'Your backup file has been downloaded.');
     }
 
     function importLogFile(file) {
@@ -3872,14 +3909,17 @@ ${c.name || '[Your Name]'}`;
           const userName = snap.user?.name || snap.cfg?.name || '';
           const exportedAt = snap.exportedAt
             ? new Date(snap.exportedAt).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' })
-            : 'unknown date';
+            : null;
 
-          // Update confirmation dialog with details
-          const desc = el('importConfirmOverlay')?.querySelector('.dialog-desc');
-          if (desc) {
-            desc.innerHTML = `This will replace your current data with:<br>
-              <strong>${dayCount} day log${dayCount !== 1 ? 's' : ''}</strong>${userName ? ` · ${userName}` : ''}<br>
-              <span style="font-size:11px;color:var(--muted-fg)">Exported ${exportedAt}</span>`;
+          // Populate info card
+          const infoUser = el('importInfoUser');
+          const infoMeta = el('importInfoMeta');
+          if (infoUser) infoUser.textContent = userName || 'Unknown user';
+          if (infoMeta) {
+            const parts = [];
+            if (exportedAt) parts.push(`Exported ${exportedAt}`);
+            parts.push(`${dayCount} day${dayCount !== 1 ? 's' : ''} of data`);
+            infoMeta.textContent = parts.join(' · ');
           }
 
           el('importConfirmOverlay').classList.add('open');
@@ -3921,12 +3961,22 @@ ${c.name || '[Your Name]'}`;
       renderDaySelector();
       renderEmptyState();
       populateSettings();
-      if (activeView === 'analytics') renderAnalytics();
 
+      // Navigate analytics to the most recent week with data
       const days  = snap.tracking?.days || snap.days || {};
       const count = Object.keys(days).length;
+      if (count > 0) {
+        const latestKey = Object.keys(days).sort().pop();
+        const latestDate = new Date(latestKey + 'T12:00:00');
+        const today = new Date();
+        const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+        const weeksDiff = Math.round((today - latestDate) / msPerWeek);
+        analyticsWeekOffset = -Math.max(0, weeksDiff);
+      }
+      renderAnalytics();
+
       const name  = snap.user?.name || snap.cfg?.name || '';
-      showToast(`Imported ${count} day${count !== 1 ? 's' : ''}${name ? ` · Welcome back, ${name}` : ''}`, 'success');
+      showToast('Data imported', 'success', `${count} day${count !== 1 ? 's' : ''} restored${name ? ` · Welcome back, ${name}!` : '.'}`);
     }
 
     function saveDayEditModal() {
@@ -4299,6 +4349,7 @@ ${c.name || '[Your Name]'}`;
     el('logFileInput').addEventListener('change', ev=>importLogFile(ev.target.files[0]));
     el('importConfirmBtn').addEventListener('click', confirmImport);
     el('importCancelBtn').addEventListener('click', ()=>{ el('importConfirmOverlay').classList.remove('open'); el('logFileInput').value=''; });
+    el('importSaveLogBtn').addEventListener('click', exportBackup);
     el('importConfirmOverlay').addEventListener('click', ev=>{if(ev.target===el('importConfirmOverlay')){ el('importConfirmOverlay').classList.remove('open'); el('logFileInput').value=''; }});
 
     // Inline edit Enter-key handlers (delegated — elements are created dynamically)
