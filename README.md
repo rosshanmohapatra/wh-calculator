@@ -8,9 +8,6 @@
 | that runs entirely in the        | Open in any modern browser and   |
 | browser with zero dependencies.  | start tracking your hours.       |
 +----------------------------------+----------------------------------+
-| Live Demo                        | License                          |
-| whcalculator.vercel.app          | Apache 2.0                       |
-+----------------------------------+----------------------------------+
 ```
 
 ## Usage
