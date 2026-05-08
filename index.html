@@ -220,6 +220,8 @@
     .shift-combo-btn.end-shift { background: transparent; color: var(--destructive);
       border: 1.5px solid var(--destructive); }
     .shift-combo-btn.end-shift:hover { background: var(--destructive-bg); opacity: 1; }
+    .shift-combo-btn.resume-shift { background: var(--success-bg); color: var(--success); border: 1.5px solid var(--success-border); }
+    .shift-combo-btn.resume-shift:hover { background: var(--success-border); opacity: 1; }
     .shift-combo-btn:disabled { opacity: .4; cursor: default; }
     .shift-combo.active-state { border-color: var(--success-border); background: var(--success-bg); }
     .shift-combo-active-label { flex: 1; font-size: 13px; font-weight: 500;
@@ -962,7 +964,7 @@
           <div class="rc-head-left">
             <span class="section-label" id="rcDayLabel">Today</span>
           </div>
-          <div id="leaveChip" style="font-size:11px;color:var(--muted-fg);font-weight:500">
+          <div id="leaveChip" style="font-size:15px;color:var(--muted-fg);font-weight:500">
             <strong id="leaveAt" style="color:var(--foreground);font-weight:500">—</strong>
           </div>
         </div>
@@ -1218,11 +1220,11 @@
               <div class="st-panel" id="stDailyInputs">
                 <div class="st-panel-label" id="stDailyInputLabel" style="display:none">Daily (Personal)</div>
                 <div class="form-row" style="display:flex;gap:8px">
-                  <div class="input-suffix-wrap" style="flex:1">
+                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
                     <input type="number" class="field-input" id="inpDailyH" min="0" max="23" step="1" value="9" placeholder="0">
                     <span class="input-suffix-text">hrs</span>
                   </div>
-                  <div class="input-suffix-wrap" style="flex:1">
+                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
                     <input type="number" class="field-input" id="inpDailyM" min="0" max="59" step="5" value="0" placeholder="0">
                     <span class="input-suffix-text">min</span>
                   </div>
@@ -1232,11 +1234,11 @@
               <div id="stPanelWeekly" style="display:none">
                 <div class="st-panel-label" style="margin-top:10px">Weekly</div>
                 <div class="form-row" style="display:flex;gap:8px">
-                  <div class="input-suffix-wrap" style="flex:1">
+                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
                     <input type="number" class="field-input" id="inpWeeklyH" min="0" max="167" step="1" value="45" placeholder="0">
                     <span class="input-suffix-text">hrs</span>
                   </div>
-                  <div class="input-suffix-wrap" style="flex:1">
+                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
                     <input type="number" class="field-input" id="inpWeeklyM" min="0" max="59" step="5" value="0" placeholder="0">
                     <span class="input-suffix-text">min</span>
                   </div>
@@ -1834,8 +1836,9 @@
       // Reset state — clearLogin() is called inside closeCheckoutModal
       _sessionAccSecs = 0; _sessionCheckoutTime = null;
       loginDate = null; autoStopped = false;
-      el('calcBtn').textContent = 'Start Shift';
-      el('calcBtn').classList.remove('end-shift');
+      el('calcBtn').textContent = 'Quick Start';
+      el('calcBtn').classList.remove('end-shift', 'resume-shift');
+      el('calcBtn').dataset.state = 'start';
       el('calcBtn').disabled = false;
       el('shiftInputRow').classList.remove('active-state', 'hidden');
     }
@@ -1860,15 +1863,14 @@
       });
       Store.clearSession();
       loginDate = null; autoStopped = false;
-      el('calcBtn').textContent = 'Start Shift';
+      el('calcBtn').textContent = 'Resume';
       el('calcBtn').classList.remove('end-shift');
+      el('calcBtn').classList.add('resume-shift');
+      el('calcBtn').dataset.state = 'ended';
       el('calcBtn').disabled = false;
       el('shiftInputRow').classList.remove('active-state', 'hidden');
       el('shiftActiveLabel').textContent = '—';
       el('autostopBanner').classList.remove('show');
-      // Show resume row with label
-      el('resumeLabel').textContent = `Last session ended at ${short(now)} · ${dur(_sessionAccSecs)} total`;
-      el('resumeRow').style.display = 'flex';
       renderDaySelector();
       renderEmptyState();
     }
@@ -2200,7 +2202,7 @@
       }
 
       // Position
-      const refEl = el(targetInputId) || event?.currentTarget || event?.target;
+      const refEl = event?.currentTarget || event?.target || el(targetInputId);
       const refRect = refEl?.getBoundingClientRect();
       if (refRect) {
         const GAP = 8, mW = 256, mH = 320, pad = 8;
@@ -2451,18 +2453,14 @@
         lastUpdated:  now.toISOString(),
         sessionTag:   'autostopped'
       });
-      el('calcBtn').textContent = 'Shift Ended';
-      el('calcBtn').classList.add('end-shift');
-      el('calcBtn').disabled = true;
+      el('calcBtn').textContent = 'Resume';
+      el('calcBtn').classList.remove('end-shift');
+      el('calcBtn').classList.add('resume-shift');
+      el('calcBtn').dataset.state = 'ended';
+      el('calcBtn').disabled = false;
       el('shiftInputRow').classList.remove('active-state');
       el('autostopBanner').classList.add('show');
       el('autostopMsg').textContent = `Auto-stopped at ${short(now)} — target + buffer reached.`;
-      // Show resume button if before midnight
-      const midnight = new Date(); midnight.setHours(23,59,59,0);
-      if (now < midnight) {
-        el('resumeLabel').textContent = `Auto-stopped at ${short(now)} · ${dur(worked)} total`;
-        el('resumeRow').style.display = 'flex';
-      }
       renderDaySelector();
     }
 
@@ -2830,9 +2828,8 @@
 
           // Centered badge
           const badge = document.createElement('div');
-          badge.style.cssText = `position:absolute;left:50%;transform:translateX(-50%);font-size:12px;font-weight:500;color:${color};background:${bg};border:1px solid ${border};padding:2px 12px;border-radius:20px;letter-spacing:.3px;pointer-events:none`;
+          badge.style.cssText = `justify-self:center;font-size:12px;font-weight:500;color:${color};background:${bg};border:1px solid ${border};padding:2px 12px;border-radius:20px;letter-spacing:.3px;pointer-events:none`;
           badge.textContent = label;
-          row.style.position = 'relative';
           row.appendChild(badge);
 
           // Edit icon still on the right
@@ -2879,9 +2876,8 @@
             totalSecs += wSecs;
           } else if (isPastDay) {
             // Centered "Missing Data" badge like override rows
-            row.style.position = 'relative';
             const missBadge = document.createElement('div');
-            missBadge.style.cssText = 'position:absolute;left:50%;transform:translateX(-50%);font-size:12px;font-weight:500;color:var(--destructive);background:var(--destructive-bg);border:1px solid var(--destructive-border);padding:2px 12px;border-radius:20px;letter-spacing:.3px;pointer-events:none';
+            missBadge.style.cssText = 'justify-self:center;font-size:12px;font-weight:500;color:var(--destructive);background:var(--destructive-bg);border:1px solid var(--destructive-border);padding:2px 12px;border-radius:20px;letter-spacing:.3px;pointer-events:none';
             missBadge.textContent = 'Missing Entry';
             row.appendChild(missBadge);
             // add edit button (created inline here since editBtn hasn't been declared yet)
@@ -2993,14 +2989,15 @@
       el('errMsg').classList.remove('show');
       loginDate = p; wasDone = false; notifSent = false; autoStopped = false;
       if (el('metaLogin')) el('metaLogin').textContent = short(p);
-      // Switch CTA to "End Shift" combo active state
-      el('calcBtn').textContent = 'End Shift';
+      // Switch CTA to "Pause" combo active state
+      el('calcBtn').textContent = 'Pause';
       el('calcBtn').classList.add('end-shift');
+      el('calcBtn').classList.remove('resume-shift');
+      el('calcBtn').dataset.state = 'running';
       el('calcBtn').disabled = false;
       el('shiftInputRow').classList.add('active-state');
       el('shiftActiveLabel').textContent = `Started at ${short(p)}`;
       el('autostopBanner').classList.remove('show');
-      el('resumeRow').style.display = 'none';
       persistSession();
       selectDay(todayKey()); // snap selector back to today
       render();
@@ -3016,13 +3013,13 @@
       el('loginInput').value = '';
       el('loginInput').classList.remove('err');
       el('errMsg').classList.remove('show');
-      // Restore CTA to Start Shift
-      el('calcBtn').textContent = 'Start Shift';
-      el('calcBtn').classList.remove('end-shift');
+      // Restore CTA to Quick Start
+      el('calcBtn').textContent = 'Quick Start';
+      el('calcBtn').classList.remove('end-shift', 'resume-shift');
+      el('calcBtn').dataset.state = 'start';
       el('calcBtn').disabled = false;
       el('shiftInputRow').classList.remove('active-state', 'hidden');
       el('autostopBanner').classList.remove('show');
-      el('resumeRow').style.display = 'none';
       selectedDayKey = todayKey();
       el('todayLoginSection').style.display = '';
       el('pastLoginSection').style.display = 'none';
@@ -3847,18 +3844,22 @@ ${c.name || '[Your Name]'}`;
         const d=new Date(s.loginISO);
         if (isNaN(d.getTime())||d>new Date()) { Store.clearSession(); return; }
         loginDate=d;
-        el('calcBtn').textContent='End Shift';
+        el('calcBtn').textContent='Pause';
         el('calcBtn').classList.add('end-shift');
+        el('calcBtn').classList.remove('resume-shift');
+        el('calcBtn').dataset.state='running';
         el('calcBtn').disabled=false;
         el('shiftInputRow').classList.add('active-state');
         el('shiftActiveLabel').textContent=`Started at ${short(loginDate)}`;
         el('autostopBanner').classList.remove('show');
-        el('resumeRow').style.display='none';
         if (ticker) clearInterval(ticker);
         ticker=setInterval(render,1000);
       } else if (_sessionAccSecs>0) {
-        el('resumeLabel').textContent=`Session paused · ${dur(_sessionAccSecs)} logged`;
-        el('resumeRow').style.display='flex';
+        el('calcBtn').textContent='Resume';
+        el('calcBtn').classList.remove('end-shift');
+        el('calcBtn').classList.add('resume-shift');
+        el('calcBtn').dataset.state='ended';
+        el('calcBtn').disabled=false;
       }
     }
 
@@ -4174,7 +4175,7 @@ ${c.name || '[Your Name]'}`;
       const prevLog = dayLog(tk);
       // Guard: only resume if the paused session belongs to today
       if (!prevLog || prevLog.sessionDate !== tk) {
-        el('resumeRow').style.display = 'none'; return;
+        return;
       }
       const midnight = new Date(); midnight.setHours(23,59,59,999);
       if (now >= midnight) return;
@@ -4183,13 +4184,14 @@ ${c.name || '[Your Name]'}`;
         _sessionAccSecs = Math.round(prevLog.hoursWorked * 3600);
       }
       loginDate = now; wasDone = false; notifSent = false; autoStopped = false;
-      el('calcBtn').textContent = 'End Shift';
+      el('calcBtn').textContent = 'Pause';
       el('calcBtn').classList.add('end-shift');
+      el('calcBtn').classList.remove('resume-shift');
+      el('calcBtn').dataset.state = 'running';
       el('calcBtn').disabled = false;
       el('shiftInputRow').classList.add('active-state');
       el('shiftActiveLabel').textContent = `Resumed · ${dur(_sessionAccSecs)} prior`;
       el('autostopBanner').classList.remove('show');
-      el('resumeRow').style.display = 'none';
       saveDayLog(tk, { ...prevLog, sessionTag: 'realtime', autostopped: false });
       persistSession();
       selectDay(tk); render();
@@ -4245,8 +4247,10 @@ ${c.name || '[Your Name]'}`;
     });
     // Shift presets handled by renderShiftPresets() / applyShiftPreset()
     el('calcBtn').addEventListener('click', () => {
-      if (autoStopped) return;
-      if (loginDate) endSession(); else calculate();
+      const state = el('calcBtn').dataset.state || 'start';
+      if (state === 'running') endSession();
+      else if (state === 'ended') resumeShift();
+      else calculate();
     });
     el('coDone').addEventListener('click', closeCheckoutModal);
     el('checkoutOverlay').addEventListener('click', e => { if (e.target === el('checkoutOverlay')) closeCheckoutModal(); });
@@ -4520,8 +4524,10 @@ ${c.name || '[Your Name]'}`;
         const d = new Date(); d.setHours(pts[0] || 0, pts[1] || 0, pts[2] || 0, 0);
         if (d <= new Date()) {
           loginDate = d;
-          el('calcBtn').textContent = 'End Shift';
+          el('calcBtn').textContent = 'Pause';
           el('calcBtn').classList.add('end-shift');
+          el('calcBtn').classList.remove('resume-shift');
+          el('calcBtn').dataset.state = 'running';
           el('shiftInputRow').classList.add('active-state');
           el('shiftActiveLabel').textContent = `Started at ${short(d)}`;
           render();
@@ -4533,13 +4539,13 @@ ${c.name || '[Your Name]'}`;
         const pts = tl.loginTime.split(':').map(Number);
         const d = new Date(); d.setHours(pts[0] || 0, pts[1] || 0, pts[2] || 0, 0);
         loginDate = d;
-        el('calcBtn').textContent = 'Shift Ended';
-        el('calcBtn').classList.add('end-shift');
-        el('calcBtn').disabled = true;
+        el('calcBtn').textContent = 'Resume';
+        el('calcBtn').classList.remove('end-shift');
+        el('calcBtn').classList.add('resume-shift');
+        el('calcBtn').dataset.state = 'ended';
+        el('calcBtn').disabled = false;
         el('autostopBanner').classList.add('show');
         el('autostopMsg').textContent = `Auto-stopped at ${tl.checkoutDisplay || '—'} — target + buffer reached.`;
-        const now = new Date(); const midnight = new Date(); midnight.setHours(23,59,59,0);
-        if (now < midnight) el('resumeRow').style.display = 'flex';
         renderEmptyState(); // show card in read mode
       } else { renderEmptyState(); }
 
@@ -4548,8 +4554,6 @@ ${c.name || '[Your Name]'}`;
       restoreSession();
       // Check for forgot-to-logout
       if (!loginDate) setTimeout(checkForgotLogout, 800);
-      // Hide resume row if not from today
-      (function(){ const l=dayLog(todayKey()); if(!l||l.sessionDate!==todayKey()) el('resumeRow').style.display='none'; })();
 
       // Show onboarding on first launch
       if (!localStorage.getItem(OB_DONE_KEY) && !Store.getCfg()) {
