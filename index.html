@@ -233,10 +233,8 @@
     .shift-combo-btn.resume-shift { background: var(--foreground); color: var(--background); border: none; }
     .shift-combo-btn.resume-shift:hover { opacity: .85; }
     .shift-combo-btn:disabled { opacity: .4; cursor: default; }
-    .shift-combo.active-state { border-color: var(--success-border); background: var(--success-bg); }
     .shift-combo-active-label { flex: 1; font-size: 13px; font-weight: 500;
-      color: var(--success); display: none; }
-    .shift-combo.active-state .shift-combo-clock { color: var(--success); }
+      color: var(--muted-fg); display: none; }
     .shift-combo.active-state .shift-combo-input { display: none; }
     .shift-combo.active-state .shift-combo-active-label { display: block; }
     .shift-resume-row { display: flex; gap: 8px; }
@@ -391,9 +389,8 @@
       transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
       white-space: nowrap; font-family: var(--font); }
     .plan-btn:hover { background: var(--background); color: var(--foreground); }
-    .plan-btn.selected { background: var(--background); color: var(--foreground);
-      border-color: var(--foreground); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
-    .dark .plan-btn.selected { box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+    .plan-btn.selected { background: var(--foreground); color: var(--background);
+      border-color: var(--foreground); box-shadow: none; }
     /* Settings groups */
     .settings-group { display: flex; flex-direction: column; gap: 14px; }
     .settings-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
@@ -888,18 +885,9 @@
     <nav class="navbar">
       <div class="nav-inner">
         <div class="nav-tabs">
-          <button class="nav-tab active" data-view="home" id="tabHome">
-            <span class="tab-icon" style="display:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
-            <span class="tab-label">Overview</span>
-          </button>
-          <button class="nav-tab" data-view="analytics" id="tabAnalytics">
-            <span class="tab-icon" style="display:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
-            <span class="tab-label">Dashboard</span>
-          </button>
-          <button class="nav-tab" data-view="settings" id="tabSettings">
-            <span class="tab-icon" style="display:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
-            <span class="tab-label">Settings</span>
-          </button>
+          <button class="nav-tab active" data-view="home" id="tabHome">Overview</button>
+          <button class="nav-tab" data-view="analytics" id="tabAnalytics">Dashboard</button>
+          <button class="nav-tab" data-view="settings" id="tabSettings">Settings</button>
         </div>
         <div class="nav-actions">
           <button class="btn-icon" id="themeBtn" title="Theme · D">
@@ -924,7 +912,7 @@
   </div>
 
   <!-- Notification panel — inline, between nav and content -->
-  <div class="notif-panel hidden" id="notifPanel" style="max-width:600px;margin:0 auto;padding:0 24px 0;">
+  <div class="notif-panel hidden" id="notifPanel" style="max-width:600px;margin:0 auto;padding:16px 24px 0;">
     <div class="notif-card">
       <div class="notif-head">
         <span class="section-label">Notifications</span>
@@ -1218,11 +1206,11 @@
                 <div class="st-panel-label" id="stDailyInputLabel" style="display:none">Daily (Personal)</div>
                 <div class="form-row" style="display:flex;gap:8px">
                   <div class="input-suffix-wrap" style="flex:1">
-                    <input type="number" class="field-input" id="inpDailyH" min="0" max="23" step="1" value="9" placeholder="0">
+                    <input type="number" class="field-input" id="inpDailyH" min="0" max="23" step="1" value="9" placeholder="0" style="height:38px;font-size:13px;padding-left:12px">
                     <span class="input-suffix-text">hrs</span>
                   </div>
                   <div class="input-suffix-wrap" style="flex:1">
-                    <input type="number" class="field-input" id="inpDailyM" min="0" max="59" step="5" value="0" placeholder="0">
+                    <input type="number" class="field-input" id="inpDailyM" min="0" max="59" step="5" value="0" placeholder="0" style="height:38px;font-size:13px;padding-left:12px">
                     <span class="input-suffix-text">min</span>
                   </div>
                 </div>
@@ -1232,11 +1220,11 @@
                 <div class="st-panel-label" style="margin-top:10px">Weekly</div>
                 <div class="form-row" style="display:flex;gap:8px">
                   <div class="input-suffix-wrap" style="flex:1">
-                    <input type="number" class="field-input" id="inpWeeklyH" min="0" max="167" step="1" value="45" placeholder="0">
+                    <input type="number" class="field-input" id="inpWeeklyH" min="0" max="167" step="1" value="45" placeholder="0" style="height:38px;font-size:13px;padding-left:12px">
                     <span class="input-suffix-text">hrs</span>
                   </div>
                   <div class="input-suffix-wrap" style="flex:1">
-                    <input type="number" class="field-input" id="inpWeeklyM" min="0" max="59" step="5" value="0" placeholder="0">
+                    <input type="number" class="field-input" id="inpWeeklyM" min="0" max="59" step="5" value="0" placeholder="0" style="height:38px;font-size:13px;padding-left:12px">
                     <span class="input-suffix-text">min</span>
                   </div>
                 </div>
@@ -1260,7 +1248,7 @@
               <div class="form-label">Shift Type</div>
               <div class="form-sub">We'll notify you by the end of your daily target.</div>
               <div style="display:flex;align-items:center;gap:8px">
-                <div class="time-input-wrap" style="min-width:130px;flex-shrink:0">
+                <div class="time-input-wrap" style="flex:1">
                   <input type="text" id="inpShiftStart" placeholder="From  e.g. 09:00 AM" autocomplete="off"
                     style="flex:1;height:38px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
                   <input type="time" id="inpShiftStartPicker" tabindex="-1"
@@ -1269,8 +1257,8 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   </button>
                 </div>
-                <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">–</span>
-                <div class="time-input-wrap" style="min-width:130px;flex-shrink:0">
+                <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">to</span>
+                <div class="time-input-wrap" style="flex:1">
                   <input type="text" id="inpShiftEnd" placeholder="To  e.g. 06:00 PM" autocomplete="off"
                     style="flex:1;height:38px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
                   <input type="time" id="inpShiftEndPicker" tabindex="-1"
@@ -1340,43 +1328,6 @@
           </div>
         </div>
 
-        <!-- Timezone -->
-        <div class="form-field">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <div>
-              <div class="form-label">Timezone</div>
-              <div class="form-sub">Used for the live clock display.</div>
-            </div>
-            <select class="field-input" id="inpTimezone" style="height:40px;cursor:pointer;width:auto;flex-shrink:0;padding:0 32px 0 12px">
-            <option value="-720">UTC−12:00</option>
-            <option value="-600">UTC−10:00 (Hawaii)</option>
-            <option value="-480">UTC−08:00 (PST)</option>
-            <option value="-420">UTC−07:00 (MST)</option>
-            <option value="-360">UTC−06:00 (CST)</option>
-            <option value="-300">UTC−05:00 (EST)</option>
-            <option value="-240">UTC−04:00 (AST)</option>
-            <option value="-180">UTC−03:00 (BRT)</option>
-            <option value="0">UTC+00:00 (GMT)</option>
-            <option value="60">UTC+01:00 (CET)</option>
-            <option value="120">UTC+02:00 (EET)</option>
-            <option value="180">UTC+03:00 (AST/MSK)</option>
-            <option value="210">UTC+03:30 (IRST)</option>
-            <option value="240">UTC+04:00 (GST)</option>
-            <option value="270">UTC+04:30 (AFT)</option>
-            <option value="300">UTC+05:00 (PKT)</option>
-            <option value="330" selected>UTC+05:30 (IST)</option>
-            <option value="345">UTC+05:45 (NPT)</option>
-            <option value="360">UTC+06:00 (BST/ALMT)</option>
-            <option value="420">UTC+07:00 (ICT)</option>
-            <option value="480">UTC+08:00 (CST/SGT)</option>
-            <option value="540">UTC+09:00 (JST/KST)</option>
-            <option value="570">UTC+09:30 (ACST)</option>
-            <option value="600">UTC+10:00 (AEST)</option>
-            <option value="660">UTC+11:00 (AEDT)</option>
-            <option value="720">UTC+12:00 (NZST)</option>
-          </select>
-          </div>
-        </div>
 
       </div>
     </main>
@@ -1614,9 +1565,7 @@
     // saveCfg defined in persistence layer
 
     function nowTz() {
-      const tzOff = cfg().tzOffset !== undefined ? cfg().tzOffset : 330;
-      const localOff = -new Date().getTimezoneOffset();
-      return new Date(Date.now() + (tzOff - localOff) * 60000);
+      return new Date();
     }
 
     // ── DISMISSED NOTIFICATIONS ────────────────────────
@@ -3069,7 +3018,6 @@
       el('inpWeeklyOn').checked = c.weeklyOn;
       el('inpNotifOn').checked  = c.notifOn;
       switchStTab(c.weeklyOn ? 'weekly' : 'daily');
-      el('inpTimezone').value = String(c.tzOffset !== undefined ? c.tzOffset : 330);
       document.querySelectorAll('.plan-btn[data-sday]').forEach(btn => {
         btn.classList.toggle('selected', (c.lateDays || []).includes(+btn.dataset.sday));
       });
@@ -3103,7 +3051,7 @@
       const _wHVal = parseInt(el('inpWeeklyH')?.value, 10) || 0;
       const _wMVal = parseInt(el('inpWeeklyM')?.value, 10) || 0;
       const on     = el('inpWeeklyOn').checked;
-      const tzOffset = parseInt(el('inpTimezone')?.value) || 330;
+      const tzOffset = -new Date().getTimezoneOffset();
       if (isNaN(daily) || daily <= 0 || daily > 24) return;
       const lateDays       = [...document.querySelectorAll('.plan-btn[data-sday].selected')].map(b => +b.dataset.sday);
       const earlyLeaveDays = [...document.querySelectorAll('.plan-btn[data-tday].selected')].map(b => +b.dataset.tday);
@@ -3750,20 +3698,19 @@ ${c.name || '[Your Name]'}`;
       // full snapshot for export — structured v2 schema
       snapshot() {
         const c = this.getCfg() || {};
-        const tzLabel = (() => {
-          const off = c.tzOffset !== undefined ? c.tzOffset : 330;
-          const sign = off >= 0 ? '+' : '-';
-          const absOff = Math.abs(off);
-          return `UTC${sign}${String(Math.floor(absOff/60)).padStart(2,'0')}:${String(absOff%60).padStart(2,'0')}`;
-        })();
+        const sysTzOff = -new Date().getTimezoneOffset();
+        const sign = sysTzOff >= 0 ? '+' : '-';
+        const absOff = Math.abs(sysTzOff);
+        const tzLabel = `UTC${sign}${String(Math.floor(absOff/60)).padStart(2,'0')}:${String(absOff%60).padStart(2,'0')}`;
+        const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || tzLabel;
         return {
           schema: 'wh_backup_v2',
           appVersion: APP_VERSION,
           exportedAt: new Date().toISOString(),
           user: {
             name:     c.name || '',
-            timezone: tzLabel,
-            tzOffset: c.tzOffset !== undefined ? c.tzOffset : 330,
+            timezone: tzName,
+            tzOffset: sysTzOff,
           },
           workConfig: {
             dailyTargetHours:    Math.floor(c.dailyH || 9),
@@ -4277,7 +4224,6 @@ ${c.name || '[Your Name]'}`;
     });
     /* inpWeeklyOn is a hidden checkbox now toggled via switchStTab — no direct listener needed */
     el('inpNotifOn').addEventListener('change', autoSaveSettings);
-    el('inpTimezone')?.addEventListener('change', autoSaveSettings);
     document.querySelectorAll('.plan-btn[data-sday]').forEach(btn => {
       btn.addEventListener('click', () => { btn.classList.toggle('selected'); autoSaveSettings(); });
     });
