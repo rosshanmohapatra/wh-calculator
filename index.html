@@ -205,7 +205,7 @@
     .shift-cta { display: flex; flex-direction: column; gap: 10px; }
     .shift-combo { display: flex; align-items: center; background: var(--input-bg);
       border: 1.5px solid var(--input); border-radius: 12px; height: 52px;
-      padding: 0 6px 0 14px; gap: 8px; transition: border-color .15s; }
+      padding: 0 6px; gap: 8px; transition: border-color .15s; }
     .shift-combo:focus-within { border-color: var(--ring); }
     .shift-combo-input.err { color: var(--destructive); }
     .shift-combo-clock { color: var(--muted-fg); flex-shrink: 0; }
@@ -356,12 +356,20 @@
     .sliding-field.hidden { max-height: 0; opacity: 0; pointer-events: none; }
     .sliding-field.open   { max-height: 360px; opacity: 1; }
     .sliding-inner { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+    /* Set Target tabs */
+    .st-tabs { display: flex; background: var(--muted); border-radius: 8px; padding: 3px; gap: 2px; flex-shrink: 0; }
+    .st-tab { background: transparent; border: none; border-radius: 6px; padding: 5px 12px;
+      font-size: 12px; font-weight: 500; font-family: var(--font); color: var(--muted-fg);
+      cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; }
+    .st-tab.active { background: var(--background); color: var(--foreground); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .st-panel { margin-top: 12px; }
+    .st-panel-label { font-size: 11px; font-weight: 600; color: var(--muted-fg); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; }
     .callout { display: flex; align-items: flex-start; gap: 8px;
       font-size: 12px; color: var(--muted-fg); line-height: 1.6;
       padding: 10px 12px; background: var(--muted); border-radius: var(--radius); }
     .callout-icon { flex-shrink: 0; margin-top: 1px; opacity: .7; }
     /* Plan blocks — shared base for Early Leave Plan & Stay Late Plans */
-    .target-day-block { border: 1px solid var(--border); border-radius: 8px; padding: 14px;
+    .target-day-block { border-radius: 8px; padding: 14px;
       display: flex; flex-direction: column; gap: 10px; }
     .target-day-head { display: flex; flex-direction: column; gap: 2px; }
     .target-day-picker { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -376,6 +384,8 @@
     .dark .plan-btn.selected { box-shadow: 0 1px 4px rgba(0,0,0,.4); }
     /* Settings groups */
     .settings-group { display: flex; flex-direction: column; gap: 14px; }
+    .settings-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .sep-inner { height: 1px; background: var(--border); }
 
     /* ── Checkout modal ── */
     .overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.45);
@@ -695,7 +705,7 @@
 
     /* ── Time picker icon button (inside text fields) ── */
     .tp-icon-btn {
-      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      position: absolute; left: 6px; top: 50%; transform: translateY(-50%);
       width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
       border-radius: 6px; border: none; background: transparent; color: var(--muted-fg);
       cursor: pointer; transition: background .12s, color .12s; flex-shrink: 0; padding: 0;
@@ -722,7 +732,7 @@
     .tp-modal.open { display: flex; }
     .tp-modal-header {
       padding: 11px 16px 10px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: flex-start;
     }
     .tp-modal-title {
       font-size: 11px; font-weight: 600; color: var(--muted-fg);
@@ -874,8 +884,11 @@
 
       <!-- Notification permission warning -->
       <div class="notif-perm-bar" id="notifPermBar">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span style="flex:1">Browser notifications blocked — tracking accuracy may be affected.</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div style="flex:1;display:flex;flex-direction:column;gap:1px">
+          <span style="font-weight:600">Browser notifications blocked</span>
+          <span style="opacity:.75">Tracking accuracy may be affected.</span>
+        </div>
       </div>
 
       <!-- Selected day context (greeting left, live clock right) -->
@@ -904,8 +917,8 @@
           <div class="rc-head-left">
             <span class="section-label" id="rcDayLabel">Today</span>
           </div>
-          <div class="badge badge-neutral" id="leaveChip">
-            <strong id="leaveAt" style="color:var(--foreground)">—</strong>
+          <div id="leaveChip" style="font-size:11px;color:var(--muted-fg);font-weight:500">
+            <strong id="leaveAt" style="color:var(--foreground);font-weight:500">—</strong>
           </div>
         </div>
         <div class="rc-body">
@@ -1138,148 +1151,159 @@
           </label>
         </div>
 
-        <div class="sep"></div>
-
-        <!-- General Group -->
-        <div class="settings-group">
+        <!-- General Card -->
+        <div class="settings-card">
           <div class="section-label">General</div>
+          <div class="settings-group">
 
-        <!-- Daily Target -->
-        <div class="form-field">
-          <div class="form-label">Daily Target</div>
-          <div class="form-row" style="display:flex;gap:8px">
-            <div class="input-suffix-wrap" style="flex:1">
-              <input type="number" class="field-input" id="inpDailyH" min="0" max="23" step="1" value="9" placeholder="0">
-              <span class="input-suffix-text">hrs</span>
-            </div>
-            <div class="input-suffix-wrap" style="flex:1">
-              <input type="number" class="field-input" id="inpDailyM" min="0" max="59" step="5" value="0" placeholder="0">
-              <span class="input-suffix-text">min</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Weekly Target -->
-        <div class="weekly-block">
-          <div class="toggle-row">
-            <div>
-              <div class="form-label">Weekly Target</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="inpWeeklyOn" checked="">
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-          <div class="sliding-field open" id="weeklySlide">
-            <div class="sliding-inner">
-              <div class="form-field">
+            <!-- Set Target (unified Daily + Weekly tabs) -->
+            <div class="form-field">
+              <input type="checkbox" id="inpWeeklyOn" style="display:none">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <div class="form-label">Set Target</div>
+                  <div class="form-sub">Your daily/weekly target based on company policies.</div>
+                </div>
+                <div class="st-tabs" id="stTabs">
+                  <button type="button" class="st-tab" id="stTabDaily" onclick="switchStTab('daily')">Daily</button>
+                  <button type="button" class="st-tab" id="stTabWeekly" onclick="switchStTab('weekly')">Weekly</button>
+                </div>
+              </div>
+              <!-- Shared daily inputs (always rendered, label changes per tab) -->
+              <div class="st-panel" id="stDailyInputs">
+                <div class="st-panel-label" id="stDailyInputLabel" style="display:none">Daily (Personal)</div>
                 <div class="form-row" style="display:flex;gap:8px">
-                  <div class="input-suffix-wrap" style="flex:1">
-                    <input type="number" class="field-input" id="inpWeeklyH" min="0" max="167" step="1" value="45" placeholder="0">
+                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                    <input type="number" class="field-input" id="inpDailyH" min="0" max="23" step="1" value="9" placeholder="0">
                     <span class="input-suffix-text">hrs</span>
                   </div>
-                  <div class="input-suffix-wrap" style="flex:1">
-                    <input type="number" class="field-input" id="inpWeeklyM" min="0" max="59" step="5" value="0" placeholder="0">
+                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                    <input type="number" class="field-input" id="inpDailyM" min="0" max="59" step="5" value="0" placeholder="0">
                     <span class="input-suffix-text">min</span>
                   </div>
                 </div>
               </div>
-              <div class="callout">
-                <svg class="callout-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                <span>Exceed your weekly target by Thursday and leave early on Friday.</span>
+              <!-- Weekly-only panel (additional inputs shown only in weekly tab) -->
+              <div id="stPanelWeekly" style="display:none">
+                <div class="st-panel-label" style="margin-top:10px">Weekly</div>
+                <div class="form-row" style="display:flex;gap:8px">
+                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                    <input type="number" class="field-input" id="inpWeeklyH" min="0" max="167" step="1" value="45" placeholder="0">
+                    <span class="input-suffix-text">hrs</span>
+                  </div>
+                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                    <input type="number" class="field-input" id="inpWeeklyM" min="0" max="59" step="5" value="0" placeholder="0">
+                    <span class="input-suffix-text">min</span>
+                  </div>
+                </div>
+                <div class="callout" style="margin-top:10px">
+                  <svg class="callout-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span>Exceed your weekly target by Thursday and leave early on Friday.</span>
+                </div>
               </div>
             </div>
+
           </div>
-        </div>
+        </div><!-- /General Card -->
 
-        </div><!-- /General -->
-
-        <div class="sep"></div>
-
-        <!-- Advanced Group -->
-        <div class="settings-group">
+        <!-- Advanced Card -->
+        <div class="settings-card">
           <div class="section-label">Advanced</div>
+          <div class="settings-group">
 
-          <!-- Leave Early Plan (multi-select) -->
-          <div class="target-day-block">
-            <div class="target-day-head">
-              <div class="form-label">Leave Early</div>
-              <div class="form-sub">Days you're likely to leave early.</div>
-            </div>
-            <div class="target-day-picker" id="targetDayPicker">
-              <button type="button" class="plan-btn" data-tday="1">Monday</button>
-              <button type="button" class="plan-btn" data-tday="2">Tuesday</button>
-              <button type="button" class="plan-btn" data-tday="3">Wednesday</button>
-              <button type="button" class="plan-btn" data-tday="4">Thursday</button>
-              <button type="button" class="plan-btn" data-tday="5">Friday</button>
-            </div>
-          </div>
-
-          <!-- Stay Late Plans (multi-select) -->
-          <div class="target-day-block">
-            <div class="target-day-head">
-              <div class="form-label">Stay Late</div>
-              <div class="form-sub">Days you're likely to stay late.</div>
-            </div>
-            <div class="target-day-picker" id="dayPicker">
-              <button type="button" class="plan-btn" data-sday="0">Monday</button>
-              <button type="button" class="plan-btn selected" data-sday="1">Tuesday</button>
-              <button type="button" class="plan-btn" data-sday="2">Wednesday</button>
-              <button type="button" class="plan-btn selected" data-sday="3">Thursday</button>
-              <button type="button" class="plan-btn" data-sday="4">Friday</button>
-            </div>
-          </div>
-        </div><!-- /Advanced -->
-
-          <!-- Shift Type -->
-          <div class="form-field">
-            <div class="form-label">Shift Type</div>
-            <div class="form-sub">We'll notify you by the end of your daily target.</div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div class="time-input-wrap" style="flex:1">
-                <input type="text" id="inpShiftStart" placeholder="From  e.g. 09:00 AM" autocomplete="off"
-                  style="flex:1;height:38px;padding:0 38px 0 12px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
-                <input type="time" id="inpShiftStartPicker" tabindex="-1"
-                  style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
-                <button type="button" class="tp-icon-btn" onclick="openTpModal('inpShiftStart',event)" title="Pick time">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </button>
-              </div>
-              <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">–</span>
-              <div class="time-input-wrap" style="flex:1">
-                <input type="text" id="inpShiftEnd" placeholder="To  e.g. 06:00 PM" autocomplete="off"
-                  style="flex:1;height:38px;padding:0 38px 0 12px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
-                <input type="time" id="inpShiftEndPicker" tabindex="-1"
-                  style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
-                <button type="button" class="tp-icon-btn" onclick="openTpModal('inpShiftEnd',event)" title="Pick time">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </button>
+            <!-- Shift Type FIRST -->
+            <div class="form-field">
+              <div class="form-label">Shift Type</div>
+              <div class="form-sub">We'll notify you by the end of your daily target.</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="time-input-wrap" style="min-width:130px;flex-shrink:0">
+                  <input type="text" id="inpShiftStart" placeholder="From  e.g. 09:00 AM" autocomplete="off"
+                    style="flex:1;height:38px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
+                  <input type="time" id="inpShiftStartPicker" tabindex="-1"
+                    style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
+                  <button type="button" class="tp-icon-btn" onclick="openTpModal('inpShiftStart',event)" title="Pick time">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </button>
+                </div>
+                <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">–</span>
+                <div class="time-input-wrap" style="min-width:130px;flex-shrink:0">
+                  <input type="text" id="inpShiftEnd" placeholder="To  e.g. 06:00 PM" autocomplete="off"
+                    style="flex:1;height:38px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
+                  <input type="time" id="inpShiftEndPicker" tabindex="-1"
+                    style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
+                  <button type="button" class="tp-icon-btn" onclick="openTpModal('inpShiftEnd',event)" title="Pick time">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
+
+            <div class="sep-inner"></div>
+
+            <!-- Leave Early Plan (multi-select) -->
+            <div class="target-day-block">
+              <div class="target-day-head">
+                <div class="form-label">Leave Early</div>
+                <div class="form-sub">Days you're likely to leave early.</div>
+              </div>
+              <div class="target-day-picker" id="targetDayPicker">
+                <button type="button" class="plan-btn" data-tday="1">Monday</button>
+                <button type="button" class="plan-btn" data-tday="2">Tuesday</button>
+                <button type="button" class="plan-btn" data-tday="3">Wednesday</button>
+                <button type="button" class="plan-btn" data-tday="4">Thursday</button>
+                <button type="button" class="plan-btn" data-tday="5">Friday</button>
+              </div>
+            </div>
+
+            <div class="sep-inner"></div>
+
+            <!-- Stay Late Plans (multi-select) -->
+            <div class="target-day-block">
+              <div class="target-day-head">
+                <div class="form-label">Stay Late</div>
+                <div class="form-sub">Days you're likely to stay late.</div>
+              </div>
+              <div class="target-day-picker" id="dayPicker">
+                <button type="button" class="plan-btn" data-sday="0">Monday</button>
+                <button type="button" class="plan-btn selected" data-sday="1">Tuesday</button>
+                <button type="button" class="plan-btn" data-sday="2">Wednesday</button>
+                <button type="button" class="plan-btn selected" data-sday="3">Thursday</button>
+                <button type="button" class="plan-btn" data-sday="4">Friday</button>
+              </div>
+            </div>
+
           </div>
+        </div><!-- /Advanced Card -->
 
         <!-- Manage Data -->
         <div class="form-field" style="margin-top:4px">
-          <div class="form-label">Manage Data</div>
-          <div class="form-sub">Import a backup or export your current log.</div>
-          <div style="display:flex;gap:8px;margin-top:10px">
-            <label class="btn-sm" style="height:36px;font-size:13px;padding:0 14px;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Import
-              <input type="file" id="logFileInput" accept=".json" style="display:none">
-            </label>
-            <button class="btn-sm" id="manualExportBtn" style="height:36px;font-size:13px;padding:0 14px">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export
-            </button>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div>
+              <div class="form-label">Manage Data</div>
+              <div class="form-sub">Import a backup or export your current log.</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0">
+              <label class="btn-sm" style="height:36px;font-size:13px;padding:0 14px;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Import
+                <input type="file" id="logFileInput" accept=".json" style="display:none">
+              </label>
+              <button class="btn-sm" id="manualExportBtn" style="height:36px;font-size:13px;padding:0 14px">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Timezone -->
         <div class="form-field">
-          <div class="form-label">Timezone</div>
-          <div class="form-sub">Used for the live clock display.</div>
-          <select class="field-input" id="inpTimezone" style="height:40px;cursor:pointer">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div>
+              <div class="form-label">Timezone</div>
+              <div class="form-sub">Used for the live clock display.</div>
+            </div>
+            <select class="field-input" id="inpTimezone" style="height:40px;cursor:pointer;width:auto;flex-shrink:0;padding:0 12px">
             <option value="-720">UTC−12:00</option>
             <option value="-600">UTC−10:00 (Hawaii)</option>
             <option value="-480">UTC−08:00 (PST)</option>
@@ -1307,6 +1331,7 @@
             <option value="660">UTC+11:00 (AEDT)</option>
             <option value="720">UTC+12:00 (NZST)</option>
           </select>
+          </div>
         </div>
 
       </div>
@@ -1423,14 +1448,14 @@
         </div>
         <div class="modal-time-row">
           <div style="position:relative;flex:1" class="time-input-wrap">
-            <input type="text" class="field-input" id="deStart" placeholder="Start time" autocomplete="off" style="padding-right:38px">
+            <input type="text" class="field-input" id="deStart" placeholder="Start time" autocomplete="off" style="padding-left:38px">
             <button type="button" class="tp-icon-btn" onclick="openTpModal('deStart',event)" title="Pick time">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </button>
           </div>
           <span class="modal-time-sep">–</span>
           <div style="position:relative;flex:1" class="time-input-wrap">
-            <input type="text" class="field-input" id="deEnd" placeholder="End time (optional)" autocomplete="off" style="padding-right:38px">
+            <input type="text" class="field-input" id="deEnd" placeholder="End time (optional)" autocomplete="off" style="padding-left:38px">
             <button type="button" class="tp-icon-btn" onclick="openTpModal('deEnd',event)" title="Pick time">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </button>
@@ -2026,35 +2051,59 @@
     function _tpPopulateWheel(id, items, selectedIdx) {
       const wheel = el(id);
       if (!wheel) return;
-      wheel.innerHTML = items.map((v, i) =>
-        `<div class="tp-wheel-item${i === selectedIdx ? ' active' : ''}" data-idx="${i}">${v}</div>`
-      ).join('');
-      requestAnimationFrame(() => { wheel.scrollTop = selectedIdx * TP_ITEM_H; });
+      const isLooping = id !== 'tpWheelAp';
+      const COPIES = isLooping ? 3 : 1;
+      const N = items.length;
+      const midOffset = Math.floor(COPIES / 2) * N;
+      const rows = [];
+      for (let c = 0; c < COPIES; c++) {
+        for (let i = 0; i < N; i++) {
+          const isActive = c === Math.floor(COPIES / 2) && i === selectedIdx;
+          rows.push(`<div class="tp-wheel-item${isActive ? ' active' : ''}" data-idx="${i}">${items[i]}</div>`);
+        }
+      }
+      wheel.innerHTML = rows.join('');
+      requestAnimationFrame(() => { wheel.scrollTop = (midOffset + selectedIdx) * TP_ITEM_H; });
     }
 
     function _tpInitWheels() {
       ['tpWheelH', 'tpWheelM', 'tpWheelAp'].forEach(wheelId => {
         const wheel = el(wheelId);
         if (!wheel) return;
+        const isLooping = wheelId !== 'tpWheelAp';
+        const COPIES = isLooping ? 3 : 1;
         let _snapTimer;
         wheel.addEventListener('scroll', () => {
           clearTimeout(_snapTimer);
           _snapTimer = setTimeout(() => {
             const items = wheelId === 'tpWheelH' ? TP_HOURS : wheelId === 'tpWheelM' ? TP_MINS : TP_AMPM;
-            const idx = Math.max(0, Math.min(items.length - 1, Math.round(wheel.scrollTop / TP_ITEM_H)));
-            wheel.scrollTo({ top: idx * TP_ITEM_H, behavior: 'smooth' });
+            const N = items.length;
+            const midOffset = Math.floor(COPIES / 2) * N;
+            const totalItems = COPIES * N;
+            const rawIdx = Math.max(0, Math.min(totalItems - 1, Math.round(wheel.scrollTop / TP_ITEM_H)));
+            const idx = ((rawIdx % N) + N) % N;
             wheel.querySelectorAll('.tp-wheel-item').forEach(item =>
               item.classList.toggle('active', +item.dataset.idx === idx));
+            const snapTop = (midOffset + idx) * TP_ITEM_H;
+            const diff = Math.abs(wheel.scrollTop - snapTop);
+            if (diff > N * TP_ITEM_H * 0.5) {
+              wheel.scrollTop = snapTop;
+            } else {
+              wheel.scrollTo({ top: snapTop, behavior: 'smooth' });
+            }
             if (wheelId === 'tpWheelH')  _tpHIdx  = idx;
             if (wheelId === 'tpWheelM')  _tpMIdx  = idx;
             if (wheelId === 'tpWheelAp') _tpApIdx = idx;
           }, 80);
         }, { passive: true });
-        // Click to scroll
         wheel.addEventListener('click', e => {
           const item = e.target.closest('.tp-wheel-item');
           if (!item) return;
-          wheel.scrollTo({ top: +item.dataset.idx * TP_ITEM_H, behavior: 'smooth' });
+          const items = wheelId === 'tpWheelH' ? TP_HOURS : wheelId === 'tpWheelM' ? TP_MINS : TP_AMPM;
+          const N = items.length;
+          const midOffset = Math.floor(COPIES / 2) * N;
+          const idx = +item.dataset.idx;
+          wheel.scrollTo({ top: (midOffset + idx) * TP_ITEM_H, behavior: 'smooth' });
         });
       });
     }
@@ -2298,6 +2347,7 @@
       el('rcWorked').textContent = '—';
       el('rcWorked').style.color = 'var(--muted-fg)';
       el('rcElapsedLabel').textContent = 'Not Started';
+      el('rcElapsedLabel').style.color = 'var(--muted-fg)';
       _setTodayDateChip();
       el('rcRightCol').style.display = 'block';
       el('rcRemaining').textContent = dur(eff);
@@ -2352,6 +2402,7 @@
       const now = new Date(), eff = effSecs();
       const worked  = Math.max(0, Math.floor((now - loginDate) / 1000)) + _sessionAccSecs;
       el('rcElapsedLabel').textContent = 'Elapsed';
+      el('rcElapsedLabel').style.color = '';
       if (Math.floor(Date.now()/1000) % 30 === 0) persistSession(); // every 30s
       const isDone  = eff > 0 && worked >= eff;
       const leaveDate = new Date(loginDate.getTime() + eff * 1000);
@@ -2708,7 +2759,7 @@
 
           // Centered badge
           const badge = document.createElement('div');
-          badge.style.cssText = `position:absolute;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:${color};background:${bg};border:1px solid ${border};padding:2px 12px;border-radius:20px;letter-spacing:.3px;pointer-events:none`;
+          badge.style.cssText = `position:absolute;left:50%;transform:translateX(-50%);font-size:12px;font-weight:500;color:${color};background:${bg};border:1px solid ${border};padding:2px 12px;border-radius:20px;letter-spacing:.3px;pointer-events:none`;
           badge.textContent = label;
           row.style.position = 'relative';
           row.appendChild(badge);
@@ -2759,7 +2810,7 @@
             // Centered "Missing Data" badge like override rows
             row.style.position = 'relative';
             const missBadge = document.createElement('div');
-            missBadge.style.cssText = 'position:absolute;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:var(--destructive);background:var(--destructive-bg);border:1px solid var(--destructive-border);padding:2px 12px;border-radius:20px;letter-spacing:.3px;pointer-events:none';
+            missBadge.style.cssText = 'position:absolute;left:50%;transform:translateX(-50%);font-size:12px;font-weight:500;color:var(--destructive);background:var(--destructive-bg);border:1px solid var(--destructive-border);padding:2px 12px;border-radius:20px;letter-spacing:.3px;pointer-events:none';
             missBadge.textContent = 'Missing Entry';
             row.appendChild(missBadge);
             // add edit button (created inline here since editBtn hasn't been declared yet)
@@ -2923,7 +2974,7 @@
       el('inpWeeklyM').value    = _wm;
       el('inpWeeklyOn').checked = c.weeklyOn;
       el('inpNotifOn').checked  = c.notifOn;
-      el('weeklySlide').className = 'sliding-field ' + (c.weeklyOn ? 'open' : 'hidden');
+      switchStTab(c.weeklyOn ? 'weekly' : 'daily');
       el('inpTimezone').value = String(c.tzOffset !== undefined ? c.tzOffset : 330);
       document.querySelectorAll('.plan-btn[data-sday]').forEach(btn => {
         btn.classList.toggle('selected', (c.lateDays || []).includes(+btn.dataset.sday));
@@ -2940,6 +2991,16 @@
     }
 
 
+
+    function switchStTab(tab) {
+      const isWeekly = tab === 'weekly';
+      el('inpWeeklyOn').checked = isWeekly;
+      el('stTabDaily').classList.toggle('active', !isWeekly);
+      el('stTabWeekly').classList.toggle('active', isWeekly);
+      el('stPanelWeekly').style.display = isWeekly ? '' : 'none';
+      const lbl = el('stDailyInputLabel');
+      if (lbl) lbl.style.display = isWeekly ? '' : 'none';
+    }
 
     function autoSaveSettings() {
       const _dailyHVal = parseInt(el('inpDailyH').value, 10) || 0;
@@ -3210,11 +3271,7 @@
           container.innerHTML = '<div class="penalty-empty">No daily penalties this month.</div>';
           return;
         }
-        container.innerHTML = `
-          <div class="penalty-row" style="background:var(--muted);padding:10px 16px">
-            <span class="section-label">Daily Penalties · ${now.toLocaleString('default',{month:'long'})} ${now.getFullYear()}</span>
-          </div>` +
-          penalties.map(p => {
+        container.innerHTML = penalties.map(p => {
             const dateStr = `${FULL_DAYS_EN[p.date.getDay()]}, ${MONTHS[p.date.getMonth()]} ${p.date.getDate()}`;
             return penaltyRowHtml(p, dateStr, `−${dur(p.deficit)} short of ${dur(c.dailyH*3600)} daily target`);
           }).join('');
@@ -3298,7 +3355,6 @@
         <div class="penalty-row-main">
           <div class="penalty-info">
             <span class="penalty-date">${dateStr}</span>
-            <span class="penalty-delta">${shortDesc}</span>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
             ${isWeekly ? '' : `<button class="btn-sm" onclick="openDayEditModal('${p.key}')">
@@ -4104,11 +4160,7 @@ ${c.name || '[Your Name]'}`;
       el(id)?.addEventListener('change', autoSaveSettings);
       el(id)?.addEventListener('input', autoSaveSettings);
     });
-    el('inpWeeklyOn').addEventListener('change', () => {
-      const on = el('inpWeeklyOn').checked;
-      el('weeklySlide').className = 'sliding-field ' + (on ? 'open' : 'hidden');
-      autoSaveSettings();
-    });
+    /* inpWeeklyOn is a hidden checkbox now toggled via switchStTab — no direct listener needed */
     el('inpNotifOn').addEventListener('change', autoSaveSettings);
     el('inpTimezone')?.addEventListener('change', autoSaveSettings);
     document.querySelectorAll('.plan-btn[data-sday]').forEach(btn => {
