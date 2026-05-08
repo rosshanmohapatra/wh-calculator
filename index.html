@@ -269,7 +269,7 @@
     .rc-remaining { font-size: 36px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
     .rc-rem-label { font-size: 11px; font-weight: 600; letter-spacing: .08em;
       text-transform: uppercase; color: var(--muted-fg); margin-top: 2px; }
-    .progress-wrap { display: flex; flex-direction: column; gap: 6px; }
+    .progress-wrap { display: flex; flex-direction: column; gap: 6px; margin-top: -4px; }
     .progress-track { height: 4px; background: var(--muted); border-radius: 99px; overflow: hidden; }
     .progress-fill { height: 100%; background: var(--foreground); border-radius: 99px;
       transition: width .8s ease; }
@@ -953,7 +953,6 @@
 
       <!-- Notification permission warning -->
       <div class="notif-perm-bar" id="notifPermBar">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <div style="flex:1;display:flex;flex-direction:column;gap:1px">
           <span style="font-weight:600">Browser notifications blocked</span>
           <span style="opacity:.75">Tracking accuracy may be affected.</span>
@@ -2634,7 +2633,7 @@
       const h = now.getHours();
       const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
       const name = (cfg().name || '').trim();
-      el('selDayRel').textContent = name ? `${greeting}, ${name}` : greeting;
+      el('selDayRel').textContent = name ? `${greeting}, ${name.split(' ')[0]}` : greeting;
       el('rcDayLabel').textContent = key === tk ? 'Today' : (day?.name || 'Day');
     }
 
