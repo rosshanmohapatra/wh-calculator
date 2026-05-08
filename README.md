@@ -1,4 +1,4 @@
-# WH Tracker
+# WH Tracker - Working Hour Tracker
 
 ```
 +----------------------------------+----------------------------------+
@@ -68,5 +68,4 @@ Single HTML file - CSS custom properties, vanilla JavaScript, localStorage. No f
 ## Developer
 
 Roshan Mohapatra - Mumbai, Maharashtra
-GitHub - https://github.com/rosshanmohapatra/wh-calculator
 Portfolio - https://roshan.framer.wiki/
