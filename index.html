@@ -297,15 +297,15 @@
     .wk-collapsible.open     { max-height: 500px; opacity: 1; }
     .wk-collapsible.minimized { max-height: 0; opacity: 0; }
     .wk-rows { padding: 4px 0; }
-    .wk-row { display: flex; align-items: center; justify-content: space-between;
-      padding: 6px 16px; cursor: pointer; transition: background .1s; border-radius: 0; }
+    .wk-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+      padding: 10px 14px; cursor: pointer; border-radius: 6px; position: relative; transition: background .12s; }
     .wk-row:hover { background: var(--muted); }
     .wk-day { font-size: 14px; color: var(--muted-fg); font-weight: 400; }
     .wk-row.today .wk-day { color: var(--foreground); font-weight: 600; }
     .wk-pill { display: inline-flex; align-items: center; gap: 5px;
       background: var(--muted); border-radius: 8px;
       padding: 5px 10px; font-size: 13px; font-weight: 500;
-      color: var(--muted-fg); white-space: nowrap; }
+      color: var(--muted-fg); white-space: nowrap; justify-self: center; }
     .wk-pill.live    { color: var(--foreground); }
     .wk-pill.early   { background: var(--blue-bg); color: var(--blue); }
     .wk-pill.surplus { background: var(--success-bg); color: var(--success); }
@@ -316,7 +316,7 @@
 
     /* Day edit dropdown (analytics row expand) */
     .wk-dropdown { display: none; }
-    .wk-row-actions { display: flex; align-items: center; gap: 8px; }
+    .wk-row-actions { display: flex; align-items: center; gap: 8px; justify-self: end; }
     .wk-edit-icon-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border);
       background: var(--muted); color: var(--muted-fg); display: flex; align-items: center;
       justify-content: center; cursor: pointer; transition: background .12s, color .12s; }
@@ -779,6 +779,51 @@
       font-family: var(--font); cursor: pointer; transition: opacity .12s;
     }
     .tp-set-btn:hover { opacity: .88; }
+
+    /* ── Onboarding ── */
+    .ob-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,.55);
+      backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .ob-dialog { background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(0,0,0,.22); display: flex; flex-direction: column; }
+    .ob-head { padding: 24px 24px 0; }
+    .ob-steps { display: flex; align-items: center; gap: 0; margin-bottom: 24px; }
+    .ob-step-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+      color: var(--muted-fg); background: var(--background); flex-shrink: 0; transition: all .2s; }
+    .ob-step-dot.active { border-color: var(--foreground); background: var(--foreground); color: var(--background); }
+    .ob-step-dot.done { border-color: var(--success); background: var(--success); color: #fff; }
+    .ob-step-line { flex: 1; height: 2px; background: var(--border); transition: background .3s; }
+    .ob-step-line.done { background: var(--success); }
+    .ob-body { padding: 0 24px 24px; flex: 1; }
+    .ob-panel { display: none; flex-direction: column; gap: 16px; }
+    .ob-panel.active { display: flex; }
+    .ob-icon { font-size: 36px; line-height: 1; }
+    .ob-title { font-size: 20px; font-weight: 700; color: var(--foreground); letter-spacing: -.3px; }
+    .ob-desc { font-size: 13px; color: var(--muted-fg); line-height: 1.6; margin-top: -6px; }
+    .ob-section-label { font-size: 11px; font-weight: 600; color: var(--muted-fg); letter-spacing: .06em; text-transform: uppercase; }
+    .ob-foot { padding: 16px 24px 20px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .ob-btn-primary { height: 42px; padding: 0 24px; border-radius: 10px; border: none;
+      background: var(--foreground); color: var(--background); font-size: 14px; font-weight: 600;
+      font-family: var(--font); cursor: pointer; transition: opacity .15s; }
+    .ob-btn-primary:hover { opacity: .85; }
+    .ob-btn-ghost { height: 42px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted-fg); font-size: 14px; font-weight: 500;
+      font-family: var(--font); cursor: pointer; transition: background .15s; }
+    .ob-btn-ghost:hover { background: var(--muted); color: var(--foreground); }
+    .ob-btn-link { background: none; border: none; color: var(--muted-fg); font-size: 13px;
+      font-family: var(--font); cursor: pointer; text-decoration: underline; padding: 0; }
+    .ob-import-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 28px 20px;
+      text-align: center; cursor: pointer; transition: border-color .15s; display: flex;
+      flex-direction: column; align-items: center; gap: 8px; }
+    .ob-import-zone:hover { border-color: var(--foreground); }
+    .ob-import-zone svg { color: var(--muted-fg); }
+    .ob-import-zone-text { font-size: 13px; color: var(--muted-fg); }
+    .ob-import-zone-text strong { color: var(--foreground); }
+    .ob-day-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ob-done-card { background: var(--muted); border-radius: 12px; padding: 20px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 8px; }
   </style>
 </head>
 <body>
@@ -1173,11 +1218,11 @@
               <div class="st-panel" id="stDailyInputs">
                 <div class="st-panel-label" id="stDailyInputLabel" style="display:none">Daily (Personal)</div>
                 <div class="form-row" style="display:flex;gap:8px">
-                  <div class="input-suffix-wrap" style="flex:0 0 auto;min-width:130px">
+                  <div class="input-suffix-wrap" style="flex:1">
                     <input type="number" class="field-input" id="inpDailyH" min="0" max="23" step="1" value="9" placeholder="0">
                     <span class="input-suffix-text">hrs</span>
                   </div>
-                  <div class="input-suffix-wrap" style="flex:0 0 auto;min-width:130px">
+                  <div class="input-suffix-wrap" style="flex:1">
                     <input type="number" class="field-input" id="inpDailyM" min="0" max="59" step="5" value="0" placeholder="0">
                     <span class="input-suffix-text">min</span>
                   </div>
@@ -1187,11 +1232,11 @@
               <div id="stPanelWeekly" style="display:none">
                 <div class="st-panel-label" style="margin-top:10px">Weekly</div>
                 <div class="form-row" style="display:flex;gap:8px">
-                  <div class="input-suffix-wrap" style="flex:0 0 auto;min-width:130px">
+                  <div class="input-suffix-wrap" style="flex:1">
                     <input type="number" class="field-input" id="inpWeeklyH" min="0" max="167" step="1" value="45" placeholder="0">
                     <span class="input-suffix-text">hrs</span>
                   </div>
-                  <div class="input-suffix-wrap" style="flex:0 0 auto;min-width:130px">
+                  <div class="input-suffix-wrap" style="flex:1">
                     <input type="number" class="field-input" id="inpWeeklyM" min="0" max="59" step="5" value="0" placeholder="0">
                     <span class="input-suffix-text">min</span>
                   </div>
@@ -2158,11 +2203,13 @@
       const refEl = el(targetInputId) || event?.currentTarget || event?.target;
       const refRect = refEl?.getBoundingClientRect();
       if (refRect) {
-        const mW = 256, mH = 310;
-        let top = refRect.bottom + 6, left = refRect.left;
-        if (left + mW > window.innerWidth - 8) left = window.innerWidth - mW - 8;
-        if (left < 8) left = 8;
-        if (top + mH > window.innerHeight - 8) top = refRect.top - mH - 6;
+        const GAP = 8, mW = 256, mH = 320, pad = 8;
+        let top = refRect.bottom + GAP;
+        let left = refRect.left;
+        if (left + mW > window.innerWidth - pad) left = window.innerWidth - mW - pad;
+        if (left < pad) left = pad;
+        if (top + mH > window.innerHeight - pad) top = Math.max(pad, refRect.top - mH - GAP);
+        if (top < pad) top = pad;
         modal.style.top = top + 'px'; modal.style.left = left + 'px';
       }
       modal.classList.add('open');
@@ -4315,6 +4362,142 @@ ${c.name || '[Your Name]'}`;
       el('loginInput').value = `${p2(h)}:${p2(m)}${suffix}`;
     });
 
+    // ── ONBOARDING ──────────────────────────────────
+    const OB_DONE_KEY = 'wh_ob_done';
+    let _obStep = 1;
+    let _obIsWeekly = false;
+    let _obImported = false;
+
+    function obSwitchTab(tab) {
+      _obIsWeekly = tab === 'weekly';
+      el('obTabDaily').classList.toggle('active', !_obIsWeekly);
+      el('obTabWeekly').classList.toggle('active', _obIsWeekly);
+      el('obPanelDaily').style.display = _obIsWeekly ? 'none' : '';
+      el('obPanelWeekly').style.display = _obIsWeekly ? '' : 'none';
+    }
+
+    function obUpdateSteps(step) {
+      [1,2,3,4].forEach(s => {
+        const dot = el('obDot' + s);
+        dot.classList.toggle('active', s === step);
+        dot.classList.toggle('done', s < step);
+        if (s < 4) {
+          const line = el('obLine' + s);
+          line.classList.toggle('done', s < step);
+        }
+      });
+      el('obBackBtn').style.visibility = step > 1 ? 'visible' : 'hidden';
+      el('obNextBtn').textContent = step === 3 ? 'Continue' : step === 4 ? 'Explore' : 'Next';
+      el('obSkipBtn').style.display = step === 4 ? 'none' : '';
+      [1,2,3,4].forEach(s => {
+        const p = el('obPanel' + s);
+        p.classList.toggle('active', s === step);
+      });
+    }
+
+    function obSaveStep2() {
+      const name = (el('obName')?.value || '').trim();
+      const company = (el('obCompany')?.value || '').trim();
+      const shiftStart = (el('obShiftStart')?.value || '09:00 AM').trim();
+      const shiftEnd = (el('obShiftEnd')?.value || '06:00 PM').trim();
+      const shiftType = deriveShiftType(shiftStart);
+      const c = cfg();
+      saveCfg({ ...c, name, company, shiftStart, shiftEnd, shiftType });
+    }
+
+    function obSaveStep3() {
+      const c = cfg();
+      let dailyH, weeklyH, weeklyOn;
+      if (_obIsWeekly) {
+        const dh = parseInt(el('obDailyHW')?.value, 10) || 9;
+        const dm = parseInt(el('obDailyMW')?.value, 10) || 0;
+        const wh = parseInt(el('obWeeklyH')?.value, 10) || 45;
+        const wm = parseInt(el('obWeeklyM')?.value, 10) || 0;
+        dailyH = dh + dm / 60;
+        weeklyH = wh + wm / 60;
+        weeklyOn = true;
+      } else {
+        const dh = parseInt(el('obDailyH')?.value, 10) || 9;
+        const dm = parseInt(el('obDailyM')?.value, 10) || 0;
+        dailyH = dh + dm / 60;
+        weeklyH = c.weeklyH || 45;
+        weeklyOn = false;
+      }
+      const earlyLeaveDays = [...document.querySelectorAll('#obEarlyPicker .plan-btn.selected')].map(b => +b.dataset.oday);
+      const lateDays = [...document.querySelectorAll('#obLatePicker .plan-btn.selected')].map(b => +b.dataset.lday);
+      const targetDay = earlyLeaveDays.length ? earlyLeaveDays[0] : null;
+      saveCfg({ ...c, dailyH, weeklyH, weeklyOn, earlyLeaveDays, lateDays, targetDay });
+    }
+
+    function obStep(dir) {
+      if (_obStep === 3 && dir === 1) obSaveStep3();
+      if (_obStep === 2 && dir === 1) obSaveStep2();
+      if (_obStep === 4 && dir === 1) { obFinish(); return; }
+      _obStep = Math.max(1, Math.min(4, _obStep + dir));
+      obUpdateSteps(_obStep);
+    }
+
+    function obSkip() {
+      obFinish();
+    }
+
+    function obFinish() {
+      localStorage.setItem(OB_DONE_KEY, '1');
+      el('obOverlay').style.display = 'none';
+      populateSettings();
+      renderEmptyState();
+      renderHistory();
+    }
+
+    function openOnboarding() {
+      _obStep = 1;
+      _obImported = false;
+      obSwitchTab('daily');
+      obUpdateSteps(1);
+      el('obOverlay').style.display = 'flex';
+
+      // Import file handler
+      const fileInput = el('obImportFile');
+      if (fileInput && !fileInput._obBound) {
+        fileInput._obBound = true;
+        fileInput.addEventListener('change', e => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = ev => {
+            try {
+              const data = JSON.parse(ev.target.result);
+              // Support wh_backup_v2 and raw cfg format
+              if (data.wh_backup_v2) {
+                const { cfg: c, days } = data.wh_backup_v2;
+                if (c) Store.setCfg(c);
+                if (days) Object.entries(days).forEach(([k, v]) => Store.set(KEY.day + k, v));
+              } else if (data.cfg) {
+                Store.setCfg(data.cfg);
+                if (data.days) Object.entries(data.days).forEach(([k, v]) => Store.set(KEY.day + k, v));
+              }
+              _obImported = true;
+              const statusEl = el('obImportStatus');
+              if (statusEl) { statusEl.textContent = '✓ Backup imported successfully'; statusEl.style.display = 'block'; statusEl.style.color = 'var(--success)'; }
+              setTimeout(() => obStep(1), 800);
+            } catch {
+              const statusEl = el('obImportStatus');
+              if (statusEl) { statusEl.textContent = 'Invalid backup file. Please try again.'; statusEl.style.display = 'block'; statusEl.style.color = 'var(--destructive)'; }
+            }
+          };
+          reader.readAsText(file);
+        });
+      }
+
+      // Day picker toggles
+      document.querySelectorAll('#obEarlyPicker .plan-btn').forEach(btn => {
+        btn.onclick = () => btn.classList.toggle('selected');
+      });
+      document.querySelectorAll('#obLatePicker .plan-btn').forEach(btn => {
+        btn.onclick = () => btn.classList.toggle('selected');
+      });
+    }
+
     // ── INIT ───────────────────────────────────────────
     (function init() {
       _tpInitWheels();
@@ -4368,10 +4551,185 @@ ${c.name || '[Your Name]'}`;
       // Hide resume row if not from today
       (function(){ const l=dayLog(todayKey()); if(!l||l.sessionDate!==todayKey()) el('resumeRow').style.display='none'; })();
 
+      // Show onboarding on first launch
+      if (!localStorage.getItem(OB_DONE_KEY) && !Store.getCfg()) {
+        setTimeout(openOnboarding, 300);
+      }
+
       // Show week plan modal if needed
       if (shouldShowWeekPlan()) setTimeout(openWeekPlanModal, 1200);
     })();
   </script>
 
+<!-- ── ONBOARDING MODAL ── -->
+<div class="ob-overlay" id="obOverlay" style="display:none">
+  <div class="ob-dialog">
+    <div class="ob-head">
+      <div class="ob-steps" id="obSteps">
+        <div class="ob-step-dot active" id="obDot1">1</div>
+        <div class="ob-step-line" id="obLine1"></div>
+        <div class="ob-step-dot" id="obDot2">2</div>
+        <div class="ob-step-line" id="obLine2"></div>
+        <div class="ob-step-dot" id="obDot3">3</div>
+        <div class="ob-step-line" id="obLine3"></div>
+        <div class="ob-step-dot" id="obDot4">4</div>
+      </div>
+    </div>
+    <div class="ob-body">
+
+      <!-- Step 1: Import Data -->
+      <div class="ob-panel active" id="obPanel1">
+        <div class="ob-icon">📦</div>
+        <div class="ob-title">Welcome to WH Calculator</div>
+        <div class="ob-desc">Track your work hours effortlessly. Got a backup? Import it to restore your data.</div>
+        <label class="ob-import-zone" for="obImportFile">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div class="ob-import-zone-text"><strong>Click to import a backup</strong><br>Supports .json backup files</div>
+          <input type="file" id="obImportFile" accept=".json" style="display:none">
+        </label>
+        <div id="obImportStatus" style="font-size:12px;color:var(--muted-fg);text-align:center;display:none"></div>
+      </div>
+
+      <!-- Step 2: Personal Details -->
+      <div class="ob-panel" id="obPanel2">
+        <div class="ob-title">Personal Details</div>
+        <div class="ob-desc">These help personalise your experience. Both fields are optional.</div>
+        <div class="form-field">
+          <div class="ob-section-label">Your Name</div>
+          <input type="text" class="field-input" id="obName" placeholder="e.g. Alex" maxlength="40" autocomplete="off">
+        </div>
+        <div class="form-field">
+          <div class="ob-section-label">Company</div>
+          <input type="text" class="field-input" id="obCompany" placeholder="e.g. Acme Corp" maxlength="60" autocomplete="off">
+        </div>
+        <div class="form-field">
+          <div class="ob-section-label">Shift Hours</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="time-input-wrap" style="flex:1">
+              <input type="text" id="obShiftStart" placeholder="From  e.g. 09:00 AM" autocomplete="off"
+                style="height:40px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
+              <button type="button" class="tp-icon-btn" onclick="openTpModal('obShiftStart',event)" title="Pick time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </button>
+            </div>
+            <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">–</span>
+            <div class="time-input-wrap" style="flex:1">
+              <input type="text" id="obShiftEnd" placeholder="To  e.g. 06:00 PM" autocomplete="off"
+                style="height:40px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
+              <button type="button" class="tp-icon-btn" onclick="openTpModal('obShiftEnd',event)" title="Pick time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Setup Routine -->
+      <div class="ob-panel" id="obPanel3">
+        <div class="ob-title">Setup Your Routine</div>
+        <div class="ob-desc">Configure your work target and leave patterns.</div>
+        <!-- Target tabs -->
+        <div class="form-field">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div class="ob-section-label">Target Hours</div>
+            <div class="st-tabs" id="obStTabs">
+              <button type="button" class="st-tab" id="obTabDaily" onclick="obSwitchTab('daily')">Daily</button>
+              <button type="button" class="st-tab" id="obTabWeekly" onclick="obSwitchTab('weekly')">Weekly</button>
+            </div>
+          </div>
+          <div id="obPanelDaily" style="margin-top:10px">
+            <div style="display:flex;gap:8px">
+              <div class="input-suffix-wrap" style="flex:1">
+                <input type="number" class="field-input" id="obDailyH" min="0" max="23" step="1" value="9" placeholder="0">
+                <span class="input-suffix-text">hrs</span>
+              </div>
+              <div class="input-suffix-wrap" style="flex:1">
+                <input type="number" class="field-input" id="obDailyM" min="0" max="59" step="5" value="0" placeholder="0">
+                <span class="input-suffix-text">min</span>
+              </div>
+            </div>
+          </div>
+          <div id="obPanelWeekly" style="display:none;margin-top:10px">
+            <div class="st-panel-label">Daily (Personal)</div>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <div class="input-suffix-wrap" style="flex:1">
+                <input type="number" class="field-input" id="obDailyHW" min="0" max="23" step="1" value="9" placeholder="0">
+                <span class="input-suffix-text">hrs</span>
+              </div>
+              <div class="input-suffix-wrap" style="flex:1">
+                <input type="number" class="field-input" id="obDailyMW" min="0" max="59" step="5" value="0" placeholder="0">
+                <span class="input-suffix-text">min</span>
+              </div>
+            </div>
+            <div class="st-panel-label" style="margin-top:10px">Weekly</div>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <div class="input-suffix-wrap" style="flex:1">
+                <input type="number" class="field-input" id="obWeeklyH" min="0" max="167" step="1" value="45" placeholder="0">
+                <span class="input-suffix-text">hrs</span>
+              </div>
+              <div class="input-suffix-wrap" style="flex:1">
+                <input type="number" class="field-input" id="obWeeklyM" min="0" max="59" step="5" value="0" placeholder="0">
+                <span class="input-suffix-text">min</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Leave Early (optional) -->
+        <div class="form-field">
+          <div class="ob-section-label">Leave Early <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">— optional</span></div>
+          <div class="ob-day-picker" id="obEarlyPicker">
+            <button type="button" class="plan-btn" data-oday="1">Mon</button>
+            <button type="button" class="plan-btn" data-oday="2">Tue</button>
+            <button type="button" class="plan-btn" data-oday="3">Wed</button>
+            <button type="button" class="plan-btn" data-oday="4">Thu</button>
+            <button type="button" class="plan-btn" data-oday="5">Fri</button>
+          </div>
+        </div>
+        <!-- Stay Late (optional) -->
+        <div class="form-field">
+          <div class="ob-section-label">Stay Late <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">— optional</span></div>
+          <div class="ob-day-picker" id="obLatePicker">
+            <button type="button" class="plan-btn" data-lday="1">Mon</button>
+            <button type="button" class="plan-btn" data-lday="2">Tue</button>
+            <button type="button" class="plan-btn" data-lday="3">Wed</button>
+            <button type="button" class="plan-btn" data-lday="4">Thu</button>
+            <button type="button" class="plan-btn" data-lday="5">Fri</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: All Done -->
+      <div class="ob-panel" id="obPanel4">
+        <div class="ob-done-card">
+          <div class="ob-icon">🎉</div>
+          <div style="font-size:18px;font-weight:700;color:var(--foreground)">You're all set!</div>
+          <div style="font-size:13px;color:var(--muted-fg);line-height:1.6">Your workspace is configured and ready.<br>Start tracking your hours.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted-fg)">
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Log your daily work hours
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Track weekly progress on the Dashboard
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Adjust settings anytime in Settings
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /ob-body -->
+    <div class="ob-foot">
+      <button class="ob-btn-ghost" id="obBackBtn" onclick="obStep(-1)" style="visibility:hidden">Back</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="ob-btn-link" id="obSkipBtn" onclick="obSkip()">Skip setup</button>
+        <button class="ob-btn-primary" id="obNextBtn" onclick="obStep(1)">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body></html>
