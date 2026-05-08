@@ -120,6 +120,7 @@
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
     .input-suffix-wrap { position: relative; flex: 1; }
+    .settings-group .input-suffix-wrap { max-width: 130px; }
     .input-suffix-wrap .field-input { padding-right: 74px; }
     .input-suffix-text { position: absolute; right: 12px; top: 50%;
       transform: translateY(-50%); font-size: 12px; color: var(--muted-fg);
@@ -378,8 +379,13 @@
       font-size: 12px; color: var(--muted-fg); line-height: 1.6;
       padding: 10px 12px; background: var(--muted); border-radius: var(--radius); }
     .callout-icon { flex-shrink: 0; margin-top: 1px; opacity: .7; }
+    /* Info icon button + tooltip */
+    .info-icon-btn { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; border:none; background:transparent; color:var(--muted-fg); cursor:pointer; padding:0; flex-shrink:0; }
+    .info-icon-btn:hover { color:var(--foreground); }
+    .info-tooltip { position:absolute; left:50%; top:calc(100% + 6px); transform:translateX(-50%); white-space:nowrap; background:var(--foreground); color:var(--background); font-size:12px; padding:6px 10px; border-radius:6px; pointer-events:none; opacity:0; transition:opacity .15s; z-index:100; max-width:260px; white-space:normal; text-align:center; line-height:1.5; }
+    .info-tooltip.visible { opacity:1; pointer-events:auto; }
     /* Plan blocks — shared base for Early Leave Plan & Stay Late Plans */
-    .target-day-block { border-radius: 8px; padding: 14px;
+    .target-day-block { border-radius: 8px; padding: 0;
       display: flex; flex-direction: column; gap: 10px; }
     .target-day-head { display: flex; flex-direction: column; gap: 2px; }
     .target-day-picker { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -393,7 +399,13 @@
       border-color: var(--foreground); box-shadow: none; }
     /* Settings groups */
     .settings-group { display: flex; flex-direction: column; gap: 14px; }
-    .settings-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .settings-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .settings-card-head { display: flex; align-items: center; justify-content: space-between; padding: 16px; cursor: pointer; user-select: none; }
+    .settings-card-head .section-label { margin: 0; }
+    .settings-card-chevron { color: var(--muted-fg); transition: transform .2s; flex-shrink: 0; }
+    .settings-card.collapsed .settings-card-chevron { transform: rotate(-90deg); }
+    .settings-card-body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+    .settings-card.collapsed .settings-card-body { display: none; }
     .sep-inner { height: 1px; background: var(--border); }
 
     /* ── Checkout modal ── */
@@ -633,6 +645,7 @@
 
     /* ── Time picker wrapper (native time input styled) ── */
     .time-input-wrap { position:relative; display:flex; align-items:center; gap:6px; }
+    .settings-group .time-input-wrap { max-width:130px; }
     .time-input-native { height:38px; flex:1; font-size:13px; font-family:var(--font);
       padding:0 10px; background:var(--input-bg); color:var(--foreground);
       border:1px solid var(--input); border-radius:8px; outline:none;
@@ -1181,17 +1194,29 @@
         </div>
 
         <!-- General Card -->
-        <div class="settings-card">
-          <div class="section-label">General</div>
+        <div class="settings-card" id="cardGeneral">
+          <div class="settings-card-head" onclick="toggleCard('cardGeneral')">
+            <div class="section-label">General</div>
+            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="settings-card-body">
           <div class="settings-group">
 
             <!-- Set Target (unified Daily + Weekly tabs) -->
             <div class="form-field">
               <input type="checkbox" id="inpWeeklyOn" style="display:none">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-                <div>
-                  <div class="form-label">Set Target</div>
-                  <div class="form-sub">Your daily/weekly target based on company policies.</div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div>
+                    <div class="form-label">Set Target</div>
+                    <div class="form-sub">Your daily/weekly target based on company policies.</div>
+                  </div>
+                  <div style="position:relative">
+                    <button type="button" class="info-icon-btn" id="setTargetInfoBtn" onclick="toggleSetTargetTooltip(event)" aria-label="Info">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    </button>
+                    <div class="info-tooltip" id="setTargetTooltip">Exceed your weekly target by Thursday and leave early on Friday.</div>
+                  </div>
                 </div>
                 <div class="st-tabs" id="stTabs">
                   <button type="button" class="st-tab" id="stTabDaily" onclick="switchStTab('daily')">Daily</button>
@@ -1225,19 +1250,20 @@
                     <span class="input-suffix-text">min</span>
                   </div>
                 </div>
-                <div class="callout" style="margin-top:10px">
-                  <svg class="callout-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                  <span>Exceed your weekly target by Thursday and leave early on Friday.</span>
-                </div>
               </div>
             </div>
 
           </div>
+          </div><!-- /settings-card-body -->
         </div><!-- /General Card -->
 
         <!-- Advanced Card -->
-        <div class="settings-card">
-          <div class="section-label">Advanced</div>
+        <div class="settings-card" id="cardAdvanced">
+          <div class="settings-card-head" onclick="toggleCard('cardAdvanced')">
+            <div class="section-label">Advanced</div>
+            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="settings-card-body">
           <div class="settings-group">
 
             <!-- Shift Type FIRST -->
@@ -1267,8 +1293,6 @@
               </div>
             </div>
 
-            <div class="sep-inner"></div>
-
             <!-- Leave Early Plan (multi-select) -->
             <div class="target-day-block">
               <div class="target-day-head">
@@ -1283,8 +1307,6 @@
                 <button type="button" class="plan-btn" data-tday="5">Friday</button>
               </div>
             </div>
-
-            <div class="sep-inner"></div>
 
             <!-- Stay Late Plans (multi-select) -->
             <div class="target-day-block">
@@ -1302,40 +1324,56 @@
             </div>
 
           </div>
+          </div><!-- /settings-card-body -->
         </div><!-- /Advanced Card -->
 
-        <!-- Allow Notifications -->
-        <div class="toggle-row" style="border:1px solid var(--border);border-radius:8px;background:var(--background)">
-          <div>
-            <div class="form-label">Allow Notifications</div>
-            <div class="form-sub">We'll notify you when your working hours are elapsed.</div>
+        <!-- Other Settings Card -->
+        <div class="settings-card" id="cardOther">
+          <div class="settings-card-head" onclick="toggleCard('cardOther')">
+            <div class="section-label">Other Settings</div>
+            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
-          <label class="toggle">
-            <input type="checkbox" id="inpNotifOn">
-            <span class="toggle-track"></span>
-          </label>
-        </div>
+          <div class="settings-card-body">
+          <div class="settings-group">
 
-        <!-- Manage Data -->
-        <div class="form-field" style="margin-top:4px">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <div>
-              <div class="form-label">Manage Data</div>
-              <div class="form-sub">Import a backup or export your current log.</div>
-            </div>
-            <div style="display:flex;gap:8px;flex-shrink:0">
-              <label class="btn-sm" style="height:36px;font-size:13px;padding:0 14px;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                Import
-                <input type="file" id="logFileInput" accept=".json" style="display:none">
+            <!-- Allow Notifications -->
+            <div class="toggle-row">
+              <div>
+                <div class="form-label">Allow Notifications</div>
+                <div class="form-sub">We'll notify you when your working hours are elapsed.</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="inpNotifOn">
+                <span class="toggle-track"></span>
               </label>
-              <button class="btn-sm" id="manualExportBtn" style="height:36px;font-size:13px;padding:0 14px">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Export
-              </button>
             </div>
+
+            <div class="sep-inner"></div>
+
+            <!-- Manage Data -->
+            <div class="form-field">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <div class="form-label">Manage Data</div>
+                  <div class="form-sub">Import a backup or export your current log.</div>
+                </div>
+                <div style="display:flex;gap:8px;flex-shrink:0">
+                  <label class="btn-sm" style="height:36px;font-size:13px;padding:0 14px;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Import
+                    <input type="file" id="logFileInput" accept=".json" style="display:none">
+                  </label>
+                  <button class="btn-sm" id="manualExportBtn" style="height:36px;font-size:13px;padding:0 14px">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Export
+                  </button>
+                </div>
+              </div>
+            </div>
+
           </div>
-        </div>
+          </div><!-- /settings-card-body -->
+        </div><!-- /Other Settings Card -->
 
 
       </div>
@@ -1436,18 +1474,22 @@
         <div class="dialog-title">Are you sure?</div>
         <div class="dialog-desc">This will replace your existing data.</div>
       </div>
-      <!-- File info card -->
-      <div id="importInfoCard" style="background:var(--muted);border-radius:8px;padding:12px 14px;margin:12px 0;display:flex;flex-direction:column;gap:4px">
-        <div style="font-size:13px;font-weight:600;color:var(--foreground)" id="importInfoUser"></div>
-        <div style="font-size:12px;color:var(--muted-fg)" id="importInfoMeta"></div>
+      <div class="dialog-body">
+        <!-- File info card -->
+        <div id="importInfoCard" style="background:var(--muted);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:13px;font-weight:600;color:var(--foreground)" id="importInfoUser"></div>
+          <div style="font-size:12px;color:var(--muted-fg)" id="importInfoMeta"></div>
+        </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-        <button class="btn-sm" id="importSaveLogBtn" style="height:34px;font-size:12px;padding:0 12px;flex-shrink:0">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save Log
-        </button>
-        <div style="flex:1"></div>
-        <button class="btn btn-cancel" id="importCancelBtn" style="width:auto;padding:0 16px;height:38px;font-size:13px">Cancel</button>
-        <button class="btn btn-primary" id="importConfirmBtn" style="width:auto;padding:0 16px;height:38px;font-size:13px">Import</button>
+      <div class="dialog-foot">
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn-sm" id="importSaveLogBtn" style="height:34px;font-size:12px;padding:0 12px;flex-shrink:0">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save Log
+          </button>
+          <div style="flex:1"></div>
+          <button class="btn btn-cancel" id="importCancelBtn" style="width:auto;padding:0 16px;height:38px;font-size:13px">Cancel</button>
+          <button class="btn btn-primary" id="importConfirmBtn" style="width:auto;padding:0 16px;height:38px;font-size:13px">Import</button>
+        </div>
       </div>
     </div>
   </div>
@@ -3069,6 +3111,21 @@
     }
 
 
+
+    function toggleCard(id) {
+      el(id).classList.toggle('collapsed');
+    }
+
+    function toggleSetTargetTooltip(e) {
+      e.stopPropagation();
+      const tip = el('setTargetTooltip');
+      const isVisible = tip.classList.contains('visible');
+      tip.classList.toggle('visible', !isVisible);
+      if (!isVisible) {
+        const hide = () => { tip.classList.remove('visible'); document.removeEventListener('click', hide); };
+        setTimeout(() => document.addEventListener('click', hide), 0);
+      }
+    }
 
     function switchStTab(tab) {
       const isWeekly = tab === 'weekly';
