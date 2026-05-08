@@ -4,7 +4,7 @@
 +----------------------------------+----------------------------------+
 | WH Tracker                       | Version: v0.9.1                  |
 +----------------------------------+----------------------------------+
-| A single-file work-hours tracker | No server. No install.           |
+| A working hours tracker          | No server. No install.           |
 | that runs entirely in the        | Open in any modern browser and   |
 | browser with zero dependencies.  | start tracking your hours.       |
 +----------------------------------+----------------------------------+
