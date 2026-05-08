@@ -14,7 +14,7 @@ Security updates are maintained for the current release only. Older versions are
 Security issues should be reported privately rather than disclosed publicly. Preferred approaches:
 
 - Use GitHub's private vulnerability reporting feature on this repository
-- Email `kishank.work@gmail.com` with the subject line: "Security Vulnerability: WH Tracker"
+- Email `roshanmohapatra.2001@gmail.com` with the subject line: "Security Vulnerability: WH Tracker"
 
 When submitting a report, please include:
 
