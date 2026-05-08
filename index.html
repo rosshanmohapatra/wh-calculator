@@ -1173,11 +1173,11 @@
               <div class="st-panel" id="stDailyInputs">
                 <div class="st-panel-label" id="stDailyInputLabel" style="display:none">Daily (Personal)</div>
                 <div class="form-row" style="display:flex;gap:8px">
-                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                  <div class="input-suffix-wrap" style="flex:0 0 auto;min-width:130px">
                     <input type="number" class="field-input" id="inpDailyH" min="0" max="23" step="1" value="9" placeholder="0">
                     <span class="input-suffix-text">hrs</span>
                   </div>
-                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                  <div class="input-suffix-wrap" style="flex:0 0 auto;min-width:130px">
                     <input type="number" class="field-input" id="inpDailyM" min="0" max="59" step="5" value="0" placeholder="0">
                     <span class="input-suffix-text">min</span>
                   </div>
@@ -1187,11 +1187,11 @@
               <div id="stPanelWeekly" style="display:none">
                 <div class="st-panel-label" style="margin-top:10px">Weekly</div>
                 <div class="form-row" style="display:flex;gap:8px">
-                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                  <div class="input-suffix-wrap" style="flex:0 0 auto;min-width:130px">
                     <input type="number" class="field-input" id="inpWeeklyH" min="0" max="167" step="1" value="45" placeholder="0">
                     <span class="input-suffix-text">hrs</span>
                   </div>
-                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                  <div class="input-suffix-wrap" style="flex:0 0 auto;min-width:130px">
                     <input type="number" class="field-input" id="inpWeeklyM" min="0" max="59" step="5" value="0" placeholder="0">
                     <span class="input-suffix-text">min</span>
                   </div>
@@ -1833,15 +1833,14 @@
     const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
     function tickHeader() {
-      try {
-        const n = nowTz();
-        const timeStr = clock(n);
-        el('dayName').textContent  = FULL_DAYS_EN[n.getDay()];
-        el('dayDate').textContent  = `${MONTHS[n.getMonth()]} ${n.getDate()}`;
-        el('dayClock').textContent = timeStr;
-        const clkEl = el('selDayClock');
-        if (clkEl) clkEl.textContent = timeStr;
-      } catch(e) { /* fail silently */ }
+      const n = nowTz();
+      const timeStr = clock(n);
+      el('dayName').textContent  = FULL_DAYS_EN[n.getDay()];
+      el('dayDate').textContent  = `${MONTHS[n.getMonth()]} ${n.getDate()}`;
+      el('dayClock').textContent = timeStr;
+      const clkEl = el('selDayClock');
+      if (clkEl) clkEl.textContent = timeStr;
+      _setTodayDateChip();
     }
 
     // ── WEEK MINIMIZE (no-op — week card now always visible in analytics) ──
@@ -2073,6 +2072,31 @@
         const isLooping = wheelId !== 'tpWheelAp';
         const COPIES = isLooping ? 3 : 1;
         let _snapTimer;
+        // Intercept mouse wheel: one item per tick, controlled speed
+        wheel.addEventListener('wheel', e => {
+          e.preventDefault();
+          const items = wheelId === 'tpWheelH' ? TP_HOURS : wheelId === 'tpWheelM' ? TP_MINS : TP_AMPM;
+          const N = items.length;
+          const midOffset = Math.floor(COPIES / 2) * N;
+          const rawIdx = Math.round(wheel.scrollTop / TP_ITEM_H);
+          const nextRaw = rawIdx + (e.deltaY > 0 ? 1 : -1);
+          const idx = ((nextRaw % N) + N) % N;
+          const clampedRaw = Math.max(0, Math.min(COPIES * N - 1, nextRaw));
+          const snapTo = (Math.abs(clampedRaw - (midOffset + idx)) < N)
+            ? (midOffset + idx) * TP_ITEM_H
+            : clampedRaw * TP_ITEM_H;
+          wheel.scrollTo({ top: snapTo, behavior: 'smooth' });
+          clearTimeout(_snapTimer);
+          _snapTimer = setTimeout(() => {
+            wheel.querySelectorAll('.tp-wheel-item').forEach(item =>
+              item.classList.toggle('active', +item.dataset.idx === idx));
+            const finalTop = (midOffset + idx) * TP_ITEM_H;
+            if (Math.abs(wheel.scrollTop - finalTop) > N * TP_ITEM_H * 0.5) wheel.scrollTop = finalTop;
+            if (wheelId === 'tpWheelH')  _tpHIdx  = idx;
+            if (wheelId === 'tpWheelM')  _tpMIdx  = idx;
+            if (wheelId === 'tpWheelAp') _tpApIdx = idx;
+          }, 150);
+        }, { passive: false });
         wheel.addEventListener('scroll', () => {
           clearTimeout(_snapTimer);
           _snapTimer = setTimeout(() => {
@@ -2335,9 +2359,9 @@
 
     // ── TODAY DATE CHIP ───────────────────────────────
     function _setTodayDateChip() {
-      const d = new Date();
+      const d = nowTz();
       const chip = el('leaveAt');
-      if (chip) chip.textContent = DAYS[d.getDay()].slice(0,3) + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate();
+      if (chip) chip.textContent = FULL_DAYS_EN[d.getDay()].slice(0,3) + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate();
     }
 
     // ── EMPTY STATE ────────────────────────────────────
