@@ -35,6 +35,14 @@
       --blue: #60a5fa; --blue-bg: #0c1a2e; --blue-border: #1e40af;
     }
 
+    /* ── Scrollbar (Fluent Design thin overlay) ── */
+    html { scrollbar-gutter: stable; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(128,128,128,.35); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,.6); }
+    * { scrollbar-width: thin; scrollbar-color: rgba(128,128,128,.35) transparent; }
+
     /* ── Reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: var(--font); background: var(--background); color: var(--foreground);
@@ -220,8 +228,10 @@
     .shift-combo-btn.end-shift { background: transparent; color: var(--destructive);
       border: 1.5px solid var(--destructive); }
     .shift-combo-btn.end-shift:hover { background: var(--destructive-bg); opacity: 1; }
-    .shift-combo-btn.resume-shift { background: var(--success-bg); color: var(--success); border: 1.5px solid var(--success-border); }
-    .shift-combo-btn.resume-shift:hover { background: var(--success-border); opacity: 1; }
+    .shift-combo-btn.pause-shift { background: var(--muted); color: var(--foreground); border: none; }
+    .shift-combo-btn.pause-shift:hover { opacity: .85; }
+    .shift-combo-btn.resume-shift { background: var(--foreground); color: var(--background); border: none; }
+    .shift-combo-btn.resume-shift:hover { opacity: .85; }
     .shift-combo-btn:disabled { opacity: .4; cursor: default; }
     .shift-combo.active-state { border-color: var(--success-border); background: var(--success-bg); }
     .shift-combo-active-label { flex: 1; font-size: 13px; font-weight: 500;
@@ -816,8 +826,10 @@
       background: transparent; color: var(--muted-fg); font-size: 14px; font-weight: 500;
       font-family: var(--font); cursor: pointer; transition: background .15s; }
     .ob-btn-ghost:hover { background: var(--muted); color: var(--foreground); }
-    .ob-btn-link { background: none; border: none; color: var(--muted-fg); font-size: 13px;
-      font-family: var(--font); cursor: pointer; text-decoration: underline; padding: 0; }
+    .ob-btn-link { height: 42px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted-fg); font-size: 14px; font-weight: 500;
+      font-family: var(--font); cursor: pointer; transition: background .15s; }
+    .ob-btn-link:hover { background: var(--muted); color: var(--foreground); }
     .ob-import-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 28px 20px;
       text-align: center; cursor: pointer; transition: border-color .15s; display: flex;
       flex-direction: column; align-items: center; gap: 8px; }
@@ -1157,11 +1169,17 @@
           </div>
         </div>
 
-        <!-- Name -->
+        <!-- Name + Company -->
         <div class="form-field">
-          <div class="form-label">Your Name</div>
-          <div class="form-row">
-            <input type="text" class="field-input" id="inpName" placeholder="e.g. Alex" autocomplete="off" maxlength="40">
+          <div style="display:flex;gap:12px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <div class="form-label">Your Name</div>
+              <input type="text" class="field-input" id="inpName" placeholder="e.g. Alex" autocomplete="off" maxlength="40">
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <div class="form-label">Company</div>
+              <input type="text" class="field-input" id="inpCompany" placeholder="e.g. Acme Corp" autocomplete="off" maxlength="60">
+            </div>
           </div>
         </div>
 
@@ -1199,11 +1217,11 @@
               <div class="st-panel" id="stDailyInputs">
                 <div class="st-panel-label" id="stDailyInputLabel" style="display:none">Daily (Personal)</div>
                 <div class="form-row" style="display:flex;gap:8px">
-                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                  <div class="input-suffix-wrap" style="flex:1">
                     <input type="number" class="field-input" id="inpDailyH" min="0" max="23" step="1" value="9" placeholder="0">
                     <span class="input-suffix-text">hrs</span>
                   </div>
-                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                  <div class="input-suffix-wrap" style="flex:1">
                     <input type="number" class="field-input" id="inpDailyM" min="0" max="59" step="5" value="0" placeholder="0">
                     <span class="input-suffix-text">min</span>
                   </div>
@@ -1213,11 +1231,11 @@
               <div id="stPanelWeekly" style="display:none">
                 <div class="st-panel-label" style="margin-top:10px">Weekly</div>
                 <div class="form-row" style="display:flex;gap:8px">
-                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                  <div class="input-suffix-wrap" style="flex:1">
                     <input type="number" class="field-input" id="inpWeeklyH" min="0" max="167" step="1" value="45" placeholder="0">
                     <span class="input-suffix-text">hrs</span>
                   </div>
-                  <div class="input-suffix-wrap" style="min-width:130px;flex-shrink:0">
+                  <div class="input-suffix-wrap" style="flex:1">
                     <input type="number" class="field-input" id="inpWeeklyM" min="0" max="59" step="5" value="0" placeholder="0">
                     <span class="input-suffix-text">min</span>
                   </div>
@@ -1329,7 +1347,7 @@
               <div class="form-label">Timezone</div>
               <div class="form-sub">Used for the live clock display.</div>
             </div>
-            <select class="field-input" id="inpTimezone" style="height:40px;cursor:pointer;width:auto;flex-shrink:0;padding:0 12px">
+            <select class="field-input" id="inpTimezone" style="height:40px;cursor:pointer;width:auto;flex-shrink:0;padding:0 32px 0 12px">
             <option value="-720">UTC−12:00</option>
             <option value="-600">UTC−10:00 (Hawaii)</option>
             <option value="-480">UTC−08:00 (PST)</option>
@@ -1816,7 +1834,7 @@
       _sessionAccSecs = 0; _sessionCheckoutTime = null;
       loginDate = null; autoStopped = false;
       el('calcBtn').textContent = 'Quick Start';
-      el('calcBtn').classList.remove('end-shift', 'resume-shift');
+      el('calcBtn').classList.remove('end-shift', 'pause-shift', 'resume-shift');
       el('calcBtn').dataset.state = 'start';
       el('calcBtn').disabled = false;
       el('shiftInputRow').classList.remove('active-state', 'hidden');
@@ -1843,7 +1861,7 @@
       Store.clearSession();
       loginDate = null; autoStopped = false;
       el('calcBtn').textContent = 'Resume';
-      el('calcBtn').classList.remove('end-shift');
+      el('calcBtn').classList.remove('end-shift', 'pause-shift');
       el('calcBtn').classList.add('resume-shift');
       el('calcBtn').dataset.state = 'ended';
       el('calcBtn').disabled = false;
@@ -2433,7 +2451,7 @@
         sessionTag:   'autostopped'
       });
       el('calcBtn').textContent = 'Resume';
-      el('calcBtn').classList.remove('end-shift');
+      el('calcBtn').classList.remove('end-shift', 'pause-shift');
       el('calcBtn').classList.add('resume-shift');
       el('calcBtn').dataset.state = 'ended';
       el('calcBtn').disabled = false;
@@ -2515,10 +2533,14 @@
       if (isDone) {
         if (el('calcBtn').dataset.state !== 'ending') {
           el('calcBtn').textContent = 'End Shift';
+          el('calcBtn').classList.remove('pause-shift');
+          el('calcBtn').classList.add('end-shift');
           el('calcBtn').dataset.state = 'ending';
         }
       } else if (el('calcBtn').dataset.state === 'ending') {
         el('calcBtn').textContent = 'Pause';
+        el('calcBtn').classList.remove('end-shift');
+        el('calcBtn').classList.add('pause-shift');
         el('calcBtn').dataset.state = 'running';
       }
       if (isDone && !wasDone) wasDone = true;
@@ -2994,8 +3016,8 @@
       if (el('metaLogin')) el('metaLogin').textContent = short(p);
       // Switch CTA to "Pause" combo active state
       el('calcBtn').textContent = 'Pause';
-      el('calcBtn').classList.add('end-shift');
-      el('calcBtn').classList.remove('resume-shift');
+      el('calcBtn').classList.add('pause-shift');
+      el('calcBtn').classList.remove('end-shift', 'resume-shift');
       el('calcBtn').dataset.state = 'running';
       el('calcBtn').disabled = false;
       el('shiftInputRow').classList.add('active-state');
@@ -3018,7 +3040,7 @@
       el('errMsg').classList.remove('show');
       // Restore CTA to Quick Start
       el('calcBtn').textContent = 'Quick Start';
-      el('calcBtn').classList.remove('end-shift', 'resume-shift');
+      el('calcBtn').classList.remove('end-shift', 'pause-shift', 'resume-shift');
       el('calcBtn').dataset.state = 'start';
       el('calcBtn').disabled = false;
       el('shiftInputRow').classList.remove('active-state', 'hidden');
@@ -3035,6 +3057,7 @@
     function populateSettings() {
       const c = cfg();
       el('inpName').value       = c.name || '';
+      el('inpCompany').value    = c.company || '';
       const _dh = Math.floor(c.dailyH || 9);
       const _dm = Math.round(((c.dailyH || 9) - _dh) * 60);
       el('inpDailyH').value = _dh;
@@ -3087,12 +3110,13 @@
       const targetDay      = earlyLeaveDays.length > 0 ? earlyLeaveDays[0] : null;
       const notifOn    = el('inpNotifOn').checked;
       const name       = el('inpName').value.trim();
+      const company    = el('inpCompany')?.value.trim() || '';
       const weeklyH    = (_wHVal > 0 || _wMVal > 0) ? _wHVal + _wMVal / 60 : cfg().weeklyH;
       const shiftStart = el('inpShiftStart')?.value.trim() || '09:00 AM';
       const shiftEnd   = el('inpShiftEnd')?.value.trim()   || '06:00 PM';
       const shiftType  = deriveShiftType(shiftStart);
       const now = nowTz();
-      saveCfg({ dailyH: daily, weeklyH, weeklyOn: on, lateDays, earlyLeaveDays, notifOn, name,
+      saveCfg({ dailyH: daily, weeklyH, weeklyOn: on, lateDays, earlyLeaveDays, notifOn, name, company,
                 targetDay, shiftType, shiftStart, shiftEnd, tzOffset,
                 autoStopBuf: cfg().autoStopBuf || 0.5, lastSaved: `Last Updated at ${short(now)}` });
       el('settingsLastSaved').textContent = `Last Updated at ${short(now)}`;
@@ -3843,8 +3867,8 @@ ${c.name || '[Your Name]'}`;
         if (isNaN(d.getTime())||d>new Date()) { Store.clearSession(); return; }
         loginDate=d;
         el('calcBtn').textContent='Pause';
-        el('calcBtn').classList.add('end-shift');
-        el('calcBtn').classList.remove('resume-shift');
+        el('calcBtn').classList.add('pause-shift');
+        el('calcBtn').classList.remove('end-shift','resume-shift');
         el('calcBtn').dataset.state='running';
         el('calcBtn').disabled=false;
         el('shiftInputRow').classList.add('active-state');
@@ -3854,7 +3878,7 @@ ${c.name || '[Your Name]'}`;
         ticker=setInterval(render,1000);
       } else if (_sessionAccSecs>0) {
         el('calcBtn').textContent='Resume';
-        el('calcBtn').classList.remove('end-shift');
+        el('calcBtn').classList.remove('end-shift','pause-shift');
         el('calcBtn').classList.add('resume-shift');
         el('calcBtn').dataset.state='ended';
         el('calcBtn').disabled=false;
@@ -4003,8 +4027,8 @@ ${c.name || '[Your Name]'}`;
           // No active session — start one from the given time
           loginDate = s; wasDone = false; notifSent = false; autoStopped = false;
           el('calcBtn').textContent = 'Pause';
-          el('calcBtn').classList.add('end-shift');
-          el('calcBtn').classList.remove('resume-shift');
+          el('calcBtn').classList.add('pause-shift');
+          el('calcBtn').classList.remove('end-shift', 'resume-shift');
           el('calcBtn').dataset.state = 'running';
           el('calcBtn').disabled = false;
           el('shiftInputRow').classList.add('active-state');
@@ -4199,8 +4223,8 @@ ${c.name || '[Your Name]'}`;
       }
       loginDate = now; wasDone = false; notifSent = false; autoStopped = false;
       el('calcBtn').textContent = 'Pause';
-      el('calcBtn').classList.add('end-shift');
-      el('calcBtn').classList.remove('resume-shift');
+      el('calcBtn').classList.add('pause-shift');
+      el('calcBtn').classList.remove('end-shift', 'resume-shift');
       el('calcBtn').dataset.state = 'running';
       el('calcBtn').disabled = false;
       el('shiftInputRow').classList.add('active-state');
@@ -4243,7 +4267,7 @@ ${c.name || '[Your Name]'}`;
       el(id)?.addEventListener('input', autoSaveSettings);
     });
     ['inpShiftStart','inpShiftEnd'].forEach(id => { el(id)?.addEventListener('change', autoSaveSettings); });
-    ['inpName'].forEach(id => {
+    ['inpName', 'inpCompany'].forEach(id => {
       el(id)?.addEventListener('input', autoSaveSettings);
       el(id)?.addEventListener('change', autoSaveSettings);
     });
@@ -4548,8 +4572,8 @@ ${c.name || '[Your Name]'}`;
         if (d <= new Date()) {
           loginDate = d;
           el('calcBtn').textContent = 'Pause';
-          el('calcBtn').classList.add('end-shift');
-          el('calcBtn').classList.remove('resume-shift');
+          el('calcBtn').classList.add('pause-shift');
+          el('calcBtn').classList.remove('end-shift', 'resume-shift');
           el('calcBtn').dataset.state = 'running';
           el('shiftInputRow').classList.add('active-state');
           el('shiftActiveLabel').textContent = `Started at ${short(d)}`;
@@ -4563,7 +4587,7 @@ ${c.name || '[Your Name]'}`;
         const d = new Date(); d.setHours(pts[0] || 0, pts[1] || 0, pts[2] || 0, 0);
         loginDate = d;
         el('calcBtn').textContent = 'Resume';
-        el('calcBtn').classList.remove('end-shift');
+        el('calcBtn').classList.remove('end-shift', 'pause-shift');
         el('calcBtn').classList.add('resume-shift');
         el('calcBtn').dataset.state = 'ended';
         el('calcBtn').disabled = false;
@@ -4606,8 +4630,7 @@ ${c.name || '[Your Name]'}`;
 
       <!-- Step 1: Import Data -->
       <div class="ob-panel active" id="obPanel1">
-        <div class="ob-icon">📦</div>
-        <div class="ob-title">Welcome to WH Calculator</div>
+        <div class="ob-title">Welcome to WH Tracker</div>
         <div class="ob-desc">Track your work hours effortlessly. Got a backup? Import it to restore your data.</div>
         <label class="ob-import-zone" for="obImportFile">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -4728,7 +4751,6 @@ ${c.name || '[Your Name]'}`;
       <!-- Step 4: All Done -->
       <div class="ob-panel" id="obPanel4">
         <div class="ob-done-card">
-          <div class="ob-icon">🎉</div>
           <div style="font-size:18px;font-weight:700;color:var(--foreground)">You're all set!</div>
           <div style="font-size:13px;color:var(--muted-fg);line-height:1.6">Your workspace is configured and ready.<br>Start tracking your hours.</div>
         </div>
