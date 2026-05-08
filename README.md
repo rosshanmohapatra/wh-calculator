@@ -68,4 +68,3 @@ Single HTML file - CSS custom properties, vanilla JavaScript, localStorage. No f
 ## Developer
 
 Roshan Mohapatra - Mumbai, Maharashtra
-Portfolio - https://roshan.framer.wiki/
