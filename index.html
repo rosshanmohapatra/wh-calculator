@@ -7,16 +7,16 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>WH Tracker</title>
+  <title>Murph - Work Hour Tracker</title>
   <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='%2309090b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='3' width='20' height='14' rx='2'/%3E%3Cpath d='M8 21h8m-4-4v4'/%3E%3Ccircle cx='12' cy='10' r='3' fill='%2309090b' stroke='none'/%3E%3Cpath d='M9 10c0-.8.4-1.5 1-2M15 10c0-.8-.4-1.5-1-2' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link href="./WH Calculator_files/css2" rel="stylesheet">
   <style>
     /* ── Design tokens ── */
     :root {
-      --background: #ffffff; --foreground: #09090b; --card: #ffffff;
-      --muted: #f4f4f5; --muted-fg: #71717a; --border: #e4e4e7;
-      --input: #e4e4e7; --input-bg: #f8f8f9; --ring: #09090b;
+      --background: #f5f5f7; --foreground: #09090b; --card: #ffffff;
+      --muted: #ebebee; --muted-fg: #71717a; --border: #dfe0e4;
+      --input: #dfe0e4; --input-bg: #f9f9fb; --ring: #09090b;
       --success: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
       --warning: #d97706; --warning-bg: #fffbeb; --warning-border: #fde68a;
       --destructive: #dc2626; --destructive-bg: #fef2f2; --destructive-border: #fecaca;
@@ -26,9 +26,9 @@
       --radius: 6px; --radius-lg: 12px;
     }
     .dark {
-      --background: #09090b; --foreground: #fafafa; --card: #09090b;
-      --muted: #18181b; --muted-fg: #a1a1aa; --border: #27272a;
-      --input: #3f3f46; --input-bg: #1c1c1f; --ring: #e4e4e7;
+      --background: #09090b; --foreground: #fafafa; --card: #111113;
+      --muted: #1a1a1d; --muted-fg: #a1a1aa; --border: #2c2c30;
+      --input: #3a3a3e; --input-bg: #222226; --ring: #e4e4e7;
       --success: #4ade80; --success-bg: #052e16; --success-border: #166534;
       --warning: #fbbf24; --warning-bg: #1c1400; --warning-border: #78350f;
       --destructive: #f87171; --destructive-bg: #1c0a0a; --destructive-border: #7f1d1d;
@@ -57,13 +57,16 @@
     /* ── Navbar ── */
     .navbar { background: var(--muted); border: 1px solid var(--border); border-radius: var(--radius-lg); }
     .nav-inner { height: 52px; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; }
-    .nav-tabs { display: flex; align-items: center; gap: 2px; }
+    .nav-tabs { display: flex; align-items: center; gap: 8px; }
     .nav-tab { height: 34px; padding: 0 14px; border-radius: 8px; border: none;
       background: transparent; color: var(--muted-fg); font-size: 13px; font-weight: 500;
       font-family: var(--font); transition: background .12s, color .12s;
       display: flex; align-items: center; gap: 5px; }
-    .nav-tab:hover { background: var(--background); color: var(--foreground); }
-    .nav-tab.active { background: var(--background); color: var(--foreground); }
+    .nav-tab:hover { background: var(--card); color: var(--foreground); }
+    .nav-tab.active { background: var(--card); color: var(--foreground); }
+    .dark .navbar { background: var(--background); }
+    .dark .nav-tab:hover { background: var(--muted); color: var(--foreground); }
+    .dark .nav-tab.active { background: var(--muted); color: var(--foreground); }
     .nav-tab.active .tab-icon { display: inline-flex !important; }
     .nav-actions { display: flex; align-items: center; gap: 8px; }
 
@@ -211,7 +214,7 @@
 
     /* ── Shift combo (input + button inside) ── */
     .shift-cta { display: flex; flex-direction: column; gap: 10px; }
-    .shift-combo { display: flex; align-items: center; background: var(--background);
+    .shift-combo { display: flex; align-items: center; background: var(--input-bg);
       border: 1.5px solid var(--border); border-radius: 12px; height: 52px;
       padding: 0 6px; gap: 8px; transition: border-color .15s; }
     .shift-combo:focus-within { border-color: var(--ring); }
@@ -368,11 +371,11 @@
     .sliding-field.open   { max-height: 360px; opacity: 1; }
     .sliding-inner { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
     /* Set Target tabs */
-    .st-tabs { display: flex; background: var(--muted); border-radius: 8px; padding: 3px; gap: 2px; flex-shrink: 0; }
+    .st-tabs { display: flex; background: var(--background); border-radius: 8px; padding: 3px; gap: 2px; flex-shrink: 0; }
     .st-tab { background: transparent; border: none; border-radius: 6px; padding: 5px 12px;
       font-size: 12px; font-weight: 500; font-family: var(--font); color: var(--muted-fg);
       cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; }
-    .st-tab.active { background: var(--background); color: var(--foreground); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .st-tab.active { background: var(--muted); color: var(--foreground); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
     .st-panel { margin-top: 12px; }
     .st-panel-label { font-size: 11px; font-weight: 600; color: var(--muted-fg); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; }
     .callout { display: flex; align-items: flex-start; gap: 8px;
@@ -394,7 +397,7 @@
       font-size: 12px; font-weight: 600; color: var(--muted-fg); background: var(--muted);
       transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
       white-space: nowrap; font-family: var(--font); }
-    .plan-btn:hover { background: var(--background); color: var(--foreground); }
+    .plan-btn:hover { background: var(--muted); color: var(--foreground); }
     .plan-btn.selected { background: var(--foreground); color: var(--background);
       border-color: var(--foreground); box-shadow: none; }
     /* Settings groups */
@@ -414,7 +417,7 @@
       display: flex; align-items: center; justify-content: center; padding: 16px;
       opacity: 0; pointer-events: none; transition: opacity .18s; }
     .overlay.open { opacity: 1; pointer-events: all; }
-    .dialog { position: relative; background: var(--background); border: 1px solid var(--border);
+    .dialog { position: relative; background: var(--card); border: 1px solid var(--border);
       border-radius: var(--radius-lg); width: 100%;
       max-width: 480px; min-width: min(450px, 100%);
       max-height: 90vh; overflow-y: auto;
@@ -588,13 +591,13 @@
     .wp-day-row:last-child { border-bottom: none; }
     .wp-day-name { font-size: 13px; font-weight: 500; color: var(--foreground); }
     .wp-day-name.today { color: var(--success); }
-    .wp-override-btns { display: flex; gap: 4px; }
-    .wp-override-btn { height: 26px; padding: 0 8px; border-radius: 6px; font-size: 11px;
-      font-weight: 500; border: 1px solid var(--border); background: var(--muted);
-      color: var(--muted-fg); cursor: pointer; transition: all .12s; }
-    .wp-override-btn:hover { background: var(--border); color: var(--foreground); }
-    .wp-override-btn.active { background: var(--foreground); color: var(--background);
-      border-color: var(--foreground); }
+    .wp-override-btns { display: flex; gap: 0; background: var(--background); border-radius: 6px; padding: 2px; }
+    .wp-override-btn { height: 24px; padding: 0 8px; border-radius: 4px; font-size: 11px;
+      font-weight: 500; border: none; background: transparent;
+      color: var(--muted-fg); cursor: pointer; transition: all .12s; flex: 1; white-space: nowrap; font-family: var(--font); }
+    .wp-override-btn:hover { color: var(--foreground); }
+    .wp-override-btn.active { background: var(--muted); color: var(--foreground);
+      box-shadow: 0 1px 2px rgba(0,0,0,.15); }
 
     /* ── Day selector strip ── */
     .day-selector { display: flex; gap: 6px; }
@@ -757,7 +760,7 @@
 
     /* ── Wheel time picker modal ── */
     .tp-modal {
-      position: fixed; z-index: 1200; background: var(--card); border: 1px solid var(--border);
+      position: fixed; z-index: 2100; background: var(--card); border: 1px solid var(--border);
       border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.08);
       width: 256px; display: none; flex-direction: column; overflow: hidden; pointer-events: all;
     }
@@ -815,43 +818,43 @@
     /* ── Onboarding ── */
     .ob-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,.55);
       backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 16px; }
-    .ob-dialog { background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    .ob-dialog { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg);
       width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
       box-shadow: 0 24px 60px rgba(0,0,0,.22); display: flex; flex-direction: column; }
     .ob-head { padding: 24px 24px 0; }
-    .ob-steps { display: flex; align-items: center; gap: 0; margin-bottom: 24px; }
-    .ob-step-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border);
-      display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
-      color: var(--muted-fg); background: var(--background); flex-shrink: 0; transition: all .2s; }
-    .ob-step-dot.active { border-color: var(--foreground); background: var(--foreground); color: var(--background); }
-    .ob-step-dot.done { border-color: var(--success); background: var(--success); color: #fff; }
-    .ob-step-line { flex: 1; height: 2px; background: var(--border); transition: background .3s; }
-    .ob-step-line.done { background: var(--success); }
+    .ob-progress-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+    .ob-progress-bar { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .ob-progress-fill { height: 100%; background: var(--foreground); border-radius: 2px; transition: width .35s ease; }
+    .ob-progress-label { font-size: 11px; font-weight: 600; color: var(--muted-fg); white-space: nowrap; flex-shrink: 0; letter-spacing: .02em; }
     .ob-body { padding: 0 24px 24px; flex: 1; }
     .ob-panel { display: none; flex-direction: column; gap: 16px; }
-    .ob-panel.active { display: flex; }
+    .ob-panel.active { display: flex; animation: ob-enter-fwd .25s ease both; }
+    .ob-panel.active.dir-back { animation: ob-enter-back .25s ease both; }
+    @keyframes ob-enter-fwd { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes ob-enter-back { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
     .ob-icon { font-size: 36px; line-height: 1; }
     .ob-title { font-size: 20px; font-weight: 700; color: var(--foreground); letter-spacing: -.3px; }
-    .ob-desc { font-size: 13px; color: var(--muted-fg); line-height: 1.6; margin-top: -6px; }
+    .ob-desc { font-size: 13px; color: var(--muted-fg); line-height: 1.6; margin-top: -12px; }
     .ob-section-label { font-size: 11px; font-weight: 600; color: var(--muted-fg); letter-spacing: .06em; text-transform: uppercase; }
-    .ob-foot { padding: 16px 24px 20px; border-top: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .ob-btn-primary { height: 42px; padding: 0 24px; border-radius: 10px; border: none;
-      background: var(--foreground); color: var(--background); font-size: 14px; font-weight: 600;
+    .ob-foot { padding: 12px 20px 16px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .ob-btn-primary { height: 34px; padding: 0 12px; border-radius: 8px; border: none;
+      background: var(--foreground); color: var(--background); font-size: 12px; font-weight: 600;
       font-family: var(--font); cursor: pointer; transition: opacity .15s; }
     .ob-btn-primary:hover { opacity: .85; }
-    .ob-btn-ghost { height: 42px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--border);
-      background: transparent; color: var(--muted-fg); font-size: 14px; font-weight: 500;
+    .ob-btn-ghost { height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted-fg); font-size: 12px; font-weight: 500;
       font-family: var(--font); cursor: pointer; transition: background .15s; }
     .ob-btn-ghost:hover { background: var(--muted); color: var(--foreground); }
-    .ob-btn-link { height: 42px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--border);
-      background: transparent; color: var(--muted-fg); font-size: 14px; font-weight: 500;
+    .ob-btn-link { height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted-fg); font-size: 12px; font-weight: 500;
       font-family: var(--font); cursor: pointer; transition: background .15s; }
     .ob-btn-link:hover { background: var(--muted); color: var(--foreground); }
     .ob-import-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 28px 20px;
-      text-align: center; cursor: pointer; transition: border-color .15s; display: flex;
+      text-align: center; cursor: pointer; transition: border-color .15s, background .15s; display: flex;
       flex-direction: column; align-items: center; gap: 8px; }
     .ob-import-zone:hover { border-color: var(--foreground); }
+    .ob-import-zone.drag-over { border-color: var(--foreground); background: var(--muted); }
     .ob-import-zone svg { color: var(--muted-fg); }
     .ob-import-zone-text { font-size: 13px; color: var(--muted-fg); }
     .ob-import-zone-text strong { color: var(--foreground); }
@@ -1182,11 +1185,11 @@
           <div style="display:flex;gap:12px">
             <div style="flex:1;display:flex;flex-direction:column;gap:6px">
               <div class="form-label">Your Name</div>
-              <input type="text" class="field-input" id="inpName" placeholder="e.g. Alex" autocomplete="off" maxlength="40">
+              <input type="text" class="field-input" id="inpName" placeholder="Your name" autocomplete="off" maxlength="40">
             </div>
             <div style="flex:1;display:flex;flex-direction:column;gap:6px">
               <div class="form-label">Company</div>
-              <input type="text" class="field-input" id="inpCompany" placeholder="e.g. Acme Corp" autocomplete="off" maxlength="60">
+              <input type="text" class="field-input" id="inpCompany" placeholder="Company name" autocomplete="off" maxlength="60">
             </div>
           </div>
         </div>
@@ -1262,7 +1265,7 @@
               <div class="form-sub">We'll notify you by the end of your daily target.</div>
               <div style="display:flex;align-items:center;gap:8px">
                 <div class="time-input-wrap" style="flex:1">
-                  <input type="text" id="inpShiftStart" placeholder="From  e.g. 09:00 AM" autocomplete="off"
+                  <input type="text" id="inpShiftStart" placeholder="From  09:00 AM" autocomplete="off"
                     style="flex:1;height:38px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
                   <input type="time" id="inpShiftStartPicker" tabindex="-1"
                     style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
@@ -1272,7 +1275,7 @@
                 </div>
                 <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">to</span>
                 <div class="time-input-wrap" style="flex:1">
-                  <input type="text" id="inpShiftEnd" placeholder="To  e.g. 06:00 PM" autocomplete="off"
+                  <input type="text" id="inpShiftEnd" placeholder="To  06:00 PM" autocomplete="off"
                     style="flex:1;height:38px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
                   <input type="time" id="inpShiftEndPicker" tabindex="-1"
                     style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
@@ -1455,10 +1458,10 @@
         <div id="npTimeRow" style="margin-bottom:12px">
           <div style="font-size:12px;font-weight:500;color:var(--muted-fg);margin-bottom:6px">Start &amp; End Times <span style="font-weight:400;opacity:.7">(optional)</span></div>
           <div style="display:flex;align-items:center;gap:8px">
-            <input type="text" id="npStartTime" placeholder="Start  e.g. 09:00 AM" autocomplete="off"
+            <input type="text" id="npStartTime" placeholder="Start  09:00 AM" autocomplete="off"
               style="flex:1;height:38px;padding:0 12px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground)">
             <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">–</span>
-            <input type="text" id="npEndTime" placeholder="Leave  e.g. 07:00 PM" autocomplete="off"
+            <input type="text" id="npEndTime" placeholder="Leave  07:00 PM" autocomplete="off"
               style="flex:1;height:38px;padding:0 12px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground)">
           </div>
         </div>
@@ -1468,7 +1471,7 @@
         <!-- Notes -->
         <div style="margin-bottom:4px">
           <div style="font-size:12px;font-weight:500;color:var(--muted-fg);margin-bottom:6px">Reason <span style="font-weight:400;opacity:.7">(optional)</span></div>
-          <input type="text" class="wk-time-input" id="npNotes" placeholder="e.g. Doctor's appointment" autocomplete="off" style="width:100%;height:38px;padding:0 12px;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground)">
+          <input type="text" class="wk-time-input" id="npNotes" placeholder="Add a note" autocomplete="off" style="width:100%;height:38px;padding:0 12px;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground)">
         </div>
         <div class="err-msg" id="npErr" style="margin-top:8px">Please select a day first.</div>
       </div>
@@ -1579,7 +1582,7 @@
       </div>
       <div class="dialog-body">
         <div class="modal-time-row">
-          <input type="text" class="field-input" id="forgotEndTime" placeholder="End time (e.g. 06:30 PM)">
+          <input type="text" class="field-input" id="forgotEndTime" placeholder="End time  06:30 PM">
         </div>
         <div class="err-msg" id="forgotErr">Couldn't parse that time.</div>
       </div>
@@ -4168,7 +4171,8 @@ ${c.name || '[Your Name]'}`;
         return `<div class="wp-day-row">
           <span class="wp-day-name${isToday?' today':''}">${day.name}${isToday?' (Today)':''}</span>
           <div class="wp-override-btns">
-            <button class="wp-override-btn${ov==='halfday'?' active':''}" onclick="wpSetOverride('${day.key}','halfday',this)">Half</button>
+            <button class="wp-override-btn${!ov?' active':''}" onclick="wpSetOverride('${day.key}','fullday',this)">Full Day</button>
+            <button class="wp-override-btn${ov==='halfday'?' active':''}" onclick="wpSetOverride('${day.key}','halfday',this)">Half Day</button>
             <button class="wp-override-btn${ov==='leave'?' active':''}" onclick="wpSetOverride('${day.key}','leave',this)">Leave</button>
             <button class="wp-override-btn${ov==='holiday'?' active':''}" onclick="wpSetOverride('${day.key}','holiday',this)">Holiday</button>
           </div>
@@ -4201,17 +4205,15 @@ ${c.name || '[Your Name]'}`;
 
     function wpSetOverride(key, type, btn) {
       const group = btn.closest('.wp-override-btns').querySelectorAll('.wp-override-btn');
-      const wasActive = btn.classList.contains('active');
       group.forEach(b => b.classList.remove('active'));
-      if (!wasActive) {
-        btn.classList.add('active');
-        const c = cfg(), ex = dayLog(key) || {};
-        if (type === 'halfday') saveDayLog(key, { ...ex, hoursWorked: c.dailyH / 2, override: 'halfday', sessionTag:'edited' });
-        else saveDayLog(key, { ...ex, hoursWorked: 0, override: type, sessionTag:'edited' });
-      } else {
-        // Deactivate — remove override
-        const ex = dayLog(key) || {};
+      btn.classList.add('active');
+      const c = cfg(), ex = dayLog(key) || {};
+      if (type === 'fullday') {
         if (ex.override) { delete ex.override; saveDayLog(key, ex); }
+      } else if (type === 'halfday') {
+        saveDayLog(key, { ...ex, hoursWorked: c.dailyH / 2, override: 'halfday', sessionTag: 'edited' });
+      } else {
+        saveDayLog(key, { ...ex, hoursWorked: 0, override: type, sessionTag: 'edited' });
       }
     }
 
@@ -4493,23 +4495,53 @@ ${c.name || '[Your Name]'}`;
       el('obPanelWeekly').style.display = _obIsWeekly ? '' : 'none';
     }
 
-    function obUpdateSteps(step) {
-      [1,2,3,4].forEach(s => {
-        const dot = el('obDot' + s);
-        dot.classList.toggle('active', s === step);
-        dot.classList.toggle('done', s < step);
-        if (s < 4) {
-          const line = el('obLine' + s);
-          line.classList.toggle('done', s < step);
-        }
-      });
-      el('obBackBtn').style.visibility = step > 1 ? 'visible' : 'hidden';
-      el('obNextBtn').textContent = step === 3 ? 'Continue' : step === 4 ? 'Explore' : 'Next';
-      el('obSkipBtn').style.display = step === 4 ? 'none' : '';
-      [1,2,3,4].forEach(s => {
+    function obAnimateTo(step, dir) {
+      const dialog = document.querySelector('.ob-dialog');
+      const currentH = dialog ? dialog.offsetHeight : 0;
+
+      // Deactivate all panels
+      [1,2,3,4,5].forEach(s => {
         const p = el('obPanel' + s);
-        p.classList.toggle('active', s === step);
+        if (p) p.classList.remove('active', 'dir-back');
       });
+
+      // Activate target panel
+      const incoming = el('obPanel' + step);
+      if (!incoming) return;
+      if (dir < 0) incoming.classList.add('dir-back');
+      incoming.classList.add('active');
+
+      // Animate dialog height
+      if (dialog) {
+        const newH = dialog.offsetHeight;
+        if (newH !== currentH && currentH > 0) {
+          dialog.style.height = currentH + 'px';
+          dialog.style.overflow = 'hidden';
+          dialog.style.transition = 'height .3s ease';
+          requestAnimationFrame(() => {
+            dialog.style.height = newH + 'px';
+            setTimeout(() => {
+              dialog.style.height = '';
+              dialog.style.overflow = '';
+              dialog.style.transition = '';
+            }, 320);
+          });
+        }
+      }
+    }
+
+    function obUpdateSteps(step, dir) {
+      const fill = el('obProgressFill');
+      if (fill) fill.style.width = ((step / 5) * 100) + '%';
+      const label = el('obProgressLabel');
+      if (label) label.textContent = step + ' of 5';
+      el('obBackBtn').style.visibility = step > 1 ? 'visible' : 'hidden';
+      const nextBtn = el('obNextBtn');
+      if (step === 5) nextBtn.textContent = 'Done';
+      else if (step === 4) nextBtn.textContent = 'Continue';
+      else nextBtn.textContent = 'Next Step';
+      el('obSkipBtn').style.display = step === 5 ? 'none' : '';
+      obAnimateTo(step, dir != null ? dir : 1);
     }
 
     function obSaveStep2() {
@@ -4546,12 +4578,74 @@ ${c.name || '[Your Name]'}`;
       saveCfg({ ...c, dailyH, weeklyH, weeklyOn, earlyLeaveDays, lateDays, targetDay });
     }
 
+    function obPopulateWeekPanel() {
+      const c = cfg(), wk = week(0), tk = todayKey();
+
+      // Day override rows
+      const rows = el('obWpDayRows');
+      if (rows) {
+        rows.innerHTML = wk.map(day => {
+          const log = dayLog(day.key);
+          const ov = log?.override;
+          const isToday = day.key === tk;
+          return `<div class="wp-day-row">
+            <span class="wp-day-name${isToday?' today':''}">${day.name}${isToday?' (Today)':''}</span>
+            <div class="wp-override-btns">
+              <button class="wp-override-btn${!ov?' active':''}" onclick="wpSetOverride('${day.key}','fullday',this)">Full Day</button>
+              <button class="wp-override-btn${ov==='halfday'?' active':''}" onclick="wpSetOverride('${day.key}','halfday',this)">Half Day</button>
+              <button class="wp-override-btn${ov==='leave'?' active':''}" onclick="wpSetOverride('${day.key}','leave',this)">Leave</button>
+              <button class="wp-override-btn${ov==='holiday'?' active':''}" onclick="wpSetOverride('${day.key}','holiday',this)">Holiday</button>
+            </div>
+          </div>`;
+        }).join('');
+      }
+
+      // Early leave picker (1-indexed: Mon=1)
+      const earlyPicker = el('obWpEarly');
+      if (earlyPicker) {
+        earlyPicker.innerHTML = FULL_DAY_NAMES.map((n, i) =>
+          `<button class="plan-btn${(c.targetDay === i+1)?' selected':''}" data-obwp-tday="${i+1}">${n}</button>`
+        ).join('');
+        earlyPicker.querySelectorAll('[data-obwp-tday]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const isSelected = btn.classList.contains('selected');
+            earlyPicker.querySelectorAll('[data-obwp-tday]').forEach(b => b.classList.remove('selected'));
+            if (!isSelected) btn.classList.add('selected');
+          });
+        });
+      }
+
+      // Stay late picker (0-indexed: Mon=0 to match saveWeekPlan)
+      const latePicker = el('obWpLate');
+      if (latePicker) {
+        latePicker.innerHTML = FULL_DAY_NAMES.map((n, i) =>
+          `<button class="plan-btn${(c.lateDays||[]).includes(i)?' selected':''}" data-obwp-sday="${i}">${n}</button>`
+        ).join('');
+        latePicker.querySelectorAll('[data-obwp-sday]').forEach(btn => {
+          btn.addEventListener('click', () => btn.classList.toggle('selected'));
+        });
+      }
+    }
+
+    function obSaveWeekPanel() {
+      const c = cfg();
+      const selTday = el('obWpEarly')?.querySelector('[data-obwp-tday].selected');
+      const targetDay = selTday ? +selTday.dataset.obwpTday : (c.targetDay || null);
+      const lateDays = [...(el('obWpLate')?.querySelectorAll('[data-obwp-sday].selected') || [])].map(b => +b.dataset.obwpSday);
+      saveCfg({ ...c, targetDay, lateDays });
+    }
+
     function obStep(dir) {
-      if (_obStep === 3 && dir === 1) obSaveStep3();
       if (_obStep === 2 && dir === 1) obSaveStep2();
-      if (_obStep === 4 && dir === 1) { obFinish(); return; }
-      _obStep = Math.max(1, Math.min(4, _obStep + dir));
-      obUpdateSteps(_obStep);
+      if (_obStep === 3 && dir === 1) obSaveStep3();
+      if (_obStep === 4 && dir === 1) obSaveWeekPanel();
+      if (_obStep === 5 && dir === 1) { obFinish(); return; }
+      const prev = _obStep;
+      _obStep = Math.max(1, Math.min(5, _obStep + dir));
+      if (_obStep !== prev) {
+        if (_obStep === 4) obPopulateWeekPanel();
+        obUpdateSteps(_obStep, dir);
+      }
     }
 
     function obSkip() {
@@ -4585,6 +4679,53 @@ ${c.name || '[Your Name]'}`;
             try {
               const data = JSON.parse(ev.target.result);
               // Support wh_backup_v2 and raw cfg format
+              if (data.wh_backup_v2) {
+                const { cfg: c, days } = data.wh_backup_v2;
+                if (c) Store.setCfg(c);
+                if (days) Object.entries(days).forEach(([k, v]) => Store.set(KEY.day + k, v));
+              } else if (data.cfg) {
+                Store.setCfg(data.cfg);
+                if (data.days) Object.entries(data.days).forEach(([k, v]) => Store.set(KEY.day + k, v));
+              }
+              _obImported = true;
+              const statusEl = el('obImportStatus');
+              if (statusEl) { statusEl.textContent = '✓ Backup imported successfully'; statusEl.style.display = 'block'; statusEl.style.color = 'var(--success)'; }
+              setTimeout(() => obStep(1), 800);
+            } catch {
+              const statusEl = el('obImportStatus');
+              if (statusEl) { statusEl.textContent = 'Invalid backup file. Please try again.'; statusEl.style.display = 'block'; statusEl.style.color = 'var(--destructive)'; }
+            }
+          };
+          reader.readAsText(file);
+        });
+      }
+
+      // Drag-and-drop on import zone
+      const importZone = el('obImportZone');
+      if (importZone && !importZone._obDragBound) {
+        importZone._obDragBound = true;
+        importZone.addEventListener('dragover', e => {
+          e.preventDefault();
+          importZone.classList.add('drag-over');
+          const txt = el('obImportZoneText');
+          if (txt) txt.innerHTML = '<strong>Release to import</strong><br>Drop your .json backup here';
+        });
+        importZone.addEventListener('dragleave', () => {
+          importZone.classList.remove('drag-over');
+          const txt = el('obImportZoneText');
+          if (txt) txt.innerHTML = '<strong>Choose a file or drag &amp; drop here</strong><br>Supports .json files';
+        });
+        importZone.addEventListener('drop', e => {
+          e.preventDefault();
+          importZone.classList.remove('drag-over');
+          const txt = el('obImportZoneText');
+          if (txt) txt.innerHTML = '<strong>Choose a file or drag &amp; drop here</strong><br>Supports .json files';
+          const file = e.dataTransfer.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = ev => {
+            try {
+              const data = JSON.parse(ev.target.result);
               if (data.wh_backup_v2) {
                 const { cfg: c, days } = data.wh_backup_v2;
                 if (c) Store.setCfg(c);
@@ -4682,25 +4823,20 @@ ${c.name || '[Your Name]'}`;
 <div class="ob-overlay" id="obOverlay" style="display:none">
   <div class="ob-dialog">
     <div class="ob-head">
-      <div class="ob-steps" id="obSteps">
-        <div class="ob-step-dot active" id="obDot1">1</div>
-        <div class="ob-step-line" id="obLine1"></div>
-        <div class="ob-step-dot" id="obDot2">2</div>
-        <div class="ob-step-line" id="obLine2"></div>
-        <div class="ob-step-dot" id="obDot3">3</div>
-        <div class="ob-step-line" id="obLine3"></div>
-        <div class="ob-step-dot" id="obDot4">4</div>
+      <div class="ob-progress-wrap">
+        <div class="ob-progress-bar"><div class="ob-progress-fill" id="obProgressFill" style="width:20%"></div></div>
+        <div class="ob-progress-label" id="obProgressLabel">1 of 5</div>
       </div>
     </div>
     <div class="ob-body">
 
       <!-- Step 1: Import Data -->
       <div class="ob-panel active" id="obPanel1">
-        <div class="ob-title">Welcome to WH Tracker</div>
-        <div class="ob-desc">Track your work hours effortlessly. Got a backup? Import it to restore your data.</div>
-        <label class="ob-import-zone" for="obImportFile">
+        <div class="ob-title">Say Hello to Murph.</div>
+        <div class="ob-desc">Your work hour tracker. Track your work hours effortlessly. Got a backup? Import it to restore your data.</div>
+        <label class="ob-import-zone" for="obImportFile" id="obImportZone">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <div class="ob-import-zone-text"><strong>Click to import a backup</strong><br>Supports .json backup files</div>
+          <div class="ob-import-zone-text" id="obImportZoneText"><strong>Choose a file or drag &amp; drop here</strong><br>Supports .json files</div>
           <input type="file" id="obImportFile" accept=".json" style="display:none">
         </label>
         <div id="obImportStatus" style="font-size:12px;color:var(--muted-fg);text-align:center;display:none"></div>
@@ -4712,17 +4848,17 @@ ${c.name || '[Your Name]'}`;
         <div class="ob-desc">These help personalise your experience. Both fields are optional.</div>
         <div class="form-field">
           <div class="ob-section-label">Your Name</div>
-          <input type="text" class="field-input" id="obName" placeholder="e.g. Alex" maxlength="40" autocomplete="off">
+          <input type="text" class="field-input" id="obName" placeholder="Your name" maxlength="40" autocomplete="off">
         </div>
         <div class="form-field">
           <div class="ob-section-label">Company</div>
-          <input type="text" class="field-input" id="obCompany" placeholder="e.g. Acme Corp" maxlength="60" autocomplete="off">
+          <input type="text" class="field-input" id="obCompany" placeholder="Company name" maxlength="60" autocomplete="off">
         </div>
         <div class="form-field">
           <div class="ob-section-label">Shift Hours</div>
           <div style="display:flex;align-items:center;gap:8px">
             <div class="time-input-wrap" style="flex:1">
-              <input type="text" id="obShiftStart" placeholder="From  e.g. 09:00 AM" autocomplete="off"
+              <input type="text" id="obShiftStart" placeholder="From  09:00 AM" autocomplete="off"
                 style="height:40px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
               <button type="button" class="tp-icon-btn" onclick="openTpModal('obShiftStart',event)" title="Pick time">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -4730,7 +4866,7 @@ ${c.name || '[Your Name]'}`;
             </div>
             <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">–</span>
             <div class="time-input-wrap" style="flex:1">
-              <input type="text" id="obShiftEnd" placeholder="To  e.g. 06:00 PM" autocomplete="off"
+              <input type="text" id="obShiftEnd" placeholder="To  06:00 PM" autocomplete="off"
                 style="height:40px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
               <button type="button" class="tp-icon-btn" onclick="openTpModal('obShiftEnd',event)" title="Pick time">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -4792,30 +4928,46 @@ ${c.name || '[Your Name]'}`;
         </div>
         <!-- Leave Early (optional) -->
         <div class="form-field">
-          <div class="ob-section-label">Leave Early <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">— optional</span></div>
+          <div class="ob-section-label">Leave Early <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
           <div class="ob-day-picker" id="obEarlyPicker">
-            <button type="button" class="plan-btn" data-oday="1">Mon</button>
-            <button type="button" class="plan-btn" data-oday="2">Tue</button>
-            <button type="button" class="plan-btn" data-oday="3">Wed</button>
-            <button type="button" class="plan-btn" data-oday="4">Thu</button>
-            <button type="button" class="plan-btn" data-oday="5">Fri</button>
+            <button type="button" class="plan-btn" data-oday="1">Monday</button>
+            <button type="button" class="plan-btn" data-oday="2">Tuesday</button>
+            <button type="button" class="plan-btn" data-oday="3">Wednesday</button>
+            <button type="button" class="plan-btn" data-oday="4">Thursday</button>
+            <button type="button" class="plan-btn" data-oday="5">Friday</button>
           </div>
         </div>
         <!-- Stay Late (optional) -->
         <div class="form-field">
-          <div class="ob-section-label">Stay Late <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">— optional</span></div>
+          <div class="ob-section-label">Stay Late <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
           <div class="ob-day-picker" id="obLatePicker">
-            <button type="button" class="plan-btn" data-lday="1">Mon</button>
-            <button type="button" class="plan-btn" data-lday="2">Tue</button>
-            <button type="button" class="plan-btn" data-lday="3">Wed</button>
-            <button type="button" class="plan-btn" data-lday="4">Thu</button>
-            <button type="button" class="plan-btn" data-lday="5">Fri</button>
+            <button type="button" class="plan-btn" data-lday="1">Monday</button>
+            <button type="button" class="plan-btn" data-lday="2">Tuesday</button>
+            <button type="button" class="plan-btn" data-lday="3">Wednesday</button>
+            <button type="button" class="plan-btn" data-lday="4">Thursday</button>
+            <button type="button" class="plan-btn" data-lday="5">Friday</button>
           </div>
         </div>
       </div>
 
-      <!-- Step 4: All Done -->
+      <!-- Step 4: Plan Your Week -->
       <div class="ob-panel" id="obPanel4">
+        <div class="ob-title">Plan Your Week</div>
+        <div class="ob-desc">Set your schedule for the week. You can update this anytime from Settings.</div>
+        <div id="obWpDayRows"></div>
+        <div style="height:1px;background:var(--border);margin:2px 0 4px"></div>
+        <div class="form-field">
+          <div class="ob-section-label">Early Leave <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
+          <div class="target-day-picker" id="obWpEarly" style="margin-top:6px"></div>
+        </div>
+        <div class="form-field">
+          <div class="ob-section-label">Stay Late <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
+          <div class="target-day-picker" id="obWpLate" style="margin-top:6px"></div>
+        </div>
+      </div>
+
+      <!-- Step 5: All Done -->
+      <div class="ob-panel" id="obPanel5">
         <div class="ob-done-card">
           <div style="font-size:18px;font-weight:700;color:var(--foreground)">You're all set!</div>
           <div style="font-size:13px;color:var(--muted-fg);line-height:1.6">Your workspace is configured and ready.<br>Start tracking your hours.</div>
@@ -4840,8 +4992,8 @@ ${c.name || '[Your Name]'}`;
     <div class="ob-foot">
       <button class="ob-btn-ghost" id="obBackBtn" onclick="obStep(-1)" style="visibility:hidden">Back</button>
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="ob-btn-link" id="obSkipBtn" onclick="obSkip()">Skip setup</button>
-        <button class="ob-btn-primary" id="obNextBtn" onclick="obStep(1)">Next</button>
+        <button class="ob-btn-link" id="obSkipBtn" onclick="obSkip()">Skip</button>
+        <button class="ob-btn-primary" id="obNextBtn" onclick="obStep(1)">Next Step</button>
       </div>
     </div>
   </div>
