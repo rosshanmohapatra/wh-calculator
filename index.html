@@ -850,6 +850,9 @@
       background: transparent; color: var(--muted-fg); font-size: 12px; font-weight: 500;
       font-family: var(--font); cursor: pointer; transition: background .15s; }
     .ob-btn-link:hover { background: var(--muted); color: var(--foreground); }
+    .ob-panel input[type="text"] { outline: none; }
+    .ob-panel input[type="text"]:focus { border-color: var(--ring) !important; box-shadow: 0 0 0 3px rgba(9,9,11,.08); }
+    .dark .ob-panel input[type="text"]:focus { box-shadow: 0 0 0 3px rgba(250,250,250,.08); }
     .ob-import-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 28px 20px;
       text-align: center; cursor: pointer; transition: border-color .15s, background .15s; display: flex;
       flex-direction: column; align-items: center; gap: 8px; }
