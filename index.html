@@ -73,6 +73,10 @@
     /* ── View system ── */
     .view { display: none; }
     .view.active { display: block; }
+    @keyframes view-slide-right { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes view-slide-left  { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: translateX(0); } }
+    .view.slide-from-right { animation: view-slide-right .22s ease both; }
+    .view.slide-from-left  { animation: view-slide-left .22s ease both; }
 
     /* ── Icon button ── */
     .btn-icon { display: inline-flex; align-items: center; justify-content: center;
@@ -214,7 +218,7 @@
 
     /* ── Shift combo (input + button inside) ── */
     .shift-cta { display: flex; flex-direction: column; gap: 10px; }
-    .shift-combo { display: flex; align-items: center; background: var(--input-bg);
+    .shift-combo { display: flex; align-items: center; background: var(--card);
       border: 1.5px solid var(--border); border-radius: 12px; height: 52px;
       padding: 0 6px; gap: 8px; transition: border-color .15s; }
     .shift-combo:focus-within { border-color: var(--ring); }
@@ -611,12 +615,21 @@
     .day-sel-btn .dsel-dot  { width: 4px; height: 4px; border-radius: 50%;
       background: var(--success); opacity: 0; transition: opacity .15s; }
     .day-sel-btn.has-data .dsel-dot { opacity: 1; }
-    .day-sel-btn:hover:not(:disabled):not(.future) { border-color: var(--foreground); color: var(--foreground); background: var(--muted); }
+    .day-sel-btn:hover:not(:disabled):not(.future):not(.active) { border-color: var(--foreground); color: var(--foreground); background: var(--muted); }
     .day-sel-btn.active { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
     .day-sel-btn.active .dsel-dot { background: var(--background); opacity: .6; }
     .day-sel-btn:disabled { opacity: .28; cursor: default; pointer-events: none; }
     .day-sel-btn.future { opacity: .5; }
     .day-sel-btn.future:hover { border-color: var(--border); background: var(--muted); color: var(--muted-fg); cursor: pointer; }
+
+    /* ── This Week wrapper ── */
+    .this-week-wrap { background: var(--card); border-radius: 12px; padding: 10px 10px 10px; display: flex; flex-direction: column; gap: 8px; }
+    .this-week-header { display: flex; align-items: center; justify-content: space-between; }
+    .this-week-label { font-size: 11px; font-weight: 600; color: var(--muted-fg); letter-spacing: .05em; text-transform: uppercase; }
+    .this-week-nav { display: flex; gap: 4px; }
+    .this-week-btn { width: 24px; height: 24px; border-radius: 6px; border: none; background: var(--muted); color: var(--foreground); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .12s; padding: 0; }
+    .this-week-btn:hover { background: var(--border); }
+    .this-week-btn:disabled { opacity: .3; cursor: default; }
 
     /* ── Past-day login section ── */
     .past-login-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -976,7 +989,20 @@
       </div>
 
       <!-- Day selector (Mon–Fri of current week) -->
-      <div class="day-selector" id="daySelectorRow"><button class="day-sel-btn has-data"><span class="dsel-name">Mon</span><span class="dsel-num">13</span><span class="dsel-dot"></span></button><button class="day-sel-btn has-data"><span class="dsel-name">Tue</span><span class="dsel-num">14</span><span class="dsel-dot"></span></button><button class="day-sel-btn active"><span class="dsel-name">Wed</span><span class="dsel-num">15</span><span class="dsel-dot"></span></button><button class="day-sel-btn future"><span class="dsel-name">Thu</span><span class="dsel-num">16</span><span class="dsel-dot"></span></button><button class="day-sel-btn future"><span class="dsel-name">Fri</span><span class="dsel-num">17</span><span class="dsel-dot"></span></button></div>
+      <div class="this-week-wrap">
+        <div class="this-week-header">
+          <span class="this-week-label" id="thisWeekLabel">This Week</span>
+          <div class="this-week-nav">
+            <button class="this-week-btn" id="weekPrevBtn" onclick="navDaySelectorWeek(-1)" title="Previous week">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="this-week-btn" id="weekNextBtn" onclick="navDaySelectorWeek(1)" title="Next week" disabled>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="day-selector" id="daySelectorRow"><button class="day-sel-btn has-data"><span class="dsel-name">Mon</span><span class="dsel-num">13</span><span class="dsel-dot"></span></button><button class="day-sel-btn has-data"><span class="dsel-name">Tue</span><span class="dsel-num">14</span><span class="dsel-dot"></span></button><button class="day-sel-btn active"><span class="dsel-name">Wed</span><span class="dsel-num">15</span><span class="dsel-dot"></span></button><button class="day-sel-btn future"><span class="dsel-name">Thu</span><span class="dsel-num">16</span><span class="dsel-dot"></span></button><button class="day-sel-btn future"><span class="dsel-name">Fri</span><span class="dsel-num">17</span><span class="dsel-dot"></span></button></div>
+      </div>
 
       <!-- Future day plan section -->
       <div id="futureDayPlan" style="display:none">
@@ -1638,6 +1664,7 @@
     let activeView = 'home';
     let selectedDayKey = null;      // null = today; or a date key for past days
     let analyticsWeekOffset = 0;   // 0 = current week, -1 = last week, …
+    let daySelectorWeekOffset = 0; // 0 = current week, -1 = last week, …
     let autoStopped = false;        // true after auto-stop fires
     let _dayEditKey = null;         // key being edited in day-edit modal
     let _sessionAccSecs = 0;        // accumulated seconds from previous sessions today (for resume)
@@ -2606,14 +2633,14 @@
 
     // ── DAY SELECTOR (Home) ────────────────────────────
     function renderDaySelector() {
-      const wk = week(0), tk = todayKey(), now = new Date();
+      const wk = week(daySelectorWeekOffset), tk = todayKey(), now = new Date();
       const selKey = selectedDayKey || tk;
       const container = el('daySelectorRow');
       container.innerHTML = '';
       wk.forEach(day => {
         const btn = document.createElement('button');
         const log = dayLog(day.key);
-        const isFuture = day.date > now && day.key !== tk;
+        const isFuture = daySelectorWeekOffset === 0 && day.date > now && day.key !== tk;
         btn.className = 'day-sel-btn';
         if (day.key === selKey) btn.classList.add('active');
         if (log?.hoursWorked != null || (day.key === tk && loginDate) || log?.scheduled) btn.classList.add('has-data');
@@ -2627,10 +2654,29 @@
         });
         container.appendChild(btn);
       });
+      const label = el('thisWeekLabel');
+      if (label) label.textContent = daySelectorWeekOffset === 0 ? 'This Week' : weekRangeLabel(daySelectorWeekOffset);
+      const prevBtn = el('weekPrevBtn'), nextBtn = el('weekNextBtn');
+      if (prevBtn) prevBtn.disabled = daySelectorWeekOffset <= -52;
+      if (nextBtn) nextBtn.disabled = daySelectorWeekOffset >= 0;
+    }
+
+    function navDaySelectorWeek(dir) {
+      const newOffset = daySelectorWeekOffset + dir;
+      if (newOffset > 0) return;
+      daySelectorWeekOffset = newOffset;
+      const wk = week(daySelectorWeekOffset);
+      const tk = todayKey();
+      if (daySelectorWeekOffset === 0) {
+        selectDay(tk);
+      } else {
+        const withData = [...wk].reverse().find(d => dayLog(d.key)?.hoursWorked != null);
+        selectDay((withData || wk[4]).key);
+      }
     }
 
     function updateSelDayHeader(key) {
-      const tk = todayKey(), wk = week(0);
+      const tk = todayKey(), wk = week(daySelectorWeekOffset);
       const now = nowTz();
       const day = wk.find(d => d.key === key);
       const dayDate = day ? day.date : now;
@@ -2659,7 +2705,7 @@
       } else {
         el('todayLoginSection').style.display = 'none';
         el('pastLoginSection').style.display = '';
-        const wk = week(0), day = wk.find(d => d.key === key);
+        const wk = week(daySelectorWeekOffset), day = wk.find(d => d.key === key);
         el('pastLoginLabel').textContent = `${day?.name || 'Day'}'s Log`;
         renderPastDay(key);
       }
@@ -2668,7 +2714,7 @@
     function selectFutureDay(key) {
       selectedDayKey = key;
       renderDaySelector();
-      const wk = week(0), day = wk.find(d => d.key === key);
+      const wk = week(daySelectorWeekOffset), day = wk.find(d => d.key === key);
       const log = dayLog(key);
       const ov = log?.futurePlan;
 
@@ -3207,7 +3253,10 @@
       renderShiftPresets(); autoSaveSettings();
     }
     // ── TAB SWITCHING ──────────────────────────────────
+    const VIEW_ORDER = ['home', 'analytics', 'settings'];
     function switchTab(name) {
+      const oldIdx = VIEW_ORDER.indexOf(activeView);
+      const newIdx = VIEW_ORDER.indexOf(name);
       activeView = name;
       document.querySelectorAll('.nav-tab').forEach(t => {
         const isActive = t.dataset.view === name;
@@ -3215,8 +3264,14 @@
         const icon = t.querySelector('.tab-icon');
         if (icon) icon.style.display = isActive ? 'inline-flex' : 'none';
       });
-      document.querySelectorAll('.view').forEach(v =>
-        v.classList.toggle('active', v.id === `view${name.charAt(0).toUpperCase() + name.slice(1)}`));
+      document.querySelectorAll('.view').forEach(v => {
+        const isActive = v.id === `view${name.charAt(0).toUpperCase() + name.slice(1)}`;
+        v.classList.remove('slide-from-right', 'slide-from-left');
+        v.classList.toggle('active', isActive);
+        if (isActive && oldIdx !== newIdx) {
+          v.classList.add(newIdx > oldIdx ? 'slide-from-right' : 'slide-from-left');
+        }
+      });
       if (name === 'settings') populateSettings();
       if (name === 'analytics') renderAnalytics();
     }
