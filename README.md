@@ -1,86 +1,76 @@
-# MURPH - Work Hour Tracker
+# Murph - Work Hour Tracker
 
 A lightweight work hour tracker.
+
 Real-time work hour tracking for people who just want to work their hours honestly and leave on time.
 
 No productivity theatre. No cloud sync. No unnecessary complexity.
----
 
-# USAGE
+> Every tick counts.
+
+## Usage
 
 Open Murph in any modern browser and start tracking instantly.
+
 - Start immediately
 - Or log from an earlier time
 - Everything is stored locally
 - No installation required
 
----
+## Features
 
-# FEATURES
+### Real-Time Tracking
 
-## REAL-TIME TRACKING
 Track work hours live while you work.
 
----
+### Backdated Entries
 
-## BACKDATED ENTRIES
 Start from an earlier time if you missed punch-in.
 
----
+### Daily & Weekly Targets
 
-## DAILY & WEEKLY TARGETS
 Track progress against expected work hours.
 
----
+### Session Editing
 
-## SESSION EDITING
 Modify sessions while preventing overlaps.
 
----
+### Auto-Stop Protection
 
-## AUTO-STOP PROTECTION
 Prevent accidental overtracking.
 
----
+### Schedule Planning
 
-## SCHEDULE PLANNING
 Plan leave early or stay late for future days.
 
----
+### Notifications
 
-## NOTIFICATIONS
 Smart reminders and shift awareness.
 
----
+### Light & Dark Mode
 
-## LIGHT & DARK MODE
 Automatic theme support included.
 
----
+## Privacy
 
-# PRIVACY
+### Local-First
 
-## LOCAL-FIRST
 All data stays in your browser.
 
----
+### No Tracking
 
-## NO TRACKING
 No analytics, telemetry, or background collection.
 
----
+### No Accounts
 
-## NO ACCOUNTS
 No login or signup required.
 
----
+### No Server
 
-## NO SERVER
 Runs entirely client-side.
 
----
+## Stack
 
-# STACK
 - Vanilla JavaScript
 - CSS Custom Properties
 - localStorage
