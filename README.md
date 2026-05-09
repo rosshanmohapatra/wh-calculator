@@ -1,21 +1,16 @@
 # Murph - Work Hour Tracker
 
 A lightweight work hour tracker.
-
 Real-time work hour tracking for people who just want to work their hours honestly and leave on time.
-
-No productivity theatre. No cloud sync. No unnecessary complexity.
-
-> Every tick counts.
 
 ## Usage
 
 Open Murph in any modern browser and start tracking instantly.
 
-- Start immediately
-- Or log from an earlier time
-- Everything is stored locally
-- No installation required
+- Set a daily target
+- Click on Quick Start
+- Or enter an earlier time
+- End of the day you'll be notified to leave.
 
 ## Features
 
