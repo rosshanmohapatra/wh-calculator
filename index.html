@@ -624,7 +624,7 @@
     .day-sel-btn.future:hover { border-color: var(--border); background: var(--muted); color: var(--muted-fg); cursor: pointer; }
 
     /* ── This Week wrapper ── */
-    .this-week-wrap { background: var(--card); border-radius: 12px; padding: 10px 10px 10px; display: flex; flex-direction: column; gap: 8px; }
+    .this-week-wrap { background: var(--card); border-radius: 12px; padding: 8px; display: flex; flex-direction: column; gap: 8px; }
     .this-week-header { display: flex; align-items: center; justify-content: space-between; }
     .this-week-label { font-size: 11px; font-weight: 600; color: var(--muted-fg); letter-spacing: .05em; text-transform: uppercase; }
     .this-week-nav { display: flex; gap: 4px; }
@@ -878,6 +878,38 @@
     .ob-day-picker { display: flex; gap: 6px; flex-wrap: wrap; }
     .ob-done-card { background: var(--muted); border-radius: 12px; padding: 20px; text-align: center;
       display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+    /* ── Instagram Stories–style onboarding stepper ── */
+    .ob-stories-wrap { display: flex; align-items: center; gap: 5px; margin-bottom: 24px; }
+    .ob-story-seg { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .ob-story-fill { height: 100%; background: var(--foreground); border-radius: 2px; width: 0%; transition: width .3s ease; }
+    .ob-story-seg.done .ob-story-fill,
+    .ob-story-seg.current .ob-story-fill { width: 100%; }
+
+    /* ── Day selector week-nav slide animation ── */
+    @keyframes ds-slide-fwd  { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes ds-slide-back { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: translateX(0); } }
+    .day-selector.wk-fwd  { animation: ds-slide-fwd  .22s ease both; }
+    .day-selector.wk-back { animation: ds-slide-back .22s ease both; }
+
+    /* ── Animated number ticker ── */
+    .rc-worked, .rc-remaining { will-change: contents; }
+
+    /* ── Update Entry inside Today card ── */
+    .rc-update-btn { height: 28px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted-fg); font-size: 11px; font-weight: 600;
+      font-family: var(--font); cursor: pointer; transition: background .12s, color .12s;
+      white-space: nowrap; display: none; }
+    .rc-update-btn.visible { display: inline-flex; align-items: center; gap: 5px; }
+    .rc-update-btn:hover { background: var(--muted); color: var(--foreground); }
+
+    /* ── Dialog foot row (side-by-side CTAs) ── */
+    .dialog-foot-row { padding: 0 20px 20px; display: flex; flex-direction: row; gap: 8px; }
+    .dialog-foot-row .btn { flex: 1; }
+
+    /* ── Disabled time inputs in modal ── */
+    .modal-time-row.inputs-disabled .field-input { opacity: .4; pointer-events: none; }
+    .modal-time-row.inputs-disabled .tp-icon-btn { opacity: .4; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -1020,8 +1052,14 @@
           <div class="rc-head-left">
             <span class="section-label" id="rcDayLabel">Today</span>
           </div>
-          <div id="leaveChip" style="font-size:15px;color:var(--muted-fg);font-weight:500">
-            <strong id="leaveAt" style="color:var(--foreground);font-weight:500">—</strong>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button class="rc-update-btn" id="rcUpdateEntryBtn" onclick="openDayEditModal(selectedDayKey)">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Update Entry
+            </button>
+            <div id="leaveChip" style="font-size:15px;color:var(--muted-fg);font-weight:500">
+              <strong id="leaveAt" style="color:var(--foreground);font-weight:500">—</strong>
+            </div>
           </div>
         </div>
         <div class="rc-body">
@@ -1087,13 +1125,6 @@
         <div class="err-msg" id="errMsg">Couldn't parse that. Try: 11:30, 1130, 11:30 AM, or 13:30</div>
       </div>
 
-      <!-- Past day: just show edit button, no inline form -->
-      <div class="login-section" id="pastLoginSection" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <span class="section-label" id="pastLoginLabel">Monday's Log</span>
-          <button class="btn-sm" id="pastEditBtn" onclick="openDayEditModal(selectedDayKey)">Update Entry</button>
-        </div>
-      </div>
 
     </main>
   </div>
@@ -1565,9 +1596,9 @@
         <div class="modal-override-row">
           <button class="modal-override-btn" id="deHalfDay" onclick="setDeOverride('halfday')">Half Day</button>
           <button class="modal-override-btn" id="deHoliday" onclick="setDeOverride('holiday')">Holiday</button>
-          <button class="modal-override-btn" id="deLeave" onclick="setDeOverride('leave')">All Day Leave</button>
+          <button class="modal-override-btn" id="deLeave" onclick="setDeOverride('leave')">Full Day Leave</button>
         </div>
-        <div class="modal-time-row">
+        <div class="modal-time-row" id="deTimeRow">
           <div style="position:relative;flex:1" class="time-input-wrap">
             <input type="text" class="field-input" id="deStart" placeholder="Start time" autocomplete="off" style="padding-left:38px">
             <button type="button" class="tp-icon-btn" onclick="openTpModal('deStart',event)" title="Pick time">
@@ -1584,9 +1615,9 @@
         </div>
         <div class="err-msg" id="deErr">Invalid times — end must be after start.</div>
       </div>
-      <div class="dialog-foot">
-        <button class="btn btn-primary" id="dayEditSave">Save</button>
+      <div class="dialog-foot-row">
         <button class="btn btn-cancel" id="dayEditCancel">Cancel</button>
+        <button class="btn btn-primary" id="dayEditSave">Save</button>
       </div>
     </div>
   </div>
@@ -2161,7 +2192,8 @@
           ${eltStatusHtml ? `<div style="margin-top:4px">${eltStatusHtml}</div>` : ''}
         </div>
       </div>`;
-      return `<div class="wk-target-row"><span class="section-label">Recommended</span><div class="wk-target-right">${rightHtml}</div></div>${ioHtml}`;
+      const _rcLabel = selectedDayKey === todayKey() ? "Today's Target" : (() => { const _d = week(daySelectorWeekOffset).find(d => d.key === selectedDayKey); return (_d?.name || 'Day') + "'s Target"; })();
+      return `<div class="wk-target-row"><span class="section-label">${_rcLabel}</span><div class="wk-target-right">${rightHtml}</div></div>${ioHtml}`;
     }
 
     // ── TIME PICKER HELPER ────────────────────────────
@@ -2576,6 +2608,63 @@
       renderDaySelector();
     }
 
+    // ── ANIMATED NUMBER TICKER (react-animated-numbers style, 1.5× speed) ──
+    const _animState = {};
+    function animateNum(elId, newText) {
+      const elem = el(elId);
+      if (!elem) return;
+      const old = elem.dataset.animVal;
+      if (old === newText) return; // no change
+      elem.dataset.animVal = newText;
+
+      // Extract numeric part to animate; fall back to instant swap for non-numeric
+      const newNum = parseFloat(newText);
+      const oldNum = parseFloat(old || '0');
+      if (isNaN(newNum) || isNaN(oldNum) || old == null) { elem.textContent = newText; return; }
+
+      const DURATION = 200; // ms — 1.5× faster than typical 300ms
+      const start = performance.now();
+      if (_animState[elId]) cancelAnimationFrame(_animState[elId]);
+      function tick(now) {
+        const t = Math.min((now - start) / DURATION, 1);
+        const ease = 1 - Math.pow(1 - t, 3); // cubic ease-out
+        const cur = oldNum + (newNum - oldNum) * ease;
+        // Preserve non-numeric suffix (e.g. "h 05m")
+        elem.textContent = newText.replace(/[\d.]+/, () => {
+          // Format integer-like numbers without decimals
+          return Number.isInteger(newNum) ? Math.round(cur) : cur.toFixed(1);
+        });
+        if (t < 1) _animState[elId] = requestAnimationFrame(tick);
+        else elem.textContent = newText;
+      }
+      _animState[elId] = requestAnimationFrame(tick);
+    }
+
+    // Animate the big hour display (parses "Xh YYm" format)
+    function animateDuration(elId, newText) {
+      const elem = el(elId);
+      if (!elem) return;
+      const old = elem.dataset.animVal;
+      if (old === newText) return;
+      elem.dataset.animVal = newText;
+      const parseHM = s => { const m = s.match(/(\d+)h\s*(\d+)m/); return m ? parseInt(m[1])*60+parseInt(m[2]) : null; };
+      const newMins = parseHM(newText), oldMins = parseHM(old || '0h 00m');
+      if (newMins === null || oldMins === null) { elem.textContent = newText; return; }
+      const DURATION = 200;
+      const start = performance.now();
+      if (_animState[elId]) cancelAnimationFrame(_animState[elId]);
+      function tick(now) {
+        const t = Math.min((now - start) / DURATION, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        const cur = Math.round(oldMins + (newMins - oldMins) * ease);
+        const h = Math.floor(cur / 60), m = cur % 60;
+        elem.textContent = `${h}h ${String(m).padStart(2,'0')}m`;
+        if (t < 1) _animState[elId] = requestAnimationFrame(tick);
+        else elem.textContent = newText;
+      }
+      _animState[elId] = requestAnimationFrame(tick);
+    }
+
     // ── MAIN DISPLAY LOOP ──────────────────────────────
     function render() {
       if (!loginDate) return;
@@ -2595,7 +2684,7 @@
       if (!autoStopped && worked >= autoStopAt) { doAutoStop(); return; }
 
       const h = Math.floor(worked / 3600), m = Math.floor((worked % 3600) / 60);
-      el('rcWorked').textContent = `${h}h ${p2(m)}m`;
+      animateDuration('rcWorked', `${h}h ${p2(m)}m`);
       el('rcWorked').style.color = '';
       el('rcRemaining').style.color = '';
       // "Leave at" badge: prefer personal Out Time target if set
@@ -2605,7 +2694,8 @@
 
       if (!isDone && eff > 0) {
         const rem = eff - worked;
-        el('rcRemaining').textContent = rem < 60 ? `${Math.max(0, rem)}s` : dur(rem);
+        const remText = rem < 60 ? `${Math.max(0, rem)}s` : dur(rem);
+        animateDuration('rcRemaining', remText);
         el('rcRightCol').style.display = 'block';
         el('otBanner').classList.remove('show');
       } else if (isDone) {
@@ -2710,6 +2800,14 @@
       daySelectorWeekOffset = newOffset;
       const wk = week(daySelectorWeekOffset);
       const tk = todayKey();
+      // Animate day selector row
+      const dsRow = el('daySelectorRow');
+      if (dsRow) {
+        dsRow.classList.remove('wk-fwd', 'wk-back');
+        void dsRow.offsetWidth; // reflow
+        dsRow.classList.add(dir > 0 ? 'wk-fwd' : 'wk-back');
+        setTimeout(() => dsRow.classList.remove('wk-fwd', 'wk-back'), 260);
+      }
       if (daySelectorWeekOffset === 0) {
         selectDay(tk);
       } else {
@@ -2743,13 +2841,13 @@
 
       if (key === tk) {
         el('todayLoginSection').style.display = '';
-        el('pastLoginSection').style.display = 'none';
+        el('rcUpdateEntryBtn')?.classList.remove('visible');
+        el('leaveChip').style.display = '';
         if (loginDate) render(); else renderEmptyState();
       } else {
         el('todayLoginSection').style.display = 'none';
-        el('pastLoginSection').style.display = '';
-        const wk = week(daySelectorWeekOffset), day = wk.find(d => d.key === key);
-        el('pastLoginLabel').textContent = `${day?.name || 'Day'}'s Log`;
+        el('rcUpdateEntryBtn')?.classList.add('visible');
+        el('leaveChip').style.display = 'none';
         renderPastDay(key);
       }
     }
@@ -2762,7 +2860,8 @@
       const ov = log?.futurePlan;
 
       el('todayLoginSection').style.display = 'none';
-      el('pastLoginSection').style.display = 'none';
+      el('rcUpdateEntryBtn')?.classList.remove('visible');
+      el('leaveChip').style.display = 'none';
       el('resultCard').style.display = 'none';
       el('futureDayPlan').style.display = '';
       el('futureDayQuestion').textContent = `Any plans for ${day?.name || 'this day'}?`;
@@ -2836,7 +2935,7 @@
     // Override label helper used in past-day view
     function overrideLabel(ov) {
       if (ov === 'holiday') return '<span style="font-size:12px;font-weight:600;color:var(--muted-fg);background:var(--muted);padding:2px 8px;border-radius:6px">Holiday</span>';
-      if (ov === 'leave')   return '<span style="font-size:12px;font-weight:600;color:#3b82f6;background:rgba(59,130,246,.1);padding:2px 8px;border-radius:6px;border:1px solid rgba(59,130,246,.2)">All Day Leave</span>';
+      if (ov === 'leave')   return '<span style="font-size:12px;font-weight:600;color:#3b82f6;background:rgba(59,130,246,.1);padding:2px 8px;border-radius:6px;border:1px solid rgba(59,130,246,.2)">Full Day Leave</span>';
       if (ov === 'halfday') return '<span style="font-size:12px;font-weight:600;color:var(--muted-fg);background:var(--muted);padding:2px 8px;border-radius:6px">Half Day</span>';
       return '';
     }
@@ -2844,20 +2943,23 @@
     function renderPastDay(key) {
       const c = cfg(), log = dayLog(key);
       const target = c.dailyH * 3600;
+      const _pastDay = week(daySelectorWeekOffset).find(d => d.key === key);
+      const _dayName = _pastDay?.name || 'Day';
+      const _targetLabel = _dayName + "'s Target";
 
-      // All Day Leave: show a clean status, no hours, no penalty stats
+      // Full Day Leave: show a clean status, no hours, no penalty stats
       if (log?.override === 'leave') {
-        el('rcWorked').textContent = 'All Day Leave';
+        el('rcWorked').textContent = 'Full Day Leave';
         el('rcWorked').style.color = '#3b82f6';
         el('rcRightCol').style.display = 'none';
         _setTodayDateChip();
         el('progFill').style.width = '0%';
         el('progFill').classList.remove('done');
-        el('progLabel').textContent = 'Day marked as All Day Leave';
+        el('progLabel').textContent = 'Day marked as Full Day Leave';
         el('stayHint').style.display = 'none';
         el('otBanner').classList.remove('show');
         el('doneBanner').classList.remove('show');
-        el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label" style="color:#3b82f6">All Day Leave</span></div>`;
+        el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label" style="color:#3b82f6">Full Day Leave</span></div>`;
         return;
       }
       // Holiday: similar clean state
@@ -2883,7 +2985,7 @@
         el('rcRemaining').textContent = dur(target); el('rcRemaining').style.color = 'var(--muted-fg)';
         el('progFill').style.width = '0%'; el('progFill').classList.remove('done');
         el('progLabel').textContent = 'No data logged for this day';
-        el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">Recommended</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">—</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">—</div></div></div>`;
+        el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">${_targetLabel}</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">—</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">—</div></div></div>`;
         el('stayHint').style.display = 'none';
         el('otBanner').classList.remove('show'); el('doneBanner').classList.remove('show');
         return;
@@ -2913,7 +3015,7 @@
       el('stayHint').style.display = 'none';
       const loginDisp = log.loginDisplay || '—';
       const outDisp   = log.checkoutDisplay || '—';
-      el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">Recommended</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">${loginDisp}</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">${outDisp}</div></div></div>`;
+      el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">${_targetLabel}</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">${loginDisp}</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">${outDisp}</div></div></div>`;
     }
 
     // ── HISTORY CARD ───────────────────────────────────
@@ -3084,7 +3186,7 @@
       return `<div class="wk-dropdown-inner">
         <button class="wk-edit-btn" onclick="setDayOverride('${day.key}','halfday')">Half Day</button>
         <button class="wk-edit-btn" onclick="setDayOverride('${day.key}','holiday')">Holiday</button>
-        <button class="wk-edit-btn" onclick="setDayOverride('${day.key}','leave')">All Day Leave</button>
+        <button class="wk-edit-btn" onclick="setDayOverride('${day.key}','leave')">Full Day Leave</button>
         <div class="wk-time-inputs">
           <input type="text" class="wk-time-input" placeholder="Start" id="dStart-${day.key}" value="${startVal}" autocomplete="off">
           <span>–</span>
@@ -3181,7 +3283,7 @@
       el('autostopBanner').classList.remove('show');
       selectedDayKey = todayKey();
       el('todayLoginSection').style.display = '';
-      el('pastLoginSection').style.display = 'none';
+      el('rcUpdateEntryBtn')?.classList.remove('visible');
       updateSelDayHeader(selectedDayKey);
       renderEmptyState();
       renderDaySelector();
@@ -3475,7 +3577,7 @@
           </div>`;
         }
 
-        // All Day Leave → flat blue-tinted circle with "Leave" label
+        // Full Day Leave → flat blue-tinted circle with "Leave" label
         if (log?.override === 'leave') {
           return `<div class="sc-item" data-tip="On Leave">
             <div style="width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(59,130,246,.1);border:1.5px solid rgba(59,130,246,.3);font-size:9px;font-weight:700;color:#3b82f6;letter-spacing:.04em;text-align:center">Leave</div>
@@ -3808,9 +3910,15 @@ ${sig}`
       el('deEnd').placeholder   = sd.end   || 'End time';
       // Highlight active override
       ['deHalfDay','deHoliday','deLeave'].forEach(id => el(id)?.classList.remove('active'));
+      el('deTimeRow')?.classList.remove('inputs-disabled');
       if (log?.override === 'halfday') el('deHalfDay').classList.add('active');
-      else if (log?.override === 'holiday') el('deHoliday').classList.add('active');
-      else if (log?.override === 'leave') el('deLeave').classList.add('active');
+      else if (log?.override === 'holiday') {
+        el('deHoliday').classList.add('active');
+        el('deTimeRow')?.classList.add('inputs-disabled');
+      } else if (log?.override === 'leave') {
+        el('deLeave').classList.add('active');
+        el('deTimeRow')?.classList.add('inputs-disabled');
+      }
       // Shift-aware blur handlers (fresh each open)
       const startBlur = () => applyShiftAmPm(el('deStart'), 'start');
       const endBlur   = () => applyShiftAmPm(el('deEnd'),   'end');
@@ -3966,6 +4074,10 @@ ${sig}`
       const wasActive = btn.classList.contains('active');
       ['deHalfDay','deHoliday','deLeave'].forEach(id => el(id)?.classList.remove('active'));
       if (!wasActive) btn.classList.add('active'); // toggle off if same clicked
+      // Disable time inputs for full-disable overrides
+      const activeNow = wasActive ? null : type;
+      const disableInputs = activeNow === 'holiday' || activeNow === 'leave';
+      el('deTimeRow')?.classList.toggle('inputs-disabled', disableInputs);
     }
 
     // ── Export all logs as a local JSON file ───────────
@@ -4749,10 +4861,14 @@ ${sig}`
     }
 
     function obUpdateSteps(step, dir) {
-      const fill = el('obProgressFill');
-      if (fill) fill.style.width = ((step / 5) * 100) + '%';
-      const label = el('obProgressLabel');
-      if (label) label.textContent = step + ' of 5';
+      // Instagram Stories stepper
+      for (let i = 1; i <= 5; i++) {
+        const seg = el('obSeg' + i);
+        if (!seg) continue;
+        seg.classList.remove('done', 'current');
+        if (i < step) seg.classList.add('done');
+        else if (i === step) seg.classList.add('current');
+      }
       el('obBackBtn').style.visibility = step > 1 ? 'visible' : 'hidden';
       const nextBtn = el('obNextBtn');
       if (step === 5) nextBtn.textContent = 'Done';
@@ -5043,7 +5159,9 @@ ${sig}`
         renderEmptyState(); // show card in read mode
       } else { renderEmptyState(); }
 
-      renderDaySelector();
+      // If selected day is not today (e.g. weekend jump), re-render for selected day
+      if (selectedDayKey !== tk) selectDay(selectedDayKey);
+      else renderDaySelector();
 
       restoreSession();
       // Check for forgot-to-logout
@@ -5063,9 +5181,12 @@ ${sig}`
 <div class="ob-overlay" id="obOverlay" style="display:none">
   <div class="ob-dialog">
     <div class="ob-head">
-      <div class="ob-progress-wrap">
-        <div class="ob-progress-bar"><div class="ob-progress-fill" id="obProgressFill" style="width:20%"></div></div>
-        <div class="ob-progress-label" id="obProgressLabel">1 of 5</div>
+      <div class="ob-stories-wrap" id="obStoriesWrap">
+        <div class="ob-story-seg current" id="obSeg1"><div class="ob-story-fill"></div></div>
+        <div class="ob-story-seg" id="obSeg2"><div class="ob-story-fill"></div></div>
+        <div class="ob-story-seg" id="obSeg3"><div class="ob-story-fill"></div></div>
+        <div class="ob-story-seg" id="obSeg4"><div class="ob-story-fill"></div></div>
+        <div class="ob-story-seg" id="obSeg5"><div class="ob-story-fill"></div></div>
       </div>
     </div>
     <div class="ob-body">
