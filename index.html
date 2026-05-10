@@ -341,7 +341,7 @@
     .wk-edit-icon-btn:hover { background: var(--border); color: var(--foreground); }
     .wk-time-inputs { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-fg); }
 
-    /* Today's Target row */
+    /* Recommended row */
     .wk-target-row { display: flex; align-items: center; justify-content: space-between;
       background: var(--muted); border-radius: 8px; padding: 10px 12px; min-height: 40px; }
     .wk-target-right { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
@@ -1040,7 +1040,7 @@
             </div>
             <div class="progress-label" id="progLabel">Enter your login time below to begin tracking</div>
           </div>
-          <div id="rcToday"><div class="wk-target-row"><span class="section-label">Today's Target</span><div class="wk-target-right"><span class="wk-target-val">9h 00m</span><span class="hint-sep">&nbsp;+&nbsp;</span><span class="hint-makeup">1h 00m</span></div></div></div>
+          <div id="rcToday"><div class="wk-target-row"><span class="section-label">Recommended</span><div class="wk-target-right"><span class="wk-target-val">9h 00m</span><span class="hint-sep">&nbsp;+&nbsp;</span><span class="hint-makeup">1h 00m</span></div></div></div>
           <div id="stayHint" class="stay-hint" style="display:none">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
             <span id="stayHintText"></span>
@@ -1287,6 +1287,21 @@
           </div>
           <div class="settings-card-body">
           <div class="settings-group">
+
+            <!-- Work Days -->
+            <div class="form-field">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <div class="form-label">Days a Week</div>
+                  <div class="form-sub">Whether Saturday is a working day.</div>
+                </div>
+                <div class="st-tabs" style="flex-shrink:0">
+                  <button type="button" class="st-tab wd-tab active" data-wd="5" onclick="switchWorkDays(5)">5 Days</button>
+                  <button type="button" class="st-tab wd-tab" data-wd="6" onclick="switchWorkDays(6)">6 Days</button>
+                </div>
+              </div>
+              <input type="hidden" id="inpWorkDays" value="5">
+            </div>
 
             <!-- Shift Type FIRST -->
             <div class="form-field">
@@ -1670,8 +1685,18 @@
     let _sessionAccSecs = 0;        // accumulated seconds from previous sessions today (for resume)
     let _sessionCheckoutTime = null;// timestamp of last End Session (for resume label)
 
+    // ── RELATIVE TIME ──────────────────────────────────
+    function timeAgo(date) {
+      if (!date) return '';
+      const s = Math.floor((Date.now() - date.getTime()) / 1000);
+      if (s < 60)   return 'just now';
+      if (s < 3600) { const m = Math.floor(s / 60);    return `${m}m ago`; }
+      if (s < 86400){ const h = Math.floor(s / 3600);  return `${h}h ago`; }
+      const d = Math.floor(s / 86400); return `${d} day${d > 1 ? 's' : ''} ago`;
+    }
+
     // ── CONFIG ─────────────────────────────────────────
-    const CFG_DEF = { dailyH:9, weeklyH:45, weeklyOn:true, lateDays:[], earlyLeaveEntries:[], lateEntries:[], notifOn:false, name:'', targetDay:null, autoStopBuf:0.5, tzOffset:330, shiftType:'morning' };
+    const CFG_DEF = { dailyH:9, weeklyH:45, weeklyOn:true, lateDays:[], earlyLeaveEntries:[], lateEntries:[], notifOn:false, name:'', targetDay:null, autoStopBuf:0.5, tzOffset:330, shiftType:'morning', workDays:5 };
     function cfg() { const r=Store.getCfg(); return r?{...CFG_DEF,...r}:{...CFG_DEF}; }
     // saveCfg defined in persistence layer
 
@@ -1695,7 +1720,12 @@
     // saveDayLog defined in persistence layer
 
     // ── WEEK DAYS ──────────────────────────────────────
-    const FULL_DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+    const ALL_DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    function workDayNames() {
+      return cfg().workDays === 6 ? ALL_DAY_NAMES : ALL_DAY_NAMES.slice(0, 5);
+    }
+    // Keep FULL_DAY_NAMES as a backward-compat alias (static 5-day — use workDayNames() for dynamic)
+    const FULL_DAY_NAMES = ALL_DAY_NAMES.slice(0, 5);
     function week(offset) {
       offset = offset || 0;
       const t = new Date();
@@ -1704,17 +1734,17 @@
       const mon = new Date(t);
       mon.setDate(t.getDate() + (dow === 0 ? -6 : 1 - dow));
       mon.setHours(0,0,0,0);
-      return FULL_DAY_NAMES.map((n, i) => {
+      return workDayNames().map((n, i) => {
         const d = new Date(mon); d.setDate(mon.getDate() + i);
         return { key: dateKey(d), name: n, date: d };
       });
     }
     function weekRangeLabel(offset) {
       const wk = week(offset);
-      const mon = wk[0].date, fri = wk[4].date;
-      return mon.getMonth() === fri.getMonth()
-        ? `${MONTHS[mon.getMonth()]} ${mon.getDate()} to ${fri.getDate()}`
-        : `${MONTHS[mon.getMonth()]} ${mon.getDate()} to ${MONTHS[fri.getMonth()]} ${fri.getDate()}`;
+      const mon = wk[0].date, last = wk[wk.length - 1].date;
+      return mon.getMonth() === last.getMonth()
+        ? `${MONTHS[mon.getMonth()]} ${mon.getDate()} to ${last.getDate()}`
+        : `${MONTHS[mon.getMonth()]} ${mon.getDate()} to ${MONTHS[last.getMonth()]} ${last.getDate()}`;
     }
 
     // ── EFFECTIVE TARGET (carry-over) ──────────────────
@@ -2118,7 +2148,7 @@
           ${eltStatusHtml ? `<div style="margin-top:4px">${eltStatusHtml}</div>` : ''}
         </div>
       </div>`;
-      return `<div class="wk-target-row"><span class="section-label">Today's Target</span><div class="wk-target-right">${rightHtml}</div></div>${ioHtml}`;
+      return `<div class="wk-target-row"><span class="section-label">Recommended</span><div class="wk-target-right">${rightHtml}</div></div>${ioHtml}`;
     }
 
     // ── TIME PICKER HELPER ────────────────────────────
@@ -2658,12 +2688,12 @@
       if (label) label.textContent = daySelectorWeekOffset === 0 ? 'This Week' : weekRangeLabel(daySelectorWeekOffset);
       const prevBtn = el('weekPrevBtn'), nextBtn = el('weekNextBtn');
       if (prevBtn) prevBtn.disabled = daySelectorWeekOffset <= -52;
-      if (nextBtn) nextBtn.disabled = daySelectorWeekOffset >= 0;
+      if (nextBtn) nextBtn.disabled = daySelectorWeekOffset >= 1;
     }
 
     function navDaySelectorWeek(dir) {
       const newOffset = daySelectorWeekOffset + dir;
-      if (newOffset > 0) return;
+      if (newOffset > 1) return;
       daySelectorWeekOffset = newOffset;
       const wk = week(daySelectorWeekOffset);
       const tk = todayKey();
@@ -2840,7 +2870,7 @@
         el('rcRemaining').textContent = dur(target); el('rcRemaining').style.color = 'var(--muted-fg)';
         el('progFill').style.width = '0%'; el('progFill').classList.remove('done');
         el('progLabel').textContent = 'No data logged for this day';
-        el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">Today's Target</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">—</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">—</div></div></div>`;
+        el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">Recommended</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">—</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">—</div></div></div>`;
         el('stayHint').style.display = 'none';
         el('otBanner').classList.remove('show'); el('doneBanner').classList.remove('show');
         return;
@@ -2870,7 +2900,7 @@
       el('stayHint').style.display = 'none';
       const loginDisp = log.loginDisplay || '—';
       const outDisp   = log.checkoutDisplay || '—';
-      el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">Today's Target</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">${loginDisp}</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">${outDisp}</div></div></div>`;
+      el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">Recommended</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">${loginDisp}</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">${outDisp}</div></div></div>`;
     }
 
     // ── HISTORY CARD ───────────────────────────────────
@@ -3170,8 +3200,30 @@
       });
       el('inpShiftStart').value = c.shiftStart || '09:00 AM';
       el('inpShiftEnd').value   = c.shiftEnd   || '06:00 PM';
+      switchWorkDays(c.workDays || 5);
+      // Re-render day pickers with correct day count
+      const wdays = workDayNames();
+      const earlyPicker = el('targetDayPicker');
+      if (earlyPicker) {
+        const earlyDays = c.earlyLeaveDays || (c.targetDay != null ? [c.targetDay] : []);
+        earlyPicker.innerHTML = wdays.map((n, i) =>
+          `<button type="button" class="plan-btn${earlyDays.includes(i+1)?' selected':''}" data-tday="${i+1}">${n}</button>`
+        ).join('');
+        earlyPicker.querySelectorAll('[data-tday]').forEach(btn =>
+          btn.addEventListener('click', () => btn.classList.toggle('selected'))
+        );
+      }
+      const latePicker = el('dayPicker');
+      if (latePicker) {
+        latePicker.innerHTML = wdays.map((n, i) =>
+          `<button type="button" class="plan-btn${(c.lateDays||[]).includes(i)?' selected':''}" data-sday="${i}">${n}</button>`
+        ).join('');
+        latePicker.querySelectorAll('[data-sday]').forEach(btn =>
+          btn.addEventListener('click', () => btn.classList.toggle('selected'))
+        );
+      }
       const _ls = Store.getLastSaved();
-      if (_ls) el('settingsLastSaved').textContent = `Last Updated at ${short(_ls)}`;
+      if (_ls) el('settingsLastSaved').textContent = `Last updated ${timeAgo(_ls)}`;
     }
 
 
@@ -3221,12 +3273,45 @@
       const shiftEnd   = el('inpShiftEnd')?.value.trim()   || '06:00 PM';
       const shiftType  = deriveShiftType(shiftStart);
       const now = nowTz();
+      const workDays = parseInt(el('inpWorkDays')?.value || '5', 10) || 5;
       saveCfg({ dailyH: daily, weeklyH, weeklyOn: on, lateDays, earlyLeaveDays, notifOn, name, company,
-                targetDay, shiftType, shiftStart, shiftEnd, tzOffset,
-                autoStopBuf: cfg().autoStopBuf || 0.5, lastSaved: `Last Updated at ${short(now)}` });
-      el('settingsLastSaved').textContent = `Last Updated at ${short(now)}`;
+                targetDay, shiftType, shiftStart, shiftEnd, tzOffset, workDays,
+                autoStopBuf: cfg().autoStopBuf || 0.5 });
+      renderDaySelector(); // refresh strip in case work-days changed
+      el('settingsLastSaved').textContent = `Last updated just now`;
       if (notifOn && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission();
       if (loginDate) render(); else renderEmptyState();
+    }
+
+    // ── WORK DAYS SELECTOR ─────────────────────────────
+    function switchWorkDays(n) {
+      document.querySelectorAll('#cardAdvanced .wd-tab').forEach(t => t.classList.toggle('active', +t.dataset.wd === n));
+      const inp = el('inpWorkDays'); if (inp) inp.value = n;
+      // Immediately save & re-render pickers so Saturday appears/disappears live
+      autoSaveSettings();
+      // Re-render day pickers with updated day list
+      const wdays = workDayNames();
+      const c = cfg();
+      const earlyPicker = el('targetDayPicker');
+      if (earlyPicker) {
+        const earlyDays = c.earlyLeaveDays || [];
+        earlyPicker.innerHTML = wdays.map((name, i) =>
+          `<button type="button" class="plan-btn${earlyDays.includes(i+1)?' selected':''}" data-tday="${i+1}">${name}</button>`
+        ).join('');
+        earlyPicker.querySelectorAll('[data-tday]').forEach(btn =>
+          btn.addEventListener('click', () => { btn.classList.toggle('selected'); autoSaveSettings(); })
+        );
+      }
+      const latePicker = el('dayPicker');
+      if (latePicker) {
+        latePicker.innerHTML = wdays.map((name, i) =>
+          `<button type="button" class="plan-btn${(c.lateDays||[]).includes(i)?' selected':''}" data-sday="${i}">${name}</button>`
+        ).join('');
+        latePicker.querySelectorAll('[data-sday]').forEach(btn =>
+          btn.addEventListener('click', () => { btn.classList.toggle('selected'); autoSaveSettings(); })
+        );
+      }
+      renderDaySelector();
     }
 
     // ── SHIFT PRESET HELPERS ───────────────────────────
@@ -3957,7 +4042,7 @@ ${c.name || '[Your Name]'}`;
         Store._touch();
         _persistTimer=null;
         const lsEl=el('settingsLastSaved');
-        if (lsEl) { const ls=Store.getLastSaved(); if(ls) lsEl.textContent=`Last Updated at ${short(ls)}`; }
+        if (lsEl) { const ls=Store.getLastSaved(); if(ls) lsEl.textContent=`Last updated ${timeAgo(ls)}`; }
       }, 400);
     }
 
@@ -4602,14 +4687,38 @@ ${c.name || '[Your Name]'}`;
       obAnimateTo(step, dir != null ? dir : 1);
     }
 
+    function obSwitchWorkDays(n) {
+      document.querySelectorAll('#obPanel2 .wd-tab').forEach(t => t.classList.toggle('active', +t.dataset.wd === n));
+      const inp = el('obWorkDays'); if (inp) inp.value = n;
+    }
+
     function obSaveStep2() {
       const name = (el('obName')?.value || '').trim();
       const company = (el('obCompany')?.value || '').trim();
       const shiftStart = (el('obShiftStart')?.value || '09:00 AM').trim();
       const shiftEnd = (el('obShiftEnd')?.value || '06:00 PM').trim();
       const shiftType = deriveShiftType(shiftStart);
+      const workDays = parseInt(el('obWorkDays')?.value || '5', 10) || 5;
       const c = cfg();
-      saveCfg({ ...c, name, company, shiftStart, shiftEnd, shiftType });
+      saveCfg({ ...c, name, company, shiftStart, shiftEnd, shiftType, workDays });
+    }
+
+    function obPopulateStep3Days() {
+      const wdays = workDayNames();
+      const earlyPicker = el('obEarlyPicker');
+      if (earlyPicker) {
+        earlyPicker.innerHTML = wdays.map((n, i) =>
+          `<button type="button" class="plan-btn" data-oday="${i+1}">${n}</button>`
+        ).join('');
+        earlyPicker.querySelectorAll('[data-oday]').forEach(b => b.addEventListener('click', () => b.classList.toggle('selected')));
+      }
+      const latePicker = el('obLatePicker');
+      if (latePicker) {
+        latePicker.innerHTML = wdays.map((n, i) =>
+          `<button type="button" class="plan-btn" data-lday="${i+1}">${n}</button>`
+        ).join('');
+        latePicker.querySelectorAll('[data-lday]').forEach(b => b.addEventListener('click', () => b.classList.toggle('selected')));
+      }
     }
 
     function obSaveStep3() {
@@ -4701,6 +4810,7 @@ ${c.name || '[Your Name]'}`;
       const prev = _obStep;
       _obStep = Math.max(1, Math.min(5, _obStep + dir));
       if (_obStep !== prev) {
+        if (_obStep === 3) obPopulateStep3Days();
         if (_obStep === 4) obPopulateWeekPanel();
         obUpdateSteps(_obStep, dir);
       }
@@ -4805,13 +4915,7 @@ ${c.name || '[Your Name]'}`;
         });
       }
 
-      // Day picker toggles
-      document.querySelectorAll('#obEarlyPicker .plan-btn').forEach(btn => {
-        btn.onclick = () => btn.classList.toggle('selected');
-      });
-      document.querySelectorAll('#obLatePicker .plan-btn').forEach(btn => {
-        btn.onclick = () => btn.classList.toggle('selected');
-      });
+      // Day picker toggles are wired in obPopulateStep3Days() dynamically
     }
 
     // ── INIT ───────────────────────────────────────────
@@ -4822,8 +4926,16 @@ ${c.name || '[Your Name]'}`;
       tickHeader();
 
       const tk = todayKey();
-      selectedDayKey = tk;
-      updateSelDayHeader(tk);
+      const _initDow = new Date().getDay(); // 0=Sun, 6=Sat
+      if (_initDow === 6 || _initDow === 0) {
+        // Weekend: jump to next week, pre-select Monday
+        daySelectorWeekOffset = 1;
+        selectedDayKey = week(1)[0].key;
+      } else {
+        daySelectorWeekOffset = 0;
+        selectedDayKey = tk;
+      }
+      updateSelDayHeader(selectedDayKey);
 
       // Notification permission warning
       if ('Notification' in window && Notification.permission === 'denied') {
@@ -4931,6 +5043,16 @@ ${c.name || '[Your Name]'}`;
               </button>
             </div>
           </div>
+        </div>
+        <div class="form-field">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div class="ob-section-label">Days a Week</div>
+            <div class="st-tabs" style="flex-shrink:0">
+              <button type="button" class="st-tab wd-tab active" data-wd="5" onclick="obSwitchWorkDays(5)">5 Days</button>
+              <button type="button" class="st-tab wd-tab" data-wd="6" onclick="obSwitchWorkDays(6)">6 Days</button>
+            </div>
+          </div>
+          <input type="hidden" id="obWorkDays" value="5">
         </div>
       </div>
 
