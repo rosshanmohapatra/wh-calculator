@@ -369,7 +369,9 @@
     .form-row   { display: flex; align-items: center; gap: 8px; }
     .weekly-block { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
     .toggle-row { display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 14px; background: var(--muted); gap: 12px; }
+      padding: 12px 14px; background: var(--muted); gap: 12px;
+      border-radius: 4px; cursor: pointer; transition: background .12s; }
+    .toggle-row:hover { background: var(--border); }
     .sliding-field { overflow: hidden; transition: max-height .24s ease, opacity .2s; }
     .sliding-field.hidden { max-height: 0; opacity: 0; pointer-events: none; }
     .sliding-field.open   { max-height: 360px; opacity: 1; }
@@ -411,9 +413,9 @@
     .settings-card-head .section-label { margin: 0; }
     .settings-card-chevron { color: var(--muted-fg); transition: transform .25s ease; flex-shrink: 0; }
     .settings-card.collapsed .settings-card-chevron { transform: rotate(-90deg); }
-    .settings-card-body { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .25s ease, padding-bottom .25s ease; padding: 0 16px 16px; }
-    .settings-card-body > .settings-group { overflow: hidden; display: flex; flex-direction: column; gap: 12px; }
-    .settings-card.collapsed .settings-card-body { grid-template-rows: 0fr; padding-bottom: 0; }
+    .settings-card-body { overflow: hidden; max-height: 800px; transition: max-height .35s cubic-bezier(.4,0,.2,1), padding-bottom .35s cubic-bezier(.4,0,.2,1); padding: 0 16px 16px; }
+    .settings-card-body > .settings-group { display: flex; flex-direction: column; gap: 12px; }
+    .settings-card.collapsed .settings-card-body { max-height: 0; padding-bottom: 0; }
     .sep-inner { height: 1px; background: var(--border); }
 
     /* ── Checkout modal ── */
@@ -1250,11 +1252,11 @@
           <div style="display:flex;gap:12px">
             <div style="flex:1;display:flex;flex-direction:column;gap:6px">
               <div class="form-label">Your Name</div>
-              <input type="text" class="field-input" id="inpName" placeholder="Your name" autocomplete="off" maxlength="40">
+              <input type="text" class="field-input" id="inpName" placeholder="Nickname" autocomplete="off" maxlength="40">
             </div>
             <div style="flex:1;display:flex;flex-direction:column;gap:6px">
               <div class="form-label">Position</div>
-              <input type="text" class="field-input" id="inpPosition" placeholder="Your position" autocomplete="off" maxlength="60">
+              <input type="text" class="field-input" id="inpPosition" placeholder="What do you do?" autocomplete="off" maxlength="60">
             </div>
           </div>
         </div>
@@ -1339,12 +1341,12 @@
             </div>
 
             <!-- Include Saturday Toggle -->
-            <div class="toggle-row" style="background:transparent;padding-left:0;padding-right:0">
+            <div class="toggle-row" onclick="el('inpIncludeSat').click()">
               <div>
                 <div class="form-label">Include Saturday</div>
                 <div class="form-sub">Enable if Saturday is a working day for you.</div>
               </div>
-              <label class="toggle">
+              <label class="toggle" onclick="event.stopPropagation()">
                 <input type="checkbox" id="inpIncludeSat" onchange="toggleIncludeSaturday(this.checked)">
                 <span class="toggle-track"></span>
               </label>
@@ -1359,8 +1361,8 @@
                   <div class="form-sub">How your company evaluates work-hour penalties.</div>
                 </div>
                 <div class="st-tabs" style="flex-shrink:0">
-                  <button type="button" class="st-tab pc-tab active" id="pcTabDaily" onclick="switchPenaltyMode('daily')">Daily Hours</button>
-                  <button type="button" class="st-tab pc-tab" id="pcTabWeekly" onclick="switchPenaltyMode('weekly')">Weekly Hours</button>
+                  <button type="button" class="st-tab pc-tab active" id="pcTabDaily" onclick="switchPenaltyMode('daily')">Daily</button>
+                  <button type="button" class="st-tab pc-tab" id="pcTabWeekly" onclick="switchPenaltyMode('weekly')">Weekly</button>
                 </div>
               </div>
             </div>
@@ -1409,12 +1411,12 @@
           <div class="settings-group">
 
             <!-- Allow Notifications -->
-            <div class="toggle-row" style="background:transparent;padding-left:0;padding-right:0">
+            <div class="toggle-row" onclick="el('inpNotifOn').click()">
               <div>
                 <div class="form-label">Allow Notifications</div>
                 <div class="form-sub">We'll notify you when your working hours are elapsed.</div>
               </div>
-              <label class="toggle">
+              <label class="toggle" onclick="event.stopPropagation()">
                 <input type="checkbox" id="inpNotifOn">
                 <span class="toggle-track"></span>
               </label>
@@ -5269,11 +5271,11 @@ ${sig}`
         <div class="ob-desc">These help personalise your experience. Both fields are optional.</div>
         <div class="form-field">
           <div class="ob-section-label">Your Name</div>
-          <input type="text" class="field-input" id="obName" placeholder="Your name" maxlength="40" autocomplete="off">
+          <input type="text" class="field-input" id="obName" placeholder="Nickname" maxlength="40" autocomplete="off">
         </div>
         <div class="form-field">
           <div class="ob-section-label">Position</div>
-          <input type="text" class="field-input" id="obPosition" placeholder="Your position" maxlength="60" autocomplete="off">
+          <input type="text" class="field-input" id="obPosition" placeholder="What do you do?" maxlength="60" autocomplete="off">
         </div>
         <div class="form-field">
           <div class="ob-section-label">Shift Hours</div>
@@ -5295,12 +5297,12 @@ ${sig}`
             </div>
           </div>
         </div>
-        <div class="toggle-row" style="background:transparent;padding:0">
+        <div class="toggle-row" onclick="el('obIncludeSat').click()">
           <div>
             <div class="ob-section-label" style="text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;color:var(--foreground)">Include Saturday</div>
             <div style="font-size:12px;color:var(--muted-fg);margin-top:2px">Enable if Saturday is a working day.</div>
           </div>
-          <label class="toggle">
+          <label class="toggle" onclick="event.stopPropagation()">
             <input type="checkbox" id="obIncludeSat" onchange="obToggleIncludeSaturday(this.checked)">
             <span class="toggle-track"></span>
           </label>
