@@ -908,6 +908,8 @@
       white-space: nowrap; display: none; }
     .rc-update-btn.visible { display: inline-flex; align-items: center; gap: 5px; }
     .rc-update-btn:hover { background: var(--muted); color: var(--foreground); }
+    .rc-head-date { font-size: 12px; font-weight: 500; color: var(--muted-fg); display: none; }
+    .rc-head-date.visible { display: block; }
 
     /* ── Dialog foot row (side-by-side CTAs) ── */
     .dialog-foot-row { padding: 0 20px 20px; display: flex; flex-direction: row; gap: 8px; }
@@ -1063,6 +1065,7 @@
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               Update Entry
             </button>
+            <span class="rc-head-date" id="rcHeadDate"></span>
             <div id="leaveChip" style="font-size:15px;color:var(--muted-fg);font-weight:500">
               <strong id="leaveAt" style="color:var(--foreground);font-weight:500">—</strong>
             </div>
@@ -2813,24 +2816,22 @@
 
       if (dir > 0) {
         if (curIdx >= 0 && curIdx < wk.length - 1) {
-          // Next day within current week strip
+          // Next day within current week strip — no row slide
           const nextDay = wk[curIdx + 1];
           const isFut = daySelectorWeekOffset === 0 && nextDay.date > now && nextDay.key !== tk;
-          _slideDay(1);
           if (isFut) selectFutureDay(nextDay.key); else selectDay(nextDay.key);
         } else if (daySelectorWeekOffset < 1) {
-          // Cross into next week
+          // Cross into next week — slide the row
           daySelectorWeekOffset++;
           _slideDay(1);
           selectDay(week(daySelectorWeekOffset)[0].key);
         }
       } else {
         if (curIdx > 0) {
-          // Previous day within current week strip
-          _slideDay(-1);
+          // Previous day within current week strip — no row slide
           selectDay(wk[curIdx - 1].key);
         } else if (daySelectorWeekOffset > -52) {
-          // Cross into previous week, land on last day
+          // Cross into previous week, land on last day — slide the row
           daySelectorWeekOffset--;
           _slideDay(-1);
           const pwk = week(daySelectorWeekOffset);
@@ -2887,23 +2888,31 @@
       el('futureDayPlan').style.display = 'none';
       el('resultCard').style.display = '';
 
+      const headDateEl = el('rcHeadDate');
       if (key === tk) {
         // Today
         el('todayLoginSection').style.display = '';
         el('rcUpdateEntryBtn')?.classList.remove('visible');
         el('leaveChip').style.display = '';
+        if (headDateEl) { headDateEl.classList.remove('visible'); }
         if (loginDate) render(); else renderEmptyState();
       } else if (key < tk) {
         // Past day: show Update Entry button
         el('todayLoginSection').style.display = 'none';
         el('rcUpdateEntryBtn')?.classList.add('visible');
         el('leaveChip').style.display = 'none';
+        if (headDateEl) { headDateEl.classList.remove('visible'); }
         renderPastDay(key);
       } else {
-        // Future day (next week): no Update Entry
+        // Future day: show date in header
+        const wkF = week(daySelectorWeekOffset), dayF = wkF.find(d => d.key === key);
         el('todayLoginSection').style.display = 'none';
         el('rcUpdateEntryBtn')?.classList.remove('visible');
         el('leaveChip').style.display = 'none';
+        if (headDateEl && dayF) {
+          headDateEl.textContent = _fmtDayHeading(dayF.date);
+          headDateEl.classList.add('visible');
+        }
         renderPastDay(key);
       }
     }
@@ -2918,6 +2927,8 @@
       el('todayLoginSection').style.display = 'none';
       el('rcUpdateEntryBtn')?.classList.remove('visible');
       el('leaveChip').style.display = 'none';
+      const _fhd = el('rcHeadDate');
+      if (_fhd && day) { _fhd.textContent = _fmtDayHeading(day.date); _fhd.classList.add('visible'); }
       el('resultCard').style.display = 'none';
       el('futureDayPlan').style.display = '';
       el('futureDayQuestion').textContent = `Any plans for ${day?.name || 'this day'}?`;
