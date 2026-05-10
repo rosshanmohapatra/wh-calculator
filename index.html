@@ -895,6 +895,10 @@
     /* ── Animated number ticker ── */
     .rc-worked, .rc-remaining { will-change: contents; }
 
+    /* ── Saturday pill entrance animation ── */
+    @keyframes plan-btn-in { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: scale(1); } }
+    .plan-btn.sat-appear { animation: plan-btn-in .22s cubic-bezier(.34,1.56,.64,1) both; }
+
     /* ── Update Entry inside Today card ── */
     .rc-update-btn { height: 28px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--border);
       background: transparent; color: var(--muted-fg); font-size: 11px; font-weight: 600;
@@ -1026,10 +1030,10 @@
         <div class="this-week-header">
           <span class="this-week-label" id="thisWeekLabel">This Week</span>
           <div class="this-week-nav">
-            <button class="this-week-btn" id="weekPrevBtn" onclick="navDaySelectorWeek(-1)" title="Previous week">
+            <button class="this-week-btn" id="weekPrevBtn" onclick="navDaySelectorDay(-1)" title="Previous day">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <button class="this-week-btn" id="weekNextBtn" onclick="navDaySelectorWeek(1)" title="Next week" disabled>
+            <button class="this-week-btn" id="weekNextBtn" onclick="navDaySelectorDay(1)" title="Next day" disabled>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           </div>
@@ -1307,35 +1311,7 @@
           <div class="settings-card-body">
           <div class="settings-group">
 
-            <!-- Include Saturday Toggle -->
-            <div class="toggle-row" style="background:transparent;padding-left:0;padding-right:0">
-              <div>
-                <div class="form-label">Include Saturday</div>
-                <div class="form-sub">Enable if Saturday is a working day for you.</div>
-              </div>
-              <label class="toggle">
-                <input type="checkbox" id="inpIncludeSat" onchange="toggleIncludeSaturday(this.checked)">
-                <span class="toggle-track"></span>
-              </label>
-            </div>
-            <input type="hidden" id="inpWorkDays" value="5">
-
-            <!-- Penalty Calculation -->
-            <div class="sep-inner"></div>
-            <div class="form-field">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-                <div>
-                  <div class="form-label">Penalty Calculation</div>
-                  <div class="form-sub">How your company evaluates work-hour penalties.</div>
-                </div>
-                <div class="st-tabs" style="flex-shrink:0">
-                  <button type="button" class="st-tab pc-tab active" id="pcTabDaily" onclick="switchPenaltyMode('daily')">Daily Hours</button>
-                  <button type="button" class="st-tab pc-tab" id="pcTabWeekly" onclick="switchPenaltyMode('weekly')">Weekly Hours</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Shift Type FIRST -->
+            <!-- Shift Type (moved to top) -->
             <div class="form-field">
               <div class="form-label">Shift Type</div>
               <div class="form-sub">We'll notify you by the end of your daily target.</div>
@@ -1358,6 +1334,33 @@
                   <button type="button" class="tp-icon-btn" onclick="openTpModal('inpShiftEnd',event)" title="Pick time">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Include Saturday Toggle -->
+            <div class="toggle-row" style="background:transparent;padding-left:0;padding-right:0">
+              <div>
+                <div class="form-label">Include Saturday</div>
+                <div class="form-sub">Enable if Saturday is a working day for you.</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="inpIncludeSat" onchange="toggleIncludeSaturday(this.checked)">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <input type="hidden" id="inpWorkDays" value="5">
+
+            <!-- Penalty Calculation -->
+            <div class="form-field">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <div class="form-label">Penalty Calculation</div>
+                  <div class="form-sub">How your company evaluates work-hour penalties.</div>
+                </div>
+                <div class="st-tabs" style="flex-shrink:0">
+                  <button type="button" class="st-tab pc-tab active" id="pcTabDaily" onclick="switchPenaltyMode('daily')">Daily Hours</button>
+                  <button type="button" class="st-tab pc-tab" id="pcTabWeekly" onclick="switchPenaltyMode('weekly')">Weekly Hours</button>
                 </div>
               </div>
             </div>
@@ -2192,8 +2195,7 @@
           ${eltStatusHtml ? `<div style="margin-top:4px">${eltStatusHtml}</div>` : ''}
         </div>
       </div>`;
-      const _rcLabel = selectedDayKey === todayKey() ? "Today's Target" : (() => { const _d = week(daySelectorWeekOffset).find(d => d.key === selectedDayKey); return (_d?.name || 'Day') + "'s Target"; })();
-      return `<div class="wk-target-row"><span class="section-label">${_rcLabel}</span><div class="wk-target-right">${rightHtml}</div></div>${ioHtml}`;
+      return `<div class="wk-target-row"><span class="section-label">Recommended</span><div class="wk-target-right">${rightHtml}</div></div>${ioHtml}`;
     }
 
     // ── TIME PICKER HELPER ────────────────────────────
@@ -2789,31 +2791,68 @@
       });
       const label = el('thisWeekLabel');
       if (label) label.textContent = daySelectorWeekOffset === 0 ? 'This Week' : weekRangeLabel(daySelectorWeekOffset);
-      const prevBtn = el('weekPrevBtn'), nextBtn = el('weekNextBtn');
-      if (prevBtn) prevBtn.disabled = daySelectorWeekOffset <= -52;
-      if (nextBtn) nextBtn.disabled = daySelectorWeekOffset >= 1;
+      _updateDayNavBtns();
     }
 
-    function navDaySelectorWeek(dir) {
-      const newOffset = daySelectorWeekOffset + dir;
-      if (newOffset > 1) return;
-      daySelectorWeekOffset = newOffset;
+    function _slideDay(dir) {
+      const dsRow = el('daySelectorRow');
+      if (!dsRow) return;
+      dsRow.classList.remove('wk-fwd', 'wk-back');
+      void dsRow.offsetWidth;
+      dsRow.classList.add(dir > 0 ? 'wk-fwd' : 'wk-back');
+      setTimeout(() => dsRow.classList.remove('wk-fwd', 'wk-back'), 260);
+    }
+
+    function navDaySelectorDay(dir) {
       const wk = week(daySelectorWeekOffset);
       const tk = todayKey();
-      // Animate day selector row
-      const dsRow = el('daySelectorRow');
-      if (dsRow) {
-        dsRow.classList.remove('wk-fwd', 'wk-back');
-        void dsRow.offsetWidth; // reflow
-        dsRow.classList.add(dir > 0 ? 'wk-fwd' : 'wk-back');
-        setTimeout(() => dsRow.classList.remove('wk-fwd', 'wk-back'), 260);
-      }
-      if (daySelectorWeekOffset === 0) {
-        selectDay(tk);
+      const curIdx = wk.findIndex(d => d.key === selectedDayKey);
+      const now = new Date();
+
+      if (dir > 0) {
+        if (curIdx >= 0 && curIdx < wk.length - 1) {
+          // Next day within current week strip
+          const nextDay = wk[curIdx + 1];
+          const isFut = daySelectorWeekOffset === 0 && nextDay.date > now && nextDay.key !== tk;
+          _slideDay(1);
+          if (isFut) selectFutureDay(nextDay.key); else selectDay(nextDay.key);
+        } else if (daySelectorWeekOffset < 1) {
+          // Cross into next week
+          daySelectorWeekOffset++;
+          _slideDay(1);
+          selectDay(week(daySelectorWeekOffset)[0].key);
+        }
       } else {
-        const withData = [...wk].reverse().find(d => dayLog(d.key)?.hoursWorked != null);
-        selectDay((withData || wk[4]).key);
+        if (curIdx > 0) {
+          // Previous day within current week strip
+          _slideDay(-1);
+          selectDay(wk[curIdx - 1].key);
+        } else if (daySelectorWeekOffset > -52) {
+          // Cross into previous week, land on last day
+          daySelectorWeekOffset--;
+          _slideDay(-1);
+          const pwk = week(daySelectorWeekOffset);
+          selectDay(pwk[pwk.length - 1].key);
+        }
       }
+      _updateDayNavBtns();
+    }
+
+    function _updateDayNavBtns() {
+      const wk = week(daySelectorWeekOffset);
+      const curIdx = wk.findIndex(d => d.key === selectedDayKey);
+      const prevBtn = el('weekPrevBtn'), nextBtn = el('weekNextBtn');
+      if (prevBtn) prevBtn.disabled = daySelectorWeekOffset <= -52 && curIdx <= 0;
+      if (nextBtn) nextBtn.disabled = daySelectorWeekOffset >= 1 && curIdx >= wk.length - 1;
+    }
+
+    function _ordinal(n) {
+      const s = n % 100;
+      if (s >= 11 && s <= 13) return n + 'th';
+      return n + (['st','nd','rd'][n % 10 - 1] || 'th');
+    }
+    function _fmtDayHeading(dateObj) {
+      return `${FULL_DAYS_EN[dateObj.getDay()]}, ${_ordinal(dateObj.getDate())} ${MONTHS[dateObj.getMonth()]}`;
     }
 
     function updateSelDayHeader(key) {
@@ -2828,7 +2867,14 @@
       const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
       const name = (cfg().name || '').trim();
       el('selDayRel').textContent = name ? `${greeting}, ${name.split(' ')[0]}` : greeting;
-      el('rcDayLabel').textContent = key === tk ? 'Today' : (day?.name || 'Day');
+      // rcDayLabel: today → "Today", past → "Friday, 15th May", future → day name
+      if (key === tk) {
+        el('rcDayLabel').textContent = 'Today';
+      } else if (key < tk) {
+        el('rcDayLabel').textContent = _fmtDayHeading(dayDate);
+      } else {
+        el('rcDayLabel').textContent = day?.name || 'Day';
+      }
     }
 
     function selectDay(key) {
@@ -2840,13 +2886,21 @@
       el('resultCard').style.display = '';
 
       if (key === tk) {
+        // Today
         el('todayLoginSection').style.display = '';
         el('rcUpdateEntryBtn')?.classList.remove('visible');
         el('leaveChip').style.display = '';
         if (loginDate) render(); else renderEmptyState();
-      } else {
+      } else if (key < tk) {
+        // Past day: show Update Entry button
         el('todayLoginSection').style.display = 'none';
         el('rcUpdateEntryBtn')?.classList.add('visible');
+        el('leaveChip').style.display = 'none';
+        renderPastDay(key);
+      } else {
+        // Future day (next week): no Update Entry
+        el('todayLoginSection').style.display = 'none';
+        el('rcUpdateEntryBtn')?.classList.remove('visible');
         el('leaveChip').style.display = 'none';
         renderPastDay(key);
       }
@@ -2978,14 +3032,19 @@
         return;
       }
 
+      const isFutureDay = key > todayKey();
+      const targetRow = isFutureDay
+        ? `<div class="wk-target-row"><span class="section-label">Recommended</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div>`
+        : '';
+
       if (!log || log.hoursWorked == null) {
         el('rcWorked').textContent = '—'; el('rcWorked').style.color = 'var(--muted-fg)';
         _setTodayDateChip();
-        el('rcRightCol').style.display = 'block';
+        el('rcRightCol').style.display = isFutureDay ? 'block' : 'none';
         el('rcRemaining').textContent = dur(target); el('rcRemaining').style.color = 'var(--muted-fg)';
         el('progFill').style.width = '0%'; el('progFill').classList.remove('done');
-        el('progLabel').textContent = 'No data logged for this day';
-        el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">${_targetLabel}</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">—</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">—</div></div></div>`;
+        el('progLabel').textContent = isFutureDay ? '' : 'No data logged for this day';
+        el('rcToday').innerHTML = targetRow + `<div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">—</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">—</div></div></div>`;
         el('stayHint').style.display = 'none';
         el('otBanner').classList.remove('show'); el('doneBanner').classList.remove('show');
         return;
@@ -3015,7 +3074,8 @@
       el('stayHint').style.display = 'none';
       const loginDisp = log.loginDisplay || '—';
       const outDisp   = log.checkoutDisplay || '—';
-      el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label">${_targetLabel}</span><div class="wk-target-right"><span class="wk-target-val">${dur(target)}</span></div></div><div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">${loginDisp}</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">${outDisp}</div></div></div>`;
+      // Past days: no Recommended row — just login/logout
+      el('rcToday').innerHTML = targetRow + `<div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">${loginDisp}</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">${outDisp}</div></div></div>`;
     }
 
     // ── HISTORY CARD ───────────────────────────────────
@@ -3451,11 +3511,12 @@
       // Re-render day pickers with updated day list
       const wdays = workDayNames();
       const c = cfg();
+      const prevWdays = n === 6 ? 5 : 6; // what was before this call
       const earlyPicker = el('targetDayPicker');
       if (earlyPicker) {
         const earlyDays = c.earlyLeaveDays || [];
         earlyPicker.innerHTML = wdays.map((name, i) =>
-          `<button type="button" class="plan-btn${earlyDays.includes(i+1)?' selected':''}" data-tday="${i+1}">${name}</button>`
+          `<button type="button" class="plan-btn${earlyDays.includes(i+1)?' selected':''}${n===6&&i===5?' sat-appear':''}" data-tday="${i+1}">${name}</button>`
         ).join('');
         earlyPicker.querySelectorAll('[data-tday]').forEach(btn =>
           btn.addEventListener('click', () => { btn.classList.toggle('selected'); autoSaveSettings(); })
@@ -3464,7 +3525,7 @@
       const latePicker = el('dayPicker');
       if (latePicker) {
         latePicker.innerHTML = wdays.map((name, i) =>
-          `<button type="button" class="plan-btn${(c.lateDays||[]).includes(i)?' selected':''}" data-sday="${i}">${name}</button>`
+          `<button type="button" class="plan-btn${(c.lateDays||[]).includes(i)?' selected':''}${n===6&&i===5?' sat-appear':''}" data-sday="${i}">${name}</button>`
         ).join('');
         latePicker.querySelectorAll('[data-sday]').forEach(btn =>
           btn.addEventListener('click', () => { btn.classList.toggle('selected'); autoSaveSettings(); })
@@ -4469,10 +4530,9 @@ ${sig}`
       const wk = week(0); return wk[0].key;
     }
     function shouldShowWeekPlan() {
-      const now = new Date();
-      // Show on Monday OR if not yet dismissed for this week
+      if (new Date().getDay() !== 1) return false; // only on Mondays
       if (getWpDismissedWeek() === currentWeekId()) return false;
-      return true; // always show once per week
+      return true;
     }
     function openWeekPlanModal() {
       const c = cfg(), wk = week(0), tk = todayKey();
