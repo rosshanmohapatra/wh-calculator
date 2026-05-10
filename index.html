@@ -409,10 +409,11 @@
     .settings-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
     .settings-card-head { display: flex; align-items: center; justify-content: space-between; padding: 16px; cursor: pointer; user-select: none; }
     .settings-card-head .section-label { margin: 0; }
-    .settings-card-chevron { color: var(--muted-fg); transition: transform .2s; flex-shrink: 0; }
+    .settings-card-chevron { color: var(--muted-fg); transition: transform .25s ease; flex-shrink: 0; }
     .settings-card.collapsed .settings-card-chevron { transform: rotate(-90deg); }
-    .settings-card-body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px; }
-    .settings-card.collapsed .settings-card-body { display: none; }
+    .settings-card-body { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .25s ease, padding-bottom .25s ease; padding: 0 16px 16px; }
+    .settings-card-body > .settings-group { overflow: hidden; display: flex; flex-direction: column; gap: 12px; }
+    .settings-card.collapsed .settings-card-body { grid-template-rows: 0fr; padding-bottom: 0; }
     .sep-inner { height: 1px; background: var(--border); }
 
     /* ── Checkout modal ── */
@@ -1209,7 +1210,7 @@
           </div>
         </div>
 
-        <!-- Name + Company -->
+        <!-- Name + Position -->
         <div class="form-field">
           <div style="display:flex;gap:12px">
             <div style="flex:1;display:flex;flex-direction:column;gap:6px">
@@ -1217,61 +1218,48 @@
               <input type="text" class="field-input" id="inpName" placeholder="Your name" autocomplete="off" maxlength="40">
             </div>
             <div style="flex:1;display:flex;flex-direction:column;gap:6px">
-              <div class="form-label">Company</div>
-              <input type="text" class="field-input" id="inpCompany" placeholder="Company name" autocomplete="off" maxlength="60">
+              <div class="form-label">Position</div>
+              <input type="text" class="field-input" id="inpPosition" placeholder="Your position" autocomplete="off" maxlength="60">
             </div>
           </div>
         </div>
 
-        <!-- General Card -->
+        <!-- Basic Card -->
         <div class="settings-card" id="cardGeneral">
           <div class="settings-card-head" onclick="toggleCard('cardGeneral')">
-            <div class="section-label">General</div>
+            <div class="section-label">Basic</div>
             <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
           <div class="settings-card-body">
           <div class="settings-group">
 
-            <!-- Set Target (unified Daily + Weekly tabs) -->
+            <!-- Daily / Weekly Target -->
             <div class="form-field">
               <input type="checkbox" id="inpWeeklyOn" style="display:none">
+              <input type="number" id="inpWeeklyH" style="display:none" value="45">
+              <input type="number" id="inpWeeklyM" style="display:none" value="0">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
                 <div>
-                  <div class="form-label">Set Target</div>
-                  <div class="form-sub">Your daily/weekly target based on company policies.</div>
+                  <div class="form-label" id="stTargetLabel">Daily Target</div>
+                  <div class="form-sub">Hours you're expected to work per day.</div>
                 </div>
                 <div class="st-tabs" id="stTabs">
                   <button type="button" class="st-tab" id="stTabDaily" onclick="switchStTab('daily')">Daily</button>
                   <button type="button" class="st-tab" id="stTabWeekly" onclick="switchStTab('weekly')">Weekly</button>
                 </div>
               </div>
-              <!-- Shared daily inputs (always rendered, label changes per tab) -->
-              <div class="st-panel" id="stDailyInputs">
-                <div class="st-panel-label" id="stDailyInputLabel" style="display:none">Daily (Personal)</div>
+              <div class="st-panel" id="stDailyInputs" style="margin-top:10px">
                 <div class="form-row" style="display:flex;gap:8px">
                   <div class="input-suffix-wrap" style="flex:1">
-                    <input type="number" class="field-input" id="inpDailyH" min="0" max="23" step="1" value="9" placeholder="0" style="height:38px;font-size:13px;padding-left:12px">
+                    <input type="number" class="field-input" id="inpDailyH" min="0" max="23" step="1" value="9" placeholder="0" style="height:38px;font-size:13px;padding-left:12px" oninput="updateWeeklyCalc()">
                     <span class="input-suffix-text">hrs</span>
                   </div>
                   <div class="input-suffix-wrap" style="flex:1">
-                    <input type="number" class="field-input" id="inpDailyM" min="0" max="59" step="5" value="0" placeholder="0" style="height:38px;font-size:13px;padding-left:12px">
+                    <input type="number" class="field-input" id="inpDailyM" min="0" max="59" step="5" value="0" placeholder="0" style="height:38px;font-size:13px;padding-left:12px" oninput="updateWeeklyCalc()">
                     <span class="input-suffix-text">min</span>
                   </div>
                 </div>
-              </div>
-              <!-- Weekly-only panel (additional inputs shown only in weekly tab) -->
-              <div id="stPanelWeekly" style="display:none">
-                <div class="st-panel-label" style="margin-top:10px">Weekly</div>
-                <div class="form-row" style="display:flex;gap:8px">
-                  <div class="input-suffix-wrap" style="flex:1">
-                    <input type="number" class="field-input" id="inpWeeklyH" min="0" max="167" step="1" value="45" placeholder="0" style="height:38px;font-size:13px;padding-left:12px">
-                    <span class="input-suffix-text">hrs</span>
-                  </div>
-                  <div class="input-suffix-wrap" style="flex:1">
-                    <input type="number" class="field-input" id="inpWeeklyM" min="0" max="59" step="5" value="0" placeholder="0" style="height:38px;font-size:13px;padding-left:12px">
-                    <span class="input-suffix-text">min</span>
-                  </div>
-                </div>
+                <div id="weeklyCalcInfo" style="margin-top:8px;padding:8px 12px;background:var(--muted);border-radius:8px;font-size:12px;color:var(--muted-fg);line-height:1.5"></div>
               </div>
             </div>
 
@@ -1288,19 +1276,32 @@
           <div class="settings-card-body">
           <div class="settings-group">
 
-            <!-- Work Days -->
+            <!-- Include Saturday Toggle -->
+            <div class="toggle-row" style="background:transparent;padding-left:0;padding-right:0">
+              <div>
+                <div class="form-label">Include Saturday</div>
+                <div class="form-sub">Enable if Saturday is a working day for you.</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="inpIncludeSat" onchange="toggleIncludeSaturday(this.checked)">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <input type="hidden" id="inpWorkDays" value="5">
+
+            <!-- Penalty Calculation -->
+            <div class="sep-inner"></div>
             <div class="form-field">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
                 <div>
-                  <div class="form-label">Days a Week</div>
-                  <div class="form-sub">Whether Saturday is a working day.</div>
+                  <div class="form-label">Penalty Calculation</div>
+                  <div class="form-sub">How your company evaluates work-hour penalties.</div>
                 </div>
                 <div class="st-tabs" style="flex-shrink:0">
-                  <button type="button" class="st-tab wd-tab active" data-wd="5" onclick="switchWorkDays(5)">5 Days</button>
-                  <button type="button" class="st-tab wd-tab" data-wd="6" onclick="switchWorkDays(6)">6 Days</button>
+                  <button type="button" class="st-tab pc-tab active" id="pcTabDaily" onclick="switchPenaltyMode('daily')">Daily Hours</button>
+                  <button type="button" class="st-tab pc-tab" id="pcTabWeekly" onclick="switchPenaltyMode('weekly')">Weekly Hours</button>
                 </div>
               </div>
-              <input type="hidden" id="inpWorkDays" value="5">
             </div>
 
             <!-- Shift Type FIRST -->
@@ -1364,10 +1365,10 @@
           </div><!-- /settings-card-body -->
         </div><!-- /Advanced Card -->
 
-        <!-- Other Settings Card -->
+        <!-- System Card -->
         <div class="settings-card" id="cardOther">
           <div class="settings-card-head" onclick="toggleCard('cardOther')">
-            <div class="section-label">Other Settings</div>
+            <div class="section-label">System</div>
             <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
           <div class="settings-card-body">
@@ -1645,9 +1646,21 @@
         <button class="email-modal-close" id="emailModalClose">✕</button>
       </div>
       <div class="email-modal-date" id="emailModalDate"></div>
-      <textarea class="email-textarea" id="emailModalTextarea" rows="10"></textarea>
-      <div class="email-modal-actions">
-        <button class="email-copy-btn" id="emailCopyBtn">Copy to Clipboard</button>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+            <span style="font-size:11px;font-weight:600;color:var(--muted-fg);letter-spacing:.05em;text-transform:uppercase">Subject</span>
+            <button class="email-copy-btn" id="emailCopySubjectBtn" style="flex:none;height:26px;padding:0 10px;font-size:11px">Copy</button>
+          </div>
+          <input class="email-textarea" id="emailModalSubject" type="text" style="min-height:unset;height:38px;resize:none;padding:0 12px;display:flex;align-items:center" readonly>
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+            <span style="font-size:11px;font-weight:600;color:var(--muted-fg);letter-spacing:.05em;text-transform:uppercase">Body</span>
+            <button class="email-copy-btn" id="emailCopyBodyBtn" style="flex:none;height:26px;padding:0 10px;font-size:11px">Copy</button>
+          </div>
+          <textarea class="email-textarea" id="emailModalTextarea" rows="10"></textarea>
+        </div>
       </div>
     </div>
   </div>
@@ -1696,7 +1709,7 @@
     }
 
     // ── CONFIG ─────────────────────────────────────────
-    const CFG_DEF = { dailyH:9, weeklyH:45, weeklyOn:true, lateDays:[], earlyLeaveEntries:[], lateEntries:[], notifOn:false, name:'', targetDay:null, autoStopBuf:0.5, tzOffset:330, shiftType:'morning', workDays:5 };
+    const CFG_DEF = { dailyH:9, weeklyH:45, weeklyOn:true, lateDays:[], earlyLeaveEntries:[], lateEntries:[], notifOn:false, name:'', position:'', targetDay:null, autoStopBuf:0.5, tzOffset:330, shiftType:'morning', workDays:5 };
     function cfg() { const r=Store.getCfg(); return r?{...CFG_DEF,...r}:{...CFG_DEF}; }
     // saveCfg defined in persistence layer
 
@@ -3178,7 +3191,7 @@
     function populateSettings() {
       const c = cfg();
       el('inpName').value       = c.name || '';
-      el('inpCompany').value    = c.company || '';
+      el('inpPosition').value   = c.position || '';
       const _dh = Math.floor(c.dailyH || 9);
       const _dm = Math.round(((c.dailyH || 9) - _dh) * 60);
       el('inpDailyH').value = _dh;
@@ -3189,6 +3202,9 @@
       el('inpWeeklyM').value    = _wm;
       el('inpWeeklyOn').checked = c.weeklyOn;
       el('inpNotifOn').checked  = c.notifOn;
+      const satToggle = el('inpIncludeSat'); if (satToggle) satToggle.checked = (c.workDays === 6);
+      el('pcTabDaily')?.classList.toggle('active', !c.weeklyOn);
+      el('pcTabWeekly')?.classList.toggle('active', !!c.weeklyOn);
       switchStTab(c.weeklyOn ? 'weekly' : 'daily');
       document.querySelectorAll('.plan-btn[data-sday]').forEach(btn => {
         btn.classList.toggle('selected', (c.lateDays || []).includes(+btn.dataset.sday));
@@ -3222,6 +3238,7 @@
           btn.addEventListener('click', () => btn.classList.toggle('selected'))
         );
       }
+      updateWeeklyCalc();
       const _ls = Store.getLastSaved();
       if (_ls) el('settingsLastSaved').textContent = `Last updated ${timeAgo(_ls)}`;
     }
@@ -3248,9 +3265,48 @@
       el('inpWeeklyOn').checked = isWeekly;
       el('stTabDaily').classList.toggle('active', !isWeekly);
       el('stTabWeekly').classList.toggle('active', isWeekly);
-      el('stPanelWeekly').style.display = isWeekly ? '' : 'none';
-      const lbl = el('stDailyInputLabel');
-      if (lbl) lbl.style.display = isWeekly ? '' : 'none';
+      const lbl = el('stTargetLabel');
+      if (lbl) lbl.textContent = isWeekly ? 'Weekly Target' : 'Daily Target';
+      updateWeeklyCalc();
+      autoSaveSettings();
+    }
+
+    function updateWeeklyCalc() {
+      const info = el('weeklyCalcInfo'); if (!info) return;
+      const dh = parseFloat(el('inpDailyH')?.value) || 0;
+      const dm = parseFloat(el('inpDailyM')?.value) || 0;
+      const daily = dh + dm / 60;
+      const days = (cfg().workDays || 5);
+      const weekly = daily * days;
+      const wh = Math.floor(weekly), wm = Math.round((weekly - wh) * 60);
+      const isWeekly = el('inpWeeklyOn')?.checked;
+      if (isWeekly) {
+        info.textContent = `Based on ${dh}h${dm ? ' ' + dm + 'm' : ''} daily x ${days} days, that would be ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly.`;
+      } else {
+        info.textContent = `That would be ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly (${days} working days).`;
+      }
+      // Sync hidden weekly inputs so calculations still work
+      el('inpWeeklyH').value = wh;
+      el('inpWeeklyM').value = wm;
+    }
+
+    function toggleIncludeSaturday(checked) {
+      const n = checked ? 6 : 5;
+      const inp = el('inpWorkDays'); if (inp) inp.value = n;
+      switchWorkDays(n);
+    }
+
+    function obToggleIncludeSaturday(checked) {
+      const n = checked ? 6 : 5;
+      const inp = el('obWorkDays'); if (inp) inp.value = n;
+    }
+
+    function switchPenaltyMode(mode) {
+      const isWeekly = mode === 'weekly';
+      el('inpWeeklyOn').checked = isWeekly;
+      el('pcTabDaily')?.classList.toggle('active', !isWeekly);
+      el('pcTabWeekly')?.classList.toggle('active', isWeekly);
+      autoSaveSettings();
     }
 
     function autoSaveSettings() {
@@ -3267,17 +3323,18 @@
       const targetDay      = earlyLeaveDays.length > 0 ? earlyLeaveDays[0] : null;
       const notifOn    = el('inpNotifOn').checked;
       const name       = el('inpName').value.trim();
-      const company    = el('inpCompany')?.value.trim() || '';
+      const position   = el('inpPosition')?.value.trim() || '';
       const weeklyH    = (_wHVal > 0 || _wMVal > 0) ? _wHVal + _wMVal / 60 : cfg().weeklyH;
       const shiftStart = el('inpShiftStart')?.value.trim() || '09:00 AM';
       const shiftEnd   = el('inpShiftEnd')?.value.trim()   || '06:00 PM';
       const shiftType  = deriveShiftType(shiftStart);
       const now = nowTz();
       const workDays = parseInt(el('inpWorkDays')?.value || '5', 10) || 5;
-      saveCfg({ dailyH: daily, weeklyH, weeklyOn: on, lateDays, earlyLeaveDays, notifOn, name, company,
+      saveCfg({ dailyH: daily, weeklyH, weeklyOn: on, lateDays, earlyLeaveDays, notifOn, name, position,
                 targetDay, shiftType, shiftStart, shiftEnd, tzOffset, workDays,
                 autoStopBuf: cfg().autoStopBuf || 0.5 });
       renderDaySelector(); // refresh strip in case work-days changed
+      updateWeeklyCalc();
       el('settingsLastSaved').textContent = `Last updated just now`;
       if (notifOn && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission();
       if (loginDate) render(); else renderEmptyState();
@@ -3285,8 +3342,8 @@
 
     // ── WORK DAYS SELECTOR ─────────────────────────────
     function switchWorkDays(n) {
-      document.querySelectorAll('#cardAdvanced .wd-tab').forEach(t => t.classList.toggle('active', +t.dataset.wd === n));
       const inp = el('inpWorkDays'); if (inp) inp.value = n;
+      const satToggle = el('inpIncludeSat'); if (satToggle) satToggle.checked = (n === 6);
       // Immediately save & re-render pickers so Saturday appears/disappears live
       autoSaveSettings();
       // Re-render day pickers with updated day list
@@ -3661,32 +3718,35 @@
 
     function buildEmailDraft(p, dateStr) {
       const c = cfg();
+      const sig = [c.name || '[Your Name]', c.position || ''].filter(Boolean).join('\n');
       if (p.type === 'weekly') {
-        return `Subject: Weekly Hours Note — ${p.rangeStr || dateStr}
+        return {
+          subject: `Weekly Hours Note - ${p.rangeStr || dateStr}`,
+          body: `Hi [Manager],
 
-Hi [Manager],
+I wanted to flag that for the week of ${p.rangeStr || dateStr}, I logged ${dur(p.totalSecs || 0)} against the ${c.weeklyH}h weekly target, a shortfall of ${dur(p.deficit)}.
 
-I wanted to flag that for the week of ${p.rangeStr || dateStr}, I logged ${dur(p.totalSecs || 0)} against the ${c.weeklyH}h weekly target — a shortfall of ${dur(p.deficit)}.
-
-[Add reason here — e.g. public holiday, planned leave, lighter workload, etc.]
+[Add reason here - e.g. public holiday, planned leave, lighter workload, etc.]
 
 I'll make up the time in the coming week as needed.
 
-Best,
-${c.name || '[Your Name]'}`;
+Best regards,
+${sig}`
+        };
       }
-      return `Subject: Attendance Note — ${dateStr}
-
-Hi [Manager],
+      return {
+        subject: `Attendance Note - ${dateStr}`,
+        body: `Hi [Manager],
 
 I wanted to flag that on ${dateStr}, I logged ${dur((p.log?.hoursWorked || 0) * 3600)} instead of the standard ${dur(c.dailyH * 3600)}, a shortfall of ${dur(p.deficit)}.
 
-[Add reason here — e.g. left early due to appointment, worked from a different location, etc.]
+[Add reason here - e.g. left early due to appointment, worked from a different location, etc.]
 
 I'll make up the time as needed.
 
-Best,
-${c.name || '[Your Name]'}`;
+Best regards,
+${sig}`
+      };
     }
 
     function openEmailModal(key) {
@@ -3694,7 +3754,9 @@ ${c.name || '[Your Name]'}`;
       if (!p) return;
       const dateStr = `${FULL_DAYS_EN[p.date.getDay()]}, ${MONTHS[p.date.getMonth()]} ${p.date.getDate()}`;
       el('emailModalDate').textContent = dateStr;
-      el('emailModalTextarea').value = buildEmailDraft(p, dateStr);
+      const draft = buildEmailDraft(p, dateStr);
+      el('emailModalSubject').value = draft.subject;
+      el('emailModalTextarea').value = draft.body;
       el('emailModalOverlay').classList.add('open');
     }
 
@@ -4023,7 +4085,7 @@ ${c.name || '[Your Name]'}`;
             autoStopBuf:  wc.autoStopBufferHours,
             notifOn:      wc.notificationsEnabled,
             name:         snap.user?.name || legacyCfg?.name || '',
-            company:      snap.user?.company || legacyCfg?.company || '',
+            position:     snap.user?.position || legacyCfg?.position || '',
             tzOffset:     snap.user?.tzOffset !== undefined ? snap.user.tzOffset : (legacyCfg?.tzOffset || 330),
           };
           this.setCfg({ ...(legacyCfg || {}), ...restoredCfg });
@@ -4520,16 +4582,29 @@ ${c.name || '[Your Name]'}`;
 
     el('penaltiesCheck').addEventListener('click', () => {
       const container = el('penaltiesList');
-      container.innerHTML = '<div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>';
-      setTimeout(renderPenalties, 1000);
+      // Lock height to current size while skeleton shows, then release after render
+      const h = container.offsetHeight;
+      container.style.minHeight = Math.max(h, 44) + 'px';
+      container.innerHTML = '<div class="skeleton-row"></div><div class="skeleton-row"></div>';
+      setTimeout(() => {
+        renderPenalties();
+        container.style.minHeight = '';
+      }, 900);
     });
     el('emailModalClose').addEventListener('click', closeEmailModal);
     el('emailModalOverlay').addEventListener('click', e => { if (e.target === el('emailModalOverlay')) closeEmailModal(); });
-    el('emailCopyBtn').addEventListener('click', () => {
+    el('emailCopySubjectBtn').addEventListener('click', () => {
+      const inp = el('emailModalSubject');
+      navigator.clipboard.writeText(inp.value).then(() => {
+        el('emailCopySubjectBtn').textContent = 'Copied!';
+        setTimeout(() => { el('emailCopySubjectBtn').textContent = 'Copy'; }, 2000);
+      }).catch(() => { inp.select(); document.execCommand('copy'); });
+    });
+    el('emailCopyBodyBtn').addEventListener('click', () => {
       const ta = el('emailModalTextarea');
       navigator.clipboard.writeText(ta.value).then(() => {
-        el('emailCopyBtn').textContent = 'Copied!';
-        setTimeout(() => { el('emailCopyBtn').textContent = 'Copy to Clipboard'; }, 2000);
+        el('emailCopyBodyBtn').textContent = 'Copied!';
+        setTimeout(() => { el('emailCopyBodyBtn').textContent = 'Copy'; }, 2000);
       }).catch(() => { ta.select(); document.execCommand('copy'); });
     });
 
@@ -4687,20 +4762,15 @@ ${c.name || '[Your Name]'}`;
       obAnimateTo(step, dir != null ? dir : 1);
     }
 
-    function obSwitchWorkDays(n) {
-      document.querySelectorAll('#obPanel2 .wd-tab').forEach(t => t.classList.toggle('active', +t.dataset.wd === n));
-      const inp = el('obWorkDays'); if (inp) inp.value = n;
-    }
-
     function obSaveStep2() {
       const name = (el('obName')?.value || '').trim();
-      const company = (el('obCompany')?.value || '').trim();
+      const position = (el('obPosition')?.value || '').trim();
       const shiftStart = (el('obShiftStart')?.value || '09:00 AM').trim();
       const shiftEnd = (el('obShiftEnd')?.value || '06:00 PM').trim();
       const shiftType = deriveShiftType(shiftStart);
       const workDays = parseInt(el('obWorkDays')?.value || '5', 10) || 5;
       const c = cfg();
-      saveCfg({ ...c, name, company, shiftStart, shiftEnd, shiftType, workDays });
+      saveCfg({ ...c, name, position, shiftStart, shiftEnd, shiftType, workDays });
     }
 
     function obPopulateStep3Days() {
@@ -5021,8 +5091,8 @@ ${c.name || '[Your Name]'}`;
           <input type="text" class="field-input" id="obName" placeholder="Your name" maxlength="40" autocomplete="off">
         </div>
         <div class="form-field">
-          <div class="ob-section-label">Company</div>
-          <input type="text" class="field-input" id="obCompany" placeholder="Company name" maxlength="60" autocomplete="off">
+          <div class="ob-section-label">Position</div>
+          <input type="text" class="field-input" id="obPosition" placeholder="Your position" maxlength="60" autocomplete="off">
         </div>
         <div class="form-field">
           <div class="ob-section-label">Shift Hours</div>
@@ -5044,16 +5114,17 @@ ${c.name || '[Your Name]'}`;
             </div>
           </div>
         </div>
-        <div class="form-field">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <div class="ob-section-label">Days a Week</div>
-            <div class="st-tabs" style="flex-shrink:0">
-              <button type="button" class="st-tab wd-tab active" data-wd="5" onclick="obSwitchWorkDays(5)">5 Days</button>
-              <button type="button" class="st-tab wd-tab" data-wd="6" onclick="obSwitchWorkDays(6)">6 Days</button>
-            </div>
+        <div class="toggle-row" style="background:transparent;padding:0">
+          <div>
+            <div class="ob-section-label" style="text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;color:var(--foreground)">Include Saturday</div>
+            <div style="font-size:12px;color:var(--muted-fg);margin-top:2px">Enable if Saturday is a working day.</div>
           </div>
-          <input type="hidden" id="obWorkDays" value="5">
+          <label class="toggle">
+            <input type="checkbox" id="obIncludeSat" onchange="obToggleIncludeSaturday(this.checked)">
+            <span class="toggle-track"></span>
+          </label>
         </div>
+        <input type="hidden" id="obWorkDays" value="5">
       </div>
 
       <!-- Step 3: Setup Routine -->
