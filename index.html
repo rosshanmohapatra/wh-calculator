@@ -1489,11 +1489,111 @@
           </div>
         </div>
 
+        <!-- Danger Zone -->
+        <div class="settings-card" style="border-color:var(--destructive-border)">
+          <div class="settings-card-head" style="cursor:default">
+            <div class="section-label" style="color:var(--destructive)">Danger Zone</div>
+          </div>
+          <div class="settings-card-body">
+            <div class="settings-group">
+
+              <!-- Logout -->
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <div class="form-label">Log Out</div>
+                  <div class="form-sub">Sign out of your Murph account on this device.</div>
+                </div>
+                <button class="btn-sm" onclick="openLogoutModal()"
+                  style="height:32px;padding:0 14px;font-size:12px;font-weight:600;flex-shrink:0;color:var(--destructive);border-color:var(--destructive-border);background:var(--destructive-bg)">
+                  Log Out
+                </button>
+              </div>
+
+              <div style="height:1px;background:var(--border)"></div>
+
+              <!-- Delete Profile -->
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <div class="form-label">Delete Profile</div>
+                  <div class="form-sub">Permanently remove your account and all data. 48-hour grace period applies.</div>
+                </div>
+                <button class="btn-sm" onclick="openDeleteModal()"
+                  style="height:32px;padding:0 14px;font-size:12px;font-weight:600;flex-shrink:0;color:var(--destructive);border-color:var(--destructive-border);background:var(--destructive-bg)">
+                  Delete
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
       </div>
     </main>
   </div>
 
   <!-- App footer removed -->
+
+  <!-- ── Logout Confirmation Modal ── -->
+  <div class="overlay" id="logoutOverlay">
+    <div class="dialog" style="max-width:360px">
+      <div class="dialog-head">
+        <div class="dialog-title">Log out?</div>
+        <div class="dialog-desc">You'll be taken back to the login screen. Your data stays safe.</div>
+      </div>
+      <div class="dialog-foot-row" style="padding:0 20px 20px">
+        <button class="btn btn-cancel" onclick="el('logoutOverlay').classList.remove('open')" style="flex:1;height:40px">Cancel</button>
+        <button class="btn" onclick="confirmLogout()"
+          style="flex:1;height:40px;background:var(--destructive);color:#fff;border:none;font-weight:600">
+          Log Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Delete Profile Confirmation Modal ── -->
+  <div class="overlay" id="deleteProfileOverlay">
+    <div class="dialog" style="max-width:380px">
+      <div class="dialog-head">
+        <div class="dialog-title">Delete your profile?</div>
+        <div class="dialog-desc">This action cannot be undone. Your account will be queued for deletion.</div>
+      </div>
+      <div class="dialog-body">
+        <div style="background:var(--destructive-bg);border:1px solid var(--destructive-border);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--destructive)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            What happens next
+          </div>
+          <div style="font-size:12px;color:var(--muted-fg);line-height:1.6;display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;gap:8px;align-items:flex-start">
+              <span style="color:var(--destructive);margin-top:1px">→</span>
+              <span>Your account is immediately deactivated and you'll be signed out.</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-start">
+              <span style="color:var(--destructive);margin-top:1px">→</span>
+              <span>All data is retained in our database for <strong style="color:var(--foreground)">48 hours</strong> — contact support to recover it.</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-start">
+              <span style="color:var(--destructive);margin-top:1px">→</span>
+              <span>After 48 hours, your profile and all associated data are permanently erased.</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="form-label" style="margin-bottom:6px">Type <strong>DELETE</strong> to confirm</div>
+          <input class="field-input" id="deleteConfirmInput" type="text" placeholder="DELETE" autocomplete="off"
+            style="width:100%;text-transform:uppercase;letter-spacing:.5px"
+            oninput="el('deleteConfirmBtn').disabled = this.value.toUpperCase() !== 'DELETE'">
+        </div>
+      </div>
+      <div class="dialog-foot-row" style="padding:0 20px 20px">
+        <button class="btn btn-cancel" onclick="closeDeleteModal()" style="flex:1;height:40px">Cancel</button>
+        <button class="btn" id="deleteConfirmBtn" onclick="confirmDeleteProfile()" disabled
+          style="flex:1;height:40px;background:var(--destructive);color:#fff;border:none;font-weight:600;transition:opacity .15s">
+          Delete Forever
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Toast -->
   <div class="wh-toast" id="ieToast">
@@ -5117,6 +5217,39 @@ ${sig}`
     function obSkip() {
       obFinish();
     }
+
+    // ── Danger Zone ─────────────────────────────────────────────────────────
+    function openLogoutModal() {
+      el('logoutOverlay').classList.add('open');
+    }
+    function confirmLogout() {
+      el('logoutOverlay').classList.remove('open');
+      // Clear session state (keep stored data intact — just signs out)
+      if (ticker) { clearInterval(ticker); ticker = null; }
+      showToast('Signed out', 'success', 'See you next time.');
+      setTimeout(() => { window.location.href = 'login.html'; }, 1000);
+    }
+
+    function openDeleteModal() {
+      el('deleteConfirmInput').value = '';
+      el('deleteConfirmBtn').disabled = true;
+      el('deleteProfileOverlay').classList.add('open');
+    }
+    function closeDeleteModal() {
+      el('deleteProfileOverlay').classList.remove('open');
+      el('deleteConfirmInput').value = '';
+    }
+    function confirmDeleteProfile() {
+      closeDeleteModal();
+      // Wipe all local data
+      localStorage.clear();
+      showToast('Account scheduled for deletion', 'success', 'Your data will be removed in 48 hours.');
+      setTimeout(() => { window.location.href = 'login.html'; }, 1600);
+    }
+
+    // Close modals on backdrop click
+    el('logoutOverlay')?.addEventListener('click', ev => { if (ev.target === el('logoutOverlay')) el('logoutOverlay').classList.remove('open'); });
+    el('deleteProfileOverlay')?.addEventListener('click', ev => { if (ev.target === el('deleteProfileOverlay')) closeDeleteModal(); });
 
     function obFinish() {
       localStorage.setItem(OB_DONE_KEY, '1');
