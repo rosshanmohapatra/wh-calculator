@@ -154,6 +154,13 @@
     .fp-code-input { height:52px;font-size:24px;font-weight:600;letter-spacing:.25em;text-align:center; }
     .fp-timer { font-size:12px;color:var(--muted-fg);text-align:center;margin-top:10px; }
     .fp-timer span { font-weight:600;color:var(--foreground); }
+    .auth-digit { width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;
+      border:1px solid var(--border);border-radius:8px;background:var(--input-bg);
+      color:var(--foreground);font-family:var(--font);transition:border-color .15s,box-shadow .15s;
+      -moz-appearance:textfield;caret-color:transparent; }
+    .auth-digit:focus { border-color:var(--ring);outline:none;box-shadow:0 0 0 3px rgba(9,9,11,.08); }
+    .dark .auth-digit:focus { box-shadow:0 0 0 3px rgba(250,250,250,.08); }
+    .auth-digit::-webkit-outer-spin-button,.auth-digit::-webkit-inner-spin-button { -webkit-appearance:none; }
 
     /* ── Input ── */
     .field-input { height: 40px; width: 100%; font-size: 14px; font-family: var(--font);
@@ -1394,7 +1401,7 @@
             </div>
 
             <!-- Include Saturday Toggle -->
-            <div class="toggle-row" onclick="el('inpIncludeSat').click()">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpIncludeSat').click()">
               <div>
                 <div class="form-label">Include Saturday</div>
                 <div class="form-sub">Enable if Saturday is a working day for you.</div>
@@ -1464,7 +1471,7 @@
           <div class="settings-group">
 
             <!-- Allow Notifications -->
-            <div class="toggle-row" onclick="el('inpNotifOn').click()">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifOn').click()">
               <div>
                 <div class="form-label">Allow Notifications</div>
                 <div class="form-sub">We'll notify you when your working hours are elapsed.</div>
@@ -1483,7 +1490,7 @@
                 <div class="form-label">Update Password</div>
                 <div class="form-sub">Change your account password. Supabase integration coming soon.</div>
               </div>
-              <button class="btn-secondary" onclick="showToast('Coming soon','info','Password update requires Supabase auth.')">Change</button>
+              <button class="btn-secondary" onclick="showToast('Coming soon','info','Password update requires Supabase auth.')">Update</button>
             </div>
 
             <div class="sep-inner"></div>
@@ -1509,10 +1516,10 @@
               </div>
             </div>
 
-            <div class="sep-inner"></div>
+            <div style="height:1px;background:var(--border);margin:8px 0"></div>
 
             <!-- Danger Zone (merged) -->
-            <div class="section-label" style="color:var(--destructive)">Danger Zone</div>
+            <div class="section-label" style="color:var(--destructive);margin-bottom:2px">Danger Zone</div>
 
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
               <div>
@@ -1545,7 +1552,6 @@
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
               <div style="display:flex;flex-direction:column;gap:2px">
                 <div style="font-size:13px;font-weight:600;color:var(--foreground)">Roshan Mohapatra</div>
-                <div style="font-size:12px;color:var(--muted-fg)">Mumbai, Maharashtra</div>
               </div>
               <div style="display:flex;align-items:center;gap:8px">
                 <a href="https://github.com/rosshanmohapatra/wh-calculator" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted-fg);text-decoration:none;transition:color .15s,border-color .15s" onmouseover="this.style.color='var(--foreground)';this.style.borderColor='var(--foreground)'" onmouseout="this.style.color='var(--muted-fg)';this.style.borderColor='var(--border)'" title="GitHub">
@@ -1610,7 +1616,7 @@
   </div>
 
   <!-- ── Forgot Password Modal ── -->
-  <div class="overlay" id="fpOverlay">
+  <div class="overlay" id="fpOverlay" style="z-index:2200">
     <div class="dialog" style="max-width:360px">
       <!-- View 1: Email request -->
       <div id="fpViewEmail">
@@ -1633,9 +1639,36 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
             Continue with GitHub
           </button>
+          <button class="fp-oauth-btn" onclick="openAuthView()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 2C3.79086 2 2 3.79086 2 6V18C2 20.2091 3.79086 22 6 22H18C20.2091 22 22 20.2091 22 18V6C22 3.79086 20.2091 2 18 2H6ZM7 7H9V9H7V7ZM9 11H7V13H9V11ZM7 15H9V17H7V15ZM11 7H13V9H11V7ZM13 11H11V13H13V11ZM11 15H13V17H11V15ZM17 7H15V9H17V7ZM15 11H17V13H15V11ZM17 15H15V17H17V15Z" fill="currentColor"/></svg>
+            Use Authenticator
+          </button>
         </div>
         <div style="padding:0 20px 20px;text-align:center">
           <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="closeFpModal()">Back to setup</button>
+        </div>
+      </div>
+      <!-- View 3: Authenticator -->
+      <div id="fpViewAuth" style="display:none">
+        <div class="dialog-head">
+          <div class="dialog-title">Authenticator Code</div>
+          <div class="dialog-desc">Enter the 6-digit code from your authenticator app.</div>
+        </div>
+        <div class="dialog-body">
+          <div style="display:flex;gap:8px;justify-content:center">
+            <input class="auth-digit" id="authD0" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" autocomplete="one-time-code">
+            <input class="auth-digit" id="authD1" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]">
+            <input class="auth-digit" id="authD2" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]">
+            <input class="auth-digit" id="authD3" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]">
+            <input class="auth-digit" id="authD4" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]">
+            <input class="auth-digit" id="authD5" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]">
+          </div>
+        </div>
+        <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:8px">
+          <button class="ob-btn-primary" id="authVerifyBtn" style="height:40px;font-size:13px;width:100%;border-radius:8px" onclick="authVerify()" disabled>Verify Code</button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="fpBackToEmail()">Use a different method</button>
         </div>
       </div>
       <!-- View 2: OTP code -->
@@ -5346,11 +5379,54 @@ ${sig}`
       if (_fpTimer) { clearInterval(_fpTimer); _fpTimer = null; }
       el('fpViewEmail').style.display = '';
       el('fpViewOTP').style.display = 'none';
+      el('fpViewAuth').style.display = 'none';
     }
     function fpVerify() {
       closeFpModal();
       showToast('Verification pending', 'info', 'Supabase integration coming soon.');
     }
+    function openAuthView() {
+      el('fpViewEmail').style.display = 'none';
+      el('fpViewOTP').style.display = 'none';
+      el('fpViewAuth').style.display = '';
+      const digits = ['authD0','authD1','authD2','authD3','authD4','authD5'].map(id => el(id));
+      digits.forEach(d => { d.value = ''; d.disabled = false; });
+      el('authVerifyBtn').disabled = true;
+      digits[0].focus();
+    }
+    function authVerify() {
+      closeFpModal();
+      showToast('Authenticator pending', 'info', 'Supabase integration coming soon.');
+    }
+    function _initAuthDigits() {
+      const ids = ['authD0','authD1','authD2','authD3','authD4','authD5'];
+      const digits = ids.map(id => el(id));
+      const update = () => { el('authVerifyBtn').disabled = !digits.every(d => /^\d$/.test(d.value)); };
+      digits.forEach((inp, i) => {
+        inp.addEventListener('input', () => {
+          inp.value = inp.value.replace(/\D/g,'').slice(-1);
+          if (inp.value && i < 5) digits[i+1].focus();
+          update();
+        });
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Backspace') {
+            if (!inp.value && i > 0) { digits[i-1].focus(); digits[i-1].value = ''; e.preventDefault(); }
+            else if (inp.value) { inp.value = ''; e.preventDefault(); }
+            update();
+          } else if (e.key === 'ArrowLeft' && i > 0) digits[i-1].focus();
+          else if (e.key === 'ArrowRight' && i < 5) digits[i+1].focus();
+        });
+        inp.addEventListener('paste', e => {
+          e.preventDefault();
+          const txt = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+          digits.forEach((d, j) => { d.value = txt[j] || ''; });
+          digits[Math.min(txt.length - 1, 5)].focus();
+          update();
+        });
+        inp.addEventListener('click', () => inp.select());
+      });
+    }
+    _initAuthDigits();
 
     // ── Danger Zone ─────────────────────────────────────────────────────────
     function openLogoutModal() {
