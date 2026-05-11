@@ -432,7 +432,7 @@
       transform: scale(.96) translateY(8px);
       transition: transform .22s cubic-bezier(.34,1.35,.64,1); }
     .overlay.open .dialog { transform: scale(1) translateY(0); }
-    .dialog-head { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+    .dialog-head { padding: 20px 20px 16px; }
     .dialog-title { font-size: 15px; font-weight: 600; color: var(--foreground); }
     .dialog-desc  { font-size: 12px; color: var(--muted-fg); margin-top: 3px; }
     .dialog-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
@@ -1497,7 +1497,21 @@
           <div class="settings-card-body">
             <div class="settings-group">
 
-              <!-- Logout -->
+              <!-- Delete Account (top) -->
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <div class="form-label">Delete Account</div>
+                  <div class="form-sub">We'll keep your data for 48 hours before permanently removing it.</div>
+                </div>
+                <button class="btn-sm" onclick="openDeleteModal()"
+                  style="height:32px;padding:0 14px;font-size:12px;font-weight:600;flex-shrink:0;background:transparent;color:var(--destructive);border-color:var(--destructive-border)">
+                  Delete Forever
+                </button>
+              </div>
+
+              <div style="height:1px;background:var(--border)"></div>
+
+              <!-- Logout (bottom) -->
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
                 <div>
                   <div class="form-label">Log Out</div>
@@ -1506,20 +1520,6 @@
                 <button class="btn-sm" onclick="openLogoutModal()"
                   style="height:32px;padding:0 14px;font-size:12px;font-weight:600;flex-shrink:0;color:var(--destructive);border-color:var(--destructive-border);background:var(--destructive-bg)">
                   Log Out
-                </button>
-              </div>
-
-              <div style="height:1px;background:var(--border)"></div>
-
-              <!-- Delete Profile -->
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-                <div>
-                  <div class="form-label">Delete Profile</div>
-                  <div class="form-sub">Permanently remove your account and all data. 48-hour grace period applies.</div>
-                </div>
-                <button class="btn-sm" onclick="openDeleteModal()"
-                  style="height:32px;padding:0 14px;font-size:12px;font-weight:600;flex-shrink:0;color:var(--destructive);border-color:var(--destructive-border);background:var(--destructive-bg)">
-                  Delete
                 </button>
               </div>
 
@@ -1555,14 +1555,11 @@
     <div class="dialog" style="max-width:380px">
       <div class="dialog-head">
         <div class="dialog-title">Delete account?</div>
-        <div class="dialog-desc">This cannot be undone.</div>
+        <div class="dialog-desc">We'll still have your data for 48 hours. After that it'll be permanently deleted from our database.</div>
       </div>
-      <div class="dialog-body">
-        <div style="background:var(--destructive-bg);border:1px solid var(--destructive-border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--muted-fg);line-height:1.6">
-          We'll still have your data for <strong style="color:var(--foreground)">48 hours</strong>. After that it'll be permanently deleted from our database.
-        </div>
-        <div style="margin-top:14px">
-          <div class="form-label" style="margin-bottom:6px">Enter your password to confirm</div>
+      <div class="dialog-body" style="padding-top:0">
+        <div>
+          <div class="form-label" style="margin-bottom:6px">Enter Password</div>
           <div style="position:relative">
             <input class="field-input" id="deleteConfirmInput" type="password" placeholder="••••••••" autocomplete="current-password"
               style="width:100%;padding-right:44px"
@@ -1579,7 +1576,7 @@
         <button class="btn btn-cancel" onclick="closeDeleteModal()" style="height:40px;width:auto;padding:0 18px">Cancel</button>
         <button class="btn" id="deleteConfirmBtn" onclick="confirmDeleteProfile()" disabled
           style="height:40px;width:auto;padding:0 18px;background:var(--destructive);color:#fff;border:none;font-weight:600;transition:opacity .15s">
-          Delete Account
+          Delete Forever
         </button>
       </div>
     </div>
