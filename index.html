@@ -221,7 +221,7 @@
     .shift-combo { display: flex; align-items: center; background: var(--card);
       border: 1.5px solid var(--border); border-radius: 12px; height: 52px;
       padding: 0 6px; gap: 8px; transition: border-color .15s; }
-    .shift-combo:focus-within { border-color: var(--ring); }
+    .shift-combo:focus-within { border-color: var(--muted-fg); }
     .shift-combo-input.err { color: var(--destructive); }
     .shift-combo-clock { color: var(--muted-fg); flex-shrink: 0; }
     .shift-combo-input { flex: 1; background: transparent; border: none; outline: none;
@@ -369,9 +369,9 @@
     .form-row   { display: flex; align-items: center; gap: 8px; }
     .weekly-block { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
     .toggle-row { display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 14px; background: var(--muted); gap: 12px;
+      padding: 12px 14px; background: transparent; gap: 12px;
       border-radius: 4px; cursor: pointer; transition: background .12s; }
-    .toggle-row:hover { background: var(--border); }
+    .toggle-row:hover { background: var(--muted); }
     .sliding-field { overflow: hidden; transition: max-height .24s ease, opacity .2s; }
     .sliding-field.hidden { max-height: 0; opacity: 0; pointer-events: none; }
     .sliding-field.open   { max-height: 360px; opacity: 1; }
@@ -1047,10 +1047,24 @@
 
       <!-- Future day plan section -->
       <div id="futureDayPlan" style="display:none">
-        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px">
-          <div style="font-size:13px;font-weight:500;color:var(--muted-fg)" id="futureDayQuestion">Any plans for this day?</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap" id="futureDayChips"></div>
-          <button class="shift-start-btn" id="futureScheduleBtn" style="font-size:13px;height:40px;border-radius:10px">Schedule</button>
+        <div class="card" style="padding:20px 16px;display:flex;flex-direction:column;gap:16px">
+          <!-- Question -->
+          <div style="text-align:center;font-size:14px;font-weight:500;color:var(--muted-fg)" id="futureDayQuestion">Any plans for this day?</div>
+          <!-- Plan type pills -->
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap" id="futureDayChips"></div>
+          <!-- Reason input (shown after a plan is picked) -->
+          <div id="futureDayReasonWrap" style="display:none">
+            <textarea id="futureDayReason" placeholder="Add a reason (optional)" rows="2"
+              style="width:100%;resize:none;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--foreground);font-family:var(--font);font-size:13px;padding:10px 12px;outline:none;transition:border-color .15s"
+              oninput="saveFutureDayReason(this.value)"></textarea>
+          </div>
+          <!-- Hours remaining -->
+          <div id="futureDayHoursRow" style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted-fg)">
+            <span>Hours Remaining</span>
+            <span id="futureDayHoursVal" style="font-weight:600;color:var(--foreground)">—</span>
+          </div>
+          <!-- CTA button -->
+          <button class="shift-start-btn" id="futurePlanBtn" style="font-size:13px;height:40px;border-radius:10px" onclick="toggleFuturePlanMode()">New Plan</button>
         </div>
       </div>
 
@@ -2922,7 +2936,6 @@
       renderDaySelector();
       const wk = week(daySelectorWeekOffset), day = wk.find(d => d.key === key);
       const log = dayLog(key);
-      const ov = log?.futurePlan;
 
       el('todayLoginSection').style.display = 'none';
       el('rcUpdateEntryBtn')?.classList.remove('visible');
@@ -2933,71 +2946,93 @@
       el('futureDayPlan').style.display = '';
       el('futureDayQuestion').textContent = `Any plans for ${day?.name || 'this day'}?`;
 
-      const plans = [
-        { key: 'halfday', label: 'Half Day' },
-        { key: 'leave', label: 'Full Leave' },
-        { key: 'early', label: 'Early Leave' },
-        { key: 'late', label: 'Stay Late' }
-      ];
-      el('futureDayChips').innerHTML = `<button class="btn-sm" onclick="openNewPlanModal('${key}')" style="height:34px;border-radius:8px;font-size:13px;padding:0 14px;background:var(--foreground);color:var(--background);border:none">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New Plan
-      </button>${ov ? `<button class="wp-override-btn active" style="pointer-events:none">${plans.find(p=>p.key===ov)?.label||ov}</button>` : ''}`;
-
-      updateScheduleBtn(key);
+      _renderFutureDayInline(key, log, day);
     }
 
-    function toggleFuturePlan(key, planKey, btn) {
+    function _renderFutureDayInline(key, log, day) {
+      const c = cfg();
+      const hasPlan = !!(log?.futurePlan);
+      const planKey = log?.futurePlan;
+
+      // Plan type buttons
+      const planTypes = [
+        { key: 'halfday', label: 'Half Day' },
+        { key: 'leave',   label: 'Full Day Leave' },
+        { key: 'holiday', label: 'Holiday' },
+      ];
+      el('futureDayChips').innerHTML = planTypes.map(p =>
+        `<button class="wp-override-btn${planKey === p.key ? ' active' : ''}"
+          style="height:34px;border-radius:8px;font-size:12px;font-weight:600"
+          onclick="_selectFuturePlanType('${key}','${p.key}',this)">${p.label}</button>`
+      ).join('');
+
+      // Reason field
+      const reasonWrap = el('futureDayReasonWrap');
+      if (reasonWrap) {
+        reasonWrap.style.display = hasPlan ? '' : 'none';
+        const ta = el('futureDayReason');
+        if (ta) ta.value = log?.futureReason || '';
+      }
+
+      // Hours remaining
+      const hoursVal = el('futureDayHoursVal');
+      if (hoursVal) {
+        const target = planKey === 'halfday' ? c.dailyH / 2
+                     : (planKey === 'leave' || planKey === 'holiday') ? 0
+                     : c.dailyH;
+        hoursVal.textContent = target > 0 ? dur(target * 3600) : 'Day off';
+      }
+
+      // CTA button
+      const btn = el('futurePlanBtn');
+      if (btn) {
+        if (hasPlan) {
+          btn.textContent = 'Cancel Plan';
+          btn.style.cssText = 'font-size:13px;height:40px;border-radius:10px;background:transparent;color:var(--destructive);border:1.5px solid var(--destructive)';
+        } else {
+          btn.textContent = 'New Plan';
+          btn.style.cssText = 'font-size:13px;height:40px;border-radius:10px';
+        }
+        btn.onclick = () => toggleFuturePlanMode(key);
+      }
+    }
+
+    function _selectFuturePlanType(key, planKey, btn) {
       const log = dayLog(key) || {};
       const wasActive = btn.classList.contains('active');
+
+      // Toggle selection
       el('futureDayChips').querySelectorAll('.wp-override-btn').forEach(b => b.classList.remove('active'));
-      if (!wasActive) {
+      if (wasActive) {
+        // Deselect → remove plan
+        const updated = { ...log }; delete updated.futurePlan; delete updated.futureReason;
+        saveDayLog(key, updated);
+      } else {
         btn.classList.add('active');
         saveDayLog(key, { ...log, futurePlan: planKey });
-      } else {
-        const updated = { ...log }; delete updated.futurePlan;
+      }
+      _renderFutureDayInline(key, dayLog(key), week(daySelectorWeekOffset).find(d => d.key === key));
+    }
+
+    function toggleFuturePlanMode(key) {
+      const log = dayLog(key) || {};
+      if (log.futurePlan) {
+        // Cancel plan
+        const updated = { ...log }; delete updated.futurePlan; delete updated.futureReason;
         saveDayLog(key, updated);
       }
-      updateScheduleBtn(key);
+      // If no plan, just re-render (user picks type from chips)
+      _renderFutureDayInline(key, dayLog(key), week(daySelectorWeekOffset).find(d => d.key === key));
     }
 
-    function updateScheduleBtn(key) {
-      const log = dayLog(key);
-      const btn = el('futureScheduleBtn');
-      if (!btn) return;
-      if (log?.scheduled) {
-        btn.textContent = 'Unschedule';
-        btn.style.cssText = 'background:transparent;color:var(--destructive);border:1.5px solid var(--destructive);font-size:13px;height:40px;border-radius:10px;';
-        btn.disabled = false;
-        btn.onclick = () => unscheduleFutureDay(key);
-      } else {
-        btn.textContent = 'Schedule';
-        btn.style.cssText = '';
-        btn.onclick = () => scheduleFutureDay(key);
-      }
+    function saveFutureDayReason(val) {
+      const log = dayLog(selectedDayKey) || {};
+      if (!log.futurePlan) return;
+      saveDayLog(selectedDayKey, { ...log, futureReason: val });
     }
 
-    function scheduleFutureDay(key) {
-      const log = dayLog(key) || {};
-      saveDayLog(key, { ...log, scheduled: true });
-      renderDaySelector();
-      // Brief white success flash, then switch to Unschedule
-      const btn = el('futureScheduleBtn');
-      if (btn) {
-        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>&nbsp;Scheduled`;
-        btn.style.cssText = 'background:#ffffff;color:var(--success);border:1.5px solid var(--success-border);font-size:13px;height:40px;border-radius:10px;';
-        btn.disabled = true;
-        setTimeout(() => { btn.disabled = false; updateScheduleBtn(key); }, 1400);
-      }
-    }
 
-    function unscheduleFutureDay(key) {
-      const log = dayLog(key) || {};
-      const updated = { ...log, scheduled: false }; delete updated.futurePlan; delete updated.scheduled;
-      saveDayLog(key, updated);
-      updateScheduleBtn(key);
-      renderDaySelector();
-    }
+    // (scheduleFutureDay / unscheduleFutureDay removed — superseded by inline future-day plan UI)
 
     // Override label helper used in past-day view
     function overrideLabel(ov) {
@@ -3014,34 +3049,34 @@
       const _dayName = _pastDay?.name || 'Day';
       const _targetLabel = _dayName + "'s Target";
 
-      // Full Day Leave: show a clean status, no hours, no penalty stats
-      if (log?.override === 'leave') {
-        el('rcWorked').textContent = 'Full Day Leave';
-        el('rcWorked').style.color = '#3b82f6';
+      // Helper: reset all card state cleanly (no session data)
+      function _clearCardState() {
+        el('rcElapsedLabel').textContent = '';
+        el('rcElapsedLabel').style.color = '';
         el('rcRightCol').style.display = 'none';
-        _setTodayDateChip();
         el('progFill').style.width = '0%';
         el('progFill').classList.remove('done');
-        el('progLabel').textContent = 'Day marked as Full Day Leave';
         el('stayHint').style.display = 'none';
         el('otBanner').classList.remove('show');
         el('doneBanner').classList.remove('show');
-        el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label" style="color:#3b82f6">Full Day Leave</span></div>`;
+        el('autostopBanner')?.classList.remove('show');
+      }
+      // Full Day Leave: show a clean status, no hours, no session data
+      if (log?.override === 'leave') {
+        el('rcWorked').textContent = 'Full Day Leave';
+        el('rcWorked').style.color = '#3b82f6';
+        _clearCardState();
+        el('progLabel').textContent = 'Day marked as Full Day Leave';
+        el('rcToday').innerHTML = '';
         return;
       }
       // Holiday: similar clean state
       if (log?.override === 'holiday') {
         el('rcWorked').textContent = 'Holiday';
         el('rcWorked').style.color = '#22c55e';
-        el('rcRightCol').style.display = 'none';
-        _setTodayDateChip();
-        el('progFill').style.width = '0%';
-        el('progFill').classList.remove('done');
+        _clearCardState();
         el('progLabel').textContent = 'Day marked as Holiday';
-        el('stayHint').style.display = 'none';
-        el('otBanner').classList.remove('show');
-        el('doneBanner').classList.remove('show');
-        el('rcToday').innerHTML = `<div class="wk-target-row"><span class="section-label" style="color:#22c55e">Holiday</span></div>`;
+        el('rcToday').innerHTML = '';
         return;
       }
 
@@ -3773,11 +3808,14 @@
       if (btn) btn.innerHTML = refreshSvg + ' Refresh';
       const container = el('penaltiesList');
 
+      const tenDaysAgo = new Date(now); tenDaysAgo.setDate(tenDaysAgo.getDate() - 10); tenDaysAgo.setHours(0,0,0,0);
+
       if (!c.weeklyOn) {
         // ── DAILY MODE: flag each weekday below dailyH ──────────────────
         const penalties = [];
         const days = getWeekdaysInMonth(now.getFullYear(), now.getMonth());
         for (const d of days) {
+          if (new Date(d) < tenDaysAgo) continue; // discard items older than 10 days
           const key = dateKey(d);
           const log = dayLog(key);
           // Skip override days — holiday/leave reduce weekly target, not penalised
@@ -3817,8 +3855,9 @@
         for (const wk of weeks) {
           const monDate = new Date(wk.monKey + 'T00:00');
           const isCurrentWeek = monDate >= thisMonday;
-          // Only report on completed weeks (Mon of week is before this week's Monday)
+          // Only report on completed weeks; discard weeks older than 10 days
           if (isCurrentWeek) continue;
+          if (monDate < tenDaysAgo) continue;
 
           // Sum all logged hours in this week
           let totalSecs = 0, hasAnyData = false;
@@ -5094,6 +5133,52 @@ ${sig}`
       obUpdateSteps(1);
       el('obOverlay').style.display = 'flex';
 
+      // Shared handler: parse backup file, show summary, auto-fill forms
+      function _obHandleImportData(data, fileName) {
+        const snap = data.wh_backup_v2 ? { cfg: data.wh_backup_v2.cfg, days: data.wh_backup_v2.days }
+                   : data.cfg           ? { cfg: data.cfg, days: data.days }
+                   : null;
+        if (!snap) throw new Error('Unrecognised backup format');
+
+        // Apply data
+        Store.importSnap(data.wh_backup_v2 ? data : { ...data, cfg: snap.cfg, days: snap.days });
+
+        _obImported = true;
+        const c = snap.cfg || {};
+        const dayCount = Object.keys(snap.days || {}).length;
+        const userName = c.name || '';
+        const position = c.position || '';
+
+        // Show summary card
+        const statusEl = el('obImportStatus');
+        if (statusEl) {
+          statusEl.style.display = 'block';
+          statusEl.style.color = 'var(--foreground)';
+          statusEl.innerHTML = `
+            <div style="background:var(--muted);border-radius:10px;padding:14px 16px;text-align:left;margin-top:4px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:12px;font-weight:700;color:var(--success);margin-bottom:2px;display:flex;align-items:center;gap:6px">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Import Successful
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">File</span><span style="font-weight:500">${fileName || 'wh_log.json'}</span></div>
+              ${userName ? `<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">Name</span><span style="font-weight:500">${userName}</span></div>` : ''}
+              ${position ? `<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">Position</span><span style="font-weight:500">${position}</span></div>` : ''}
+              <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">Login Activities</span><span style="font-weight:500">${dayCount} day${dayCount !== 1 ? 's' : ''}</span></div>
+            </div>`;
+        }
+
+        // Auto-fill onboarding form fields from imported data
+        if (userName) { const f = el('obName'); if (f) f.value = userName; }
+        if (position) { const f = el('obPosition'); if (f) f.value = position; }
+        if (c.shiftStart) { const f = el('obShiftStart'); if (f) f.value = c.shiftStart; }
+        if (c.shiftEnd)   { const f = el('obShiftEnd');   if (f) f.value = c.shiftEnd;   }
+        if (c.includeSat != null) {
+          const chk = el('obIncludeSat'); if (chk) { chk.checked = !!c.includeSat; }
+        }
+
+        setTimeout(() => obStep(1), 1400);
+      }
+
       // Import file handler
       const fileInput = el('obImportFile');
       if (fileInput && !fileInput._obBound) {
@@ -5103,22 +5188,8 @@ ${sig}`
           if (!file) return;
           const reader = new FileReader();
           reader.onload = ev => {
-            try {
-              const data = JSON.parse(ev.target.result);
-              // Support wh_backup_v2 and raw cfg format
-              if (data.wh_backup_v2) {
-                const { cfg: c, days } = data.wh_backup_v2;
-                if (c) Store.setCfg(c);
-                if (days) Object.entries(days).forEach(([k, v]) => Store.set(KEY.day + k, v));
-              } else if (data.cfg) {
-                Store.setCfg(data.cfg);
-                if (data.days) Object.entries(data.days).forEach(([k, v]) => Store.set(KEY.day + k, v));
-              }
-              _obImported = true;
-              const statusEl = el('obImportStatus');
-              if (statusEl) { statusEl.textContent = '✓ Backup imported successfully'; statusEl.style.display = 'block'; statusEl.style.color = 'var(--success)'; }
-              setTimeout(() => obStep(1), 800);
-            } catch {
+            try { _obHandleImportData(JSON.parse(ev.target.result), file.name); }
+            catch {
               const statusEl = el('obImportStatus');
               if (statusEl) { statusEl.textContent = 'Invalid backup file. Please try again.'; statusEl.style.display = 'block'; statusEl.style.color = 'var(--destructive)'; }
             }
@@ -5151,21 +5222,8 @@ ${sig}`
           if (!file) return;
           const reader = new FileReader();
           reader.onload = ev => {
-            try {
-              const data = JSON.parse(ev.target.result);
-              if (data.wh_backup_v2) {
-                const { cfg: c, days } = data.wh_backup_v2;
-                if (c) Store.setCfg(c);
-                if (days) Object.entries(days).forEach(([k, v]) => Store.set(KEY.day + k, v));
-              } else if (data.cfg) {
-                Store.setCfg(data.cfg);
-                if (data.days) Object.entries(data.days).forEach(([k, v]) => Store.set(KEY.day + k, v));
-              }
-              _obImported = true;
-              const statusEl = el('obImportStatus');
-              if (statusEl) { statusEl.textContent = '✓ Backup imported successfully'; statusEl.style.display = 'block'; statusEl.style.color = 'var(--success)'; }
-              setTimeout(() => obStep(1), 800);
-            } catch {
+            try { _obHandleImportData(JSON.parse(ev.target.result), file.name); }
+            catch {
               const statusEl = el('obImportStatus');
               if (statusEl) { statusEl.textContent = 'Invalid backup file. Please try again.'; statusEl.style.display = 'block'; statusEl.style.color = 'var(--destructive)'; }
             }
@@ -5245,8 +5303,8 @@ ${sig}`
         setTimeout(openOnboarding, 300);
       }
 
-      // Show week plan modal if needed
-      if (shouldShowWeekPlan()) setTimeout(openWeekPlanModal, 1200);
+      // Show week plan modal if needed (only after onboarding is complete)
+      if (localStorage.getItem(OB_DONE_KEY) && shouldShowWeekPlan()) setTimeout(openWeekPlanModal, 1200);
     })();
   </script>
 
