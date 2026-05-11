@@ -113,6 +113,25 @@
       color: var(--foreground); transition: background .12s; display: inline-flex;
       align-items: center; gap: 5px; }
     .btn-sm:hover { background: var(--border); }
+    /* Danger Zone button variants */
+    .btn-danger { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 600;
+      border-radius: 8px; font-family: var(--font); display: inline-flex; align-items: center;
+      background: var(--destructive); color: #fff; border: none; cursor: pointer;
+      transition: opacity .12s; white-space: nowrap; flex-shrink: 0; }
+    .btn-danger:hover { opacity: .88; }
+    .btn-ghost-danger { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 600;
+      border-radius: 8px; font-family: var(--font); display: inline-flex; align-items: center;
+      background: transparent; color: var(--foreground); border: 1px solid var(--border);
+      cursor: pointer; transition: background .15s, color .15s, border-color .15s;
+      white-space: nowrap; flex-shrink: 0; }
+    .btn-ghost-danger:hover { background: var(--destructive-bg); color: var(--destructive); border-color: var(--destructive-border); }
+    .btn-ghost-danger:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-ghost-danger:disabled:hover { background: transparent; color: var(--foreground); border-color: var(--border); }
+    .btn-secondary { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 500;
+      border-radius: 8px; font-family: var(--font); display: inline-flex; align-items: center;
+      background: var(--muted); color: var(--foreground); border: 1px solid var(--border);
+      cursor: pointer; transition: background .12s; white-space: nowrap; flex-shrink: 0; }
+    .btn-secondary:hover { background: var(--border); }
 
     /* ── Input ── */
     .field-input { height: 40px; width: 100%; font-size: 14px; font-family: var(--font);
@@ -972,13 +991,8 @@
         </div>
         <div class="nav-actions">
           <button class="btn-icon" id="themeBtn" title="Theme · D">
-            <svg id="sunIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display: none;">
-              <circle cx="12" cy="12" r="4"></circle>
-              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
-            </svg>
-            <svg id="moonIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block;">
-              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
-            </svg>
+            <svg id="sunIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" style="display:none"><path d="M11.75 5.5C11.1977 5.5 10.75 5.05228 10.75 4.5V2C10.75 1.44772 11.1977 1 11.75 1H12.25C12.8023 1 13.25 1.44772 13.25 2V4.5C13.25 5.05228 12.8023 5.5 12.25 5.5H11.75Z" fill="currentColor"/><path d="M16.4194 7.22698C16.0289 6.83646 16.0289 6.20329 16.4194 5.81277L18.1872 4.045C18.5777 3.65447 19.2109 3.65447 19.6014 4.045L19.9549 4.39855C20.3455 4.78908 20.3455 5.42224 19.9549 5.81277L18.1872 7.58053C17.7967 7.97106 17.1635 7.97106 16.773 7.58053L16.4194 7.22698Z" fill="currentColor"/><path d="M18.5 11.75C18.5 11.1977 18.9477 10.75 19.5 10.75H22C22.5523 10.75 23 11.1977 23 11.75V12.25C23 12.8023 22.5523 13.25 22 13.25H19.5C18.9477 13.25 18.5 12.8023 18.5 12.25V11.75Z" fill="currentColor"/><path d="M16.7728 16.4194C17.1633 16.0289 17.7965 16.0289 18.187 16.4194L19.9548 18.1872C20.3453 18.5777 20.3453 19.2109 19.9548 19.6014L19.6012 19.9549C19.2107 20.3455 18.5775 20.3455 18.187 19.9549L16.4192 18.1872C16.0287 17.7967 16.0287 17.1635 16.4192 16.773L16.7728 16.4194Z" fill="currentColor"/><path d="M12.25 18.5C12.8023 18.5 13.25 18.9477 13.25 19.5V22C13.25 22.5523 12.8023 23 12.25 23H11.75C11.1977 23 10.75 22.5523 10.75 22V19.5C10.75 18.9477 11.1977 18.5 11.75 18.5H12.25Z" fill="currentColor"/><path d="M7.58059 16.773C7.97111 17.1635 7.97111 17.7967 7.58059 18.1872L5.81282 19.955C5.4223 20.3455 4.78913 20.3455 4.39861 19.955L4.04505 19.6014C3.65453 19.2109 3.65453 18.5778 4.04505 18.1872L5.81282 16.4195C6.20334 16.0289 6.83651 16.0289 7.22703 16.4195L7.58059 16.773Z" fill="currentColor"/><path d="M5.5 12.25C5.5 12.8023 5.05228 13.25 4.5 13.25H2C1.44772 13.25 1 12.8023 1 12.25V11.75C1 11.1977 1.44772 10.75 2 10.75H4.5C5.05228 10.75 5.5 11.1977 5.5 11.75V12.25Z" fill="currentColor"/><path d="M7.22722 7.58059C6.8367 7.97111 6.20353 7.97111 5.81301 7.58059L4.04524 5.81282C3.65472 5.4223 3.65472 4.78913 4.04524 4.39861L4.3988 4.04505C4.78932 3.65453 5.42248 3.65453 5.81301 4.04505L7.58078 5.81282C7.9713 6.20334 7.9713 6.83651 7.58078 7.22703L7.22722 7.58059Z" fill="currentColor"/><path d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12Z" fill="currentColor"/></svg>
+            <svg id="moonIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" style="display:block"><path d="M12.0557 3.59974C12.2752 3.2813 12.2913 2.86484 12.0972 2.53033C11.9031 2.19582 11.5335 2.00324 11.1481 2.03579C6.02351 2.46868 2 6.76392 2 12C2 17.5228 6.47715 22 12 22C17.236 22 21.5313 17.9764 21.9642 12.8518C21.9967 12.4664 21.8041 12.0968 21.4696 11.9027C21.1351 11.7086 20.7187 11.7248 20.4002 11.9443C19.4341 12.6102 18.2641 13 17 13C13.6863 13 11 10.3137 11 6.99996C11 5.73589 11.3898 4.56587 12.0557 3.59974Z" fill="currentColor"/></svg>
           </button>
           <button class="btn-icon" id="notifBtn" title="Notifications">
             <div class="notif-badge" id="notifBadge" style="display:none"></div>
@@ -1035,10 +1049,10 @@
           <span class="this-week-label" id="thisWeekLabel">This Week</span>
           <div class="this-week-nav">
             <button class="this-week-btn" id="weekPrevBtn" onclick="navDaySelectorDay(-1)" title="Previous day">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.7071 3.29289C17.0976 3.68342 17.0976 4.31658 16.7071 4.70711L9.41421 12L16.7071 19.2929C17.0976 19.6834 17.0976 20.3166 16.7071 20.7071C16.3166 21.0976 15.6834 21.0976 15.2929 20.7071L7.29289 12.7071C6.90237 12.3166 6.90237 11.6834 7.29289 11.2929L15.2929 3.29289C15.6834 2.90237 16.3166 2.90237 16.7071 3.29289Z" fill="currentColor"/></svg>
             </button>
             <button class="this-week-btn" id="weekNextBtn" onclick="navDaySelectorDay(1)" title="Next day" disabled>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.29289 3.29289C7.68342 2.90237 8.31658 2.90237 8.70711 3.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L8.70711 20.7071C8.31658 21.0976 7.68342 21.0976 7.29289 20.7071C6.90237 20.3166 6.90237 19.6834 7.29289 19.2929L14.5858 12L7.29289 4.70711C6.90237 4.31658 6.90237 3.68342 7.29289 3.29289Z" fill="currentColor"/></svg>
             </button>
           </div>
         </div>
@@ -1076,7 +1090,7 @@
           </div>
           <div style="display:flex;align-items:center;gap:10px">
             <button class="rc-update-btn" id="rcUpdateEntryBtn" onclick="openDayEditModal(selectedDayKey)">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.4324 4C18.2266 4 18.0227 4.04055 17.8325 4.11933C17.6423 4.19811 17.4695 4.31358 17.3239 4.45914L5.25659 16.5265L4.42524 19.5748L7.47353 18.7434L19.5409 6.67608C19.6864 6.53051 19.8019 6.3577 19.8807 6.16751C19.9595 5.97732 20 5.77348 20 5.56761C20 5.36175 19.9595 5.1579 19.8807 4.96771C19.8019 4.77752 19.6864 4.60471 19.5409 4.45914C19.3953 4.31358 19.2225 4.19811 19.0323 4.11933C18.8421 4.04055 18.6383 4 18.4324 4ZM17.0671 2.27157C17.5 2.09228 17.9639 2 18.4324 2C18.9009 2 19.3648 2.09228 19.7977 2.27157C20.2305 2.45086 20.6238 2.71365 20.9551 3.04493C21.2864 3.37621 21.5492 3.7695 21.7285 4.20235C21.9077 4.63519 22 5.09911 22 5.56761C22 6.03611 21.9077 6.50003 21.7285 6.93288C21.5492 7.36572 21.2864 7.75901 20.9551 8.09029L8.69996 20.3454C8.57691 20.4685 8.42387 20.5573 8.25597 20.6031L3.26314 21.9648C2.91693 22.0592 2.54667 21.9609 2.29292 21.7071C2.03917 21.4534 1.94084 21.0831 2.03526 20.7369L3.39694 15.7441C3.44273 15.5762 3.53154 15.4231 3.6546 15.3001L15.9097 3.04493C16.241 2.71365 16.6343 2.45086 17.0671 2.27157Z" fill="currentColor"/></svg>
               Update Entry
             </button>
             <span class="rc-head-date" id="rcHeadDate"></span>
@@ -1104,25 +1118,25 @@
           </div>
           <div id="rcToday"><div class="wk-target-row"><span class="section-label">Recommended</span><div class="wk-target-right"><span class="wk-target-val">9h 00m</span><span class="hint-sep">&nbsp;+&nbsp;</span><span class="hint-makeup">1h 00m</span></div></div></div>
           <div id="stayHint" class="stay-hint" style="display:none">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 18.5C12.5523 18.5 13 18.0523 13 17.5L13 10.5C13 9.94772 12.5523 9.5 12 9.5C11.4477 9.5 11 9.94772 11 10.5L11 17.5C11 18.0523 11.4477 18.5 12 18.5Z" fill="currentColor"/><path d="M12 8.5C12.8284 8.5 13.5 7.82843 13.5 7C13.5 6.17157 12.8284 5.5 12 5.5C11.1716 5.5 10.5 6.17157 10.5 7C10.5 7.82843 11.1716 8.5 12 8.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1C5.92487 1 1 5.92487 1 12ZM12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z" fill="currentColor"/></svg>
             <span id="stayHintText"></span>
           </div>
           <div class="banner banner-warning" id="otBanner">
             <div class="banner-left">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5.5C12.5523 5.5 13 5.94772 13 6.5L13 13.5C13 14.0523 12.5523 14.5 12 14.5C11.4477 14.5 11 14.0523 11 13.5L11 6.5C11 5.94772 11.4477 5.5 12 5.5Z" fill="currentColor"/><path d="M12 18.5C12.8284 18.5 13.5 17.8284 13.5 17C13.5 16.1716 12.8284 15.5 12 15.5C11.1716 15.5 10.5 16.1716 10.5 17C10.5 17.8284 11.1716 18.5 12 18.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12ZM12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3Z" fill="currentColor"/></svg>
               <span id="otMsg">+0h 00m overtime</span>
             </div>
             <span class="ot-quip" id="otQuip"></span>
           </div>
           <div class="banner banner-success" id="doneBanner">
             <div class="banner-left">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>
               <span id="doneMsg">You're done. Head out!</span>
             </div>
           </div>
           <div class="banner banner-autostop banner-warning" id="autostopBanner">
             <div class="banner-left">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5.5C12.5523 5.5 13 5.94772 13 6.5L13 13.5C13 14.0523 12.5523 14.5 12 14.5C11.4477 14.5 11 14.0523 11 13.5L11 6.5C11 5.94772 11.4477 5.5 12 5.5Z" fill="currentColor"/><path d="M12 18.5C12.8284 18.5 13.5 17.8284 13.5 17C13.5 16.1716 12.8284 15.5 12 15.5C11.1716 15.5 10.5 16.1716 10.5 17C10.5 17.8284 11.1716 18.5 12 18.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12ZM12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3Z" fill="currentColor"/></svg>
               <span id="autostopMsg">Tracking auto-stopped at daily target + buffer.</span>
             </div>
           </div>
@@ -1134,7 +1148,7 @@
         <!-- Single combo: input + button inside -->
         <div class="shift-combo" id="shiftInputRow">
           <button type="button" class="shift-tp-btn" id="loginTpBtn" onclick="openTpModal('loginInput',event)" title="Pick start time">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
           </button>
           <input class="shift-combo-input" id="loginInput" type="text" placeholder="Enter Time" autocomplete="off" spellcheck="false">
           <span class="shift-combo-active-label" id="shiftActiveLabel">—</span>
@@ -1159,11 +1173,11 @@
       <!-- Week navigation -->
       <div class="an-week-nav">
         <button class="an-nav-btn" id="wkPrevBtn" title="Previous week">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.7071 3.29289C17.0976 3.68342 17.0976 4.31658 16.7071 4.70711L9.41421 12L16.7071 19.2929C17.0976 19.6834 17.0976 20.3166 16.7071 20.7071C16.3166 21.0976 15.6834 21.0976 15.2929 20.7071L7.29289 12.7071C6.90237 12.3166 6.90237 11.6834 7.29289 11.2929L15.2929 3.29289C15.6834 2.90237 16.3166 2.90237 16.7071 3.29289Z" fill="currentColor"/></svg>
         </button>
         <span class="an-week-nav-label" id="wkNavLabel">April 13–17</span>
         <button class="an-nav-btn" id="wkNextBtn" title="Next week" disabled="">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.29289 3.29289C7.68342 2.90237 8.31658 2.90237 8.70711 3.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L8.70711 20.7071C8.31658 21.0976 7.68342 21.0976 7.29289 20.7071C6.90237 20.3166 6.90237 19.6834 7.29289 19.2929L14.5858 12L7.29289 4.70711C6.90237 4.31658 6.90237 3.68342 7.29289 3.29289Z" fill="currentColor"/></svg>
         </button>
       </div>
 
@@ -1238,7 +1252,7 @@
         <div class="analytics-card-head">
           <span class="analytics-card-title">Your Penalties</span>
           <button class="btn-sm" id="penaltiesCheck">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M2.06095 10.8901C2.61379 5.88912 6.85202 2 12 2C14.2365 2 16.0402 2.88495 17.581 4.0323C18.4275 4.66267 19.2351 5.40719 20 6.14376V3C20 2.44771 20.4477 2 21 2C21.5523 2 22 2.44771 22 3V8.5C22 9.05228 21.5523 9.5 21 9.5H15.5C14.9477 9.5 14.5 9.05228 14.5 8.5C14.5 7.94772 14.9477 7.5 15.5 7.5H18.5243C17.8281 6.82979 17.1371 6.19538 16.3865 5.6364C15.054 4.64418 13.662 4 12 4C7.88281 4 4.4909 7.11098 4.04884 11.1099C3.98816 11.6588 3.49396 12.0546 2.94502 11.9939C2.39608 11.9333 2.00027 11.4391 2.06095 10.8901Z" fill="currentColor"/><path d="M21.9939 13.1099C21.441 18.1109 17.2028 22 12.0548 22C9.81834 22 8.0146 21.115 6.47383 19.9677C5.62731 19.3373 4.8197 18.5928 4.05481 17.8562V21C4.05481 21.5523 3.60709 22 3.05481 22C2.50253 22 2.05481 21.5523 2.05481 21V15.5C2.05481 14.9477 2.50253 14.5 3.05481 14.5H8.55481C9.1071 14.5 9.55481 14.9477 9.55481 15.5C9.55481 16.0523 9.1071 16.5 8.55481 16.5H5.53052C6.22675 17.1702 6.91769 17.8046 7.66834 18.3636C9.0008 19.3558 10.3928 20 12.0548 20C16.172 20 19.5639 16.889 20.006 12.8901C20.0667 12.3412 20.5608 11.9454 21.1098 12.0061C21.6587 12.0667 22.0545 12.5609 21.9939 13.1099Z" fill="currentColor"/></svg>
             Refresh
           </button>
         </div>
@@ -1282,7 +1296,7 @@
         <div class="settings-card" id="cardGeneral">
           <div class="settings-card-head" onclick="toggleCard('cardGeneral')">
             <div class="section-label">Basic</div>
-            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.29289 7.29289C3.68342 6.90237 4.31658 6.90237 4.70711 7.29289L12 14.5858L19.2929 7.29289C19.6834 6.90237 20.3166 6.90237 20.7071 7.29289C21.0976 7.68342 21.0976 8.31658 20.7071 8.70711L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L3.29289 8.70711C2.90237 8.31658 2.90237 7.68342 3.29289 7.29289Z" fill="currentColor"/></svg>
           </div>
           <div class="settings-card-body">
           <div class="settings-group">
@@ -1325,7 +1339,7 @@
         <div class="settings-card" id="cardAdvanced">
           <div class="settings-card-head" onclick="toggleCard('cardAdvanced')">
             <div class="section-label">Advanced</div>
-            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.29289 7.29289C3.68342 6.90237 4.31658 6.90237 4.70711 7.29289L12 14.5858L19.2929 7.29289C19.6834 6.90237 20.3166 6.90237 20.7071 7.29289C21.0976 7.68342 21.0976 8.31658 20.7071 8.70711L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L3.29289 8.70711C2.90237 8.31658 2.90237 7.68342 3.29289 7.29289Z" fill="currentColor"/></svg>
           </div>
           <div class="settings-card-body">
           <div class="settings-group">
@@ -1341,7 +1355,7 @@
                   <input type="time" id="inpShiftStartPicker" tabindex="-1"
                     style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
                   <button type="button" class="tp-icon-btn" onclick="openTpModal('inpShiftStart',event)" title="Pick time">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
                   </button>
                 </div>
                 <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">to</span>
@@ -1351,7 +1365,7 @@
                   <input type="time" id="inpShiftEndPicker" tabindex="-1"
                     style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
                   <button type="button" class="tp-icon-btn" onclick="openTpModal('inpShiftEnd',event)" title="Pick time">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
                   </button>
                 </div>
               </div>
@@ -1422,7 +1436,7 @@
         <div class="settings-card" id="cardOther">
           <div class="settings-card-head" onclick="toggleCard('cardOther')">
             <div class="section-label">System</div>
-            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.29289 7.29289C3.68342 6.90237 4.31658 6.90237 4.70711 7.29289L12 14.5858L19.2929 7.29289C19.6834 6.90237 20.3166 6.90237 20.7071 7.29289C21.0976 7.68342 21.0976 8.31658 20.7071 8.70711L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L3.29289 8.70711C2.90237 8.31658 2.90237 7.68342 3.29289 7.29289Z" fill="currentColor"/></svg>
           </div>
           <div class="settings-card-body">
           <div class="settings-group">
@@ -1450,12 +1464,12 @@
                 </div>
                 <div style="display:flex;gap:8px;flex-shrink:0">
                   <label class="btn-sm" style="height:36px;font-size:13px;padding:0 14px;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M11 4C8.37318 4 6.2324 5.99599 6.01793 8.51595C5.98608 8.89012 5.74729 9.21492 5.39963 9.35691C3.3976 10.1746 2 12.1199 2 14.3783C2 16.2952 3.00543 17.9848 4.53512 18.9537C5.00168 19.2493 5.14031 19.8671 4.84477 20.3336C4.54923 20.8002 3.93143 20.9388 3.46488 20.6433C1.38625 19.3266 0 17.0152 0 14.3783C0 11.4804 1.67256 8.9777 4.10178 7.75216C4.66997 4.47797 7.54913 2 11 2C13.8191 2 16.2533 3.65235 17.362 6.03971C19.4286 6.43792 21 8.24044 21 10.4206C21 10.7714 20.959 11.1133 20.8815 11.4415C22.7225 12.3197 24 14.186 24 16.3571C24 18.2066 23.0706 19.8374 21.6596 20.8205C21.2065 21.1362 20.5832 21.0248 20.2675 20.5717C19.9518 20.1185 20.0632 19.4952 20.5163 19.1795C21.4183 18.5511 22 17.5193 22 16.3571C22 14.7492 20.882 13.3863 19.3555 13.0085C19.056 12.9344 18.8075 12.7261 18.6821 12.4442C18.5567 12.1623 18.5684 11.8383 18.7139 11.5662C18.8965 11.2247 19 10.8359 19 10.4206C19 9.10788 17.9516 8.0197 16.6155 7.96031C16.2093 7.94225 15.8545 7.68006 15.7179 7.29708C15.0347 5.38045 13.1833 4 11 4Z" fill="currentColor"/><path d="M7.29289 16.7071C7.68342 17.0976 8.31658 17.0976 8.70711 16.7071L11 14.4142V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V14.4142L15.2929 16.7071C15.6834 17.0976 16.3166 17.0976 16.7071 16.7071C17.0976 16.3166 17.0976 15.6834 16.7071 15.2929L12.7071 11.2929C12.3166 10.9024 11.6834 10.9024 11.2929 11.2929L7.29289 15.2929C6.90237 15.6834 6.90237 16.3166 7.29289 16.7071Z" fill="currentColor"/></svg>
                     Import
                     <input type="file" id="logFileInput" accept=".json" style="display:none">
                   </label>
                   <button class="btn-sm" id="manualExportBtn" style="height:36px;font-size:13px;padding:0 14px">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M7.70711 10.2929L11 13.5858L11 3C11 2.44771 11.4477 2 12 2C12.5523 2 13 2.44771 13 3L13 13.5858L16.2929 10.2929C16.6834 9.90237 17.3166 9.90237 17.7071 10.2929C18.0976 10.6834 18.0976 11.3166 17.7071 11.7071L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L6.29289 11.7071C5.90237 11.3166 5.90237 10.6834 6.29289 10.2929C6.68342 9.90237 7.31658 9.90237 7.70711 10.2929Z" fill="currentColor"/><path d="M4 22C3.44772 22 3 21.5523 3 21C3 20.4477 3.44772 20 4 20H20C20.5523 20 21 20.4477 21 21C21 21.5523 20.5523 22 20 22H4Z" fill="currentColor"/></svg>
                     Export
                   </button>
                 </div>
@@ -1490,7 +1504,7 @@
         </div>
 
         <!-- Danger Zone -->
-        <div class="settings-card" style="border-color:var(--destructive-border)">
+        <div class="settings-card">
           <div class="settings-card-head" style="cursor:default">
             <div class="section-label" style="color:var(--destructive)">Danger Zone</div>
           </div>
@@ -1503,10 +1517,7 @@
                   <div class="form-label">Delete Account</div>
                   <div class="form-sub">We'll keep your data for 48 hours before permanently removing it.</div>
                 </div>
-                <button class="btn-sm" onclick="openDeleteModal()"
-                  style="height:32px;padding:0 14px;font-size:12px;font-weight:600;flex-shrink:0;background:transparent;color:var(--destructive);border-color:var(--destructive-border)">
-                  Delete Forever
-                </button>
+                <button class="btn-ghost-danger" onclick="openDeleteModal()">Delete Forever</button>
               </div>
 
               <div style="height:1px;background:var(--border)"></div>
@@ -1517,10 +1528,7 @@
                   <div class="form-label">Log Out</div>
                   <div class="form-sub">Sign out of your Murph account on this device.</div>
                 </div>
-                <button class="btn-sm" onclick="openLogoutModal()"
-                  style="height:32px;padding:0 14px;font-size:12px;font-weight:600;flex-shrink:0;color:var(--destructive);border-color:var(--destructive-border);background:var(--destructive-bg)">
-                  Log Out
-                </button>
+                <button class="btn-danger" onclick="openLogoutModal()">Log Out</button>
               </div>
 
             </div>
@@ -1541,11 +1549,8 @@
         <div class="dialog-desc">You'll be taken back to the login screen. Your data stays safe.</div>
       </div>
       <div style="padding:20px;display:flex;justify-content:flex-end;gap:8px">
-        <button class="btn btn-cancel" onclick="el('logoutOverlay').classList.remove('open')" style="height:40px;width:auto;padding:0 18px">Cancel</button>
-        <button class="btn" onclick="confirmLogout()"
-          style="height:40px;width:auto;padding:0 18px;background:var(--destructive);color:#fff;border:none;font-weight:600">
-          Log Out
-        </button>
+        <button class="btn-secondary" onclick="el('logoutOverlay').classList.remove('open')">Stay Back</button>
+        <button class="btn-danger" onclick="confirmLogout()">Log Out</button>
       </div>
     </div>
   </div>
@@ -1566,18 +1571,15 @@
               oninput="el('deleteConfirmBtn').disabled = this.value.length < 1">
             <button type="button" onclick="toggleDeletePwd()" title="Show / hide"
               style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted-fg);padding:4px;display:flex;align-items:center">
-              <svg id="delEyeOpen" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <svg id="delEyeClose" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              <svg id="delEyeOpen" width="15" height="15" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 7.5C9.51472 7.5 7.5 9.51472 7.5 12C7.5 14.4853 9.51472 16.5 12 16.5C14.4853 16.5 16.5 14.4853 16.5 12C16.5 9.51472 14.4853 7.5 12 7.5ZM9.5 12C9.5 10.6193 10.6193 9.5 12 9.5C13.3807 9.5 14.5 10.6193 14.5 12C14.5 13.3807 13.3807 14.5 12 14.5C10.6193 14.5 9.5 13.3807 9.5 12Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 4.5C7.80929 4.5 4.80639 6.84327 2.90291 9.0685C1.94666 10.1864 1.24437 11.2998 0.780976 12.1325C0.548666 12.55 0.374765 12.8998 0.257664 13.1484C0.199077 13.2727 0.154596 13.372 0.124031 13.4419C0.108745 13.4769 0.096929 13.5046 0.08856 13.5245L0.07858 13.5483L0.07553 13.5557L0.07448 13.5583L0.07408 13.5593L0 11.9371L0.07408 13.5593L0 11.9371C0 11.9371 0.06469 12.291 0.06469 12.291L0.06508 12.292L0.06608 12.2947L0.06899 12.3023L0.07847 12.3266C0.08641 12.3469 0.09762 12.3751 0.11215 12.4107C0.14119 12.482 0.1835 12.583 0.23944 12.7095C0.35125 12.9623 0.5179 13.318 0.74225 13.7424C1.18972 14.5889 1.87318 15.7209 2.81783 16.8577C4.70146 19.1243 7.70693 21.5 12 21.5C16.293 21.5 19.2985 19.1243 21.1821 16.8577C22.1267 15.7209 22.8102 14.5889 23.2577 13.7424C23.482 13.318 23.6487 12.9623 23.7605 12.7095C23.8164 12.583 23.8587 12.482 23.8878 12.4107C23.9023 12.3751 23.9135 12.3469 23.9215 12.3266L23.9309 12.3023L23.9338 12.2947L23.9348 12.292L23.9352 12.291C23.9352 12.291 24.074 11.9233 24 11.9371L23.9352 12.291L24.074 11.9233L23.9258 11.5593C23.903 11.5046 23.8912 11.4769 23.8759 11.4419C23.8453 11.372 23.8008 11.2727 23.7423 11.1484C23.6252 10.8998 23.4513 10.55 23.2189 10.1325C22.7556 9.29981 22.0533 8.18638 21.097 7.0685C19.1935 4.84327 16.1906 2.5 12 2.5C7.80929 2.5 4.80639 4.84327 2.90291 7.0685ZM2.5104 12.8077C2.32531 12.4576 2.18603 12.1632 2.09077 11.9504C2.1909 11.7404 2.33654 11.4501 2.52859 11.105C2.94555 10.3558 3.57468 9.35995 4.42272 8.36857C6.12781 6.37527 8.62491 4.5 12 4.5C15.375 4.5 17.8721 6.37527 19.5772 8.36857C20.4252 9.35995 21.0544 10.3558 21.4713 11.105C21.6634 11.4501 21.809 11.7404 21.9092 11.9504C21.8139 12.1632 21.6746 12.4576 21.4895 12.8077C21.0883 13.5667 20.4782 14.5754 19.6439 15.5794C17.9696 17.5942 15.475 19.5 12 19.5C8.52489 19.5 6.03035 17.5942 4.35602 15.5794C3.52168 14.5754 2.91166 13.5667 2.5104 12.8077Z" fill="currentColor"/></svg>
+              <svg id="delEyeClose" width="15" height="15" viewBox="0 0 24 24" fill="none" style="display:none"><path fill-rule="evenodd" clip-rule="evenodd" d="M23.7071 0.292893C24.0976 0.683417 24.0976 1.31658 23.7071 1.70711L1.70711 23.7071C1.31658 24.0976 0.683417 24.0976 0.292893 23.7071C-0.0976311 23.3166 -0.0976311 22.6834 0.292893 22.2929L4.23434 18.3514C2.9164 17.1406 1.94176 15.7855 1.2732 14.6799C0.867646 14.0092 0.5691 13.421 0.370612 12.9971C0.271255 12.785 0.196646 12.6133 0.145961 12.4922C0.12061 12.4317 0.101217 12.3838 0.0876805 12.3497L0.0717465 12.3091L0.067044 12.2969L0.0655043 12.2928L0.0649367 12.2913C0.0645038 12.2902 1.00008 11.9371 0.074198 11.5593C0.0746014 11.5583 0.0756485 11.5557 0.0787059 11.5483L0.0886819 11.5245C0.0970512 11.5046 0.108867 11.4769 0.124153 11.4419C0.154718 11.372 0.199199 11.2727 0.257786 11.1484C0.374887 10.8998 0.548788 10.55 0.781098 10.1325C1.24449 9.29981 1.94679 8.18638 2.90303 7.0685C4.80651 4.84327 7.80941 2.5 12.0001 2.5C14.4526 2.5 16.5053 3.30553 18.165 4.42081L22.2929 0.292893C22.6834 -0.0976311 23.3166 -0.0976311 23.7071 0.292893ZM9.67199 12.9138L12.9138 9.67199C12.6308 9.56087 12.3227 9.5 12 9.5C10.6193 9.5 9.5 10.6193 9.5 12C9.5 12.3227 9.56087 12.6308 9.67199 12.9138ZM14.3956 8.19018C13.702 7.75332 12.8801 7.5 12 7.5C9.51472 7.5 7.5 9.51472 7.5 12C7.5 12.8801 7.75332 13.702 8.19018 14.3956L5.65003 16.9358C4.48386 15.8793 3.60174 14.6655 2.98463 13.645C2.62146 13.0444 2.35559 12.5199 2.18184 12.1489C2.19102 11.7404 2.33667 11.4501 2.52871 11.105C2.94567 10.3558 3.57481 9.35995 4.42285 8.36856C6.12793 6.37527 8.62503 4.5 12.0001 4.5C13.8295 4.5 15.395 5.04849 16.7186 5.8672L14.3956 8.19018Z" fill="currentColor"/><path d="M20.6071 7.99677C21.0547 7.6733 21.6798 7.77395 22.0033 8.22159C22.6476 9.11312 23.1239 9.93792 23.4403 10.542C23.5987 10.8445 23.7178 11.0931 23.7984 11.2688C23.8387 11.3567 23.8694 11.4264 23.8907 11.4757C23.9013 11.5004 23.9096 11.5199 23.9155 11.5341L23.9227 11.5512L23.9249 11.5567L23.9257 11.5586L23.9262 11.5598L23.0001 11.9371L23.9354 12.291L23.935 12.292L23.934 12.2947L23.9311 12.3023L23.9216 12.3266C23.9136 12.3469 23.9024 12.3751 23.8879 12.4107C23.8589 12.482 23.8165 12.583 23.7606 12.7095C23.6488 12.9623 23.4821 13.318 23.2578 13.7424C22.8103 14.5889 22.1269 15.7209 21.1822 16.8577C19.2986 19.1243 16.2931 21.5 12.0001 21.5C11.1273 21.5 10.3032 21.4013 9.5276 21.2228C8.98937 21.099 8.65343 20.5623 8.77726 20.0241C8.90108 19.4859 9.43778 19.1499 9.97601 19.2737C10.6058 19.4186 11.2795 19.5 12.0001 19.5C15.4752 19.5 17.9697 17.5942 19.644 15.5794C20.4784 14.5754 21.0884 13.5667 21.4896 12.8077C21.6747 12.4576 21.814 12.1632 21.9093 11.9504C21.8469 11.8195 21.7667 11.6573 21.6686 11.4699C21.3866 10.9316 20.9593 10.1915 20.3823 9.393C20.0588 8.94536 20.1594 8.32025 20.6071 7.99677Z" fill="currentColor"/></svg>
             </button>
           </div>
         </div>
       </div>
       <div style="padding:0 20px 20px;display:flex;justify-content:flex-end;gap:8px">
-        <button class="btn btn-cancel" onclick="closeDeleteModal()" style="height:40px;width:auto;padding:0 18px">Cancel</button>
-        <button class="btn" id="deleteConfirmBtn" onclick="confirmDeleteProfile()" disabled
-          style="height:40px;width:auto;padding:0 18px;background:var(--destructive);color:#fff;border:none;font-weight:600;transition:opacity .15s">
-          Delete Forever
-        </button>
+        <button class="btn-secondary" onclick="closeDeleteModal()">Keep Account</button>
+        <button class="btn-ghost-danger" id="deleteConfirmBtn" onclick="confirmDeleteProfile()" disabled>Delete Forever</button>
       </div>
     </div>
   </div>
@@ -1684,7 +1686,7 @@
       <div class="dialog-foot">
         <div style="display:flex;align-items:center;gap:8px">
           <button class="btn-sm" id="importSaveLogBtn" style="height:34px;font-size:12px;padding:0 12px;flex-shrink:0">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save Log
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px"><path fill-rule="evenodd" clip-rule="evenodd" d="M5 2C4.20435 2 3.44129 2.31607 2.87868 2.87868C2.31607 3.44129 2 4.20435 2 5V19C2 19.7957 2.31607 20.5587 2.87868 21.1213C3.44129 21.6839 4.20435 22 5 22H19C19.7957 22 20.5587 21.6839 21.1213 21.1213C21.6839 20.5587 22 19.7957 22 19V8C22 7.73478 21.8946 7.48043 21.7071 7.29289L16.7071 2.29289C16.5196 2.10536 16.2652 2 16 2H5ZM5 4C4.73478 4 4.48043 4.10536 4.29289 4.29289C4.10536 4.48043 4 4.73478 4 5V19C4 19.2652 4.10536 19.5196 4.29289 19.7071C4.48043 19.8946 4.73478 20 5 20H6V13C6 12.4477 6.44772 12 7 12H17C17.5523 12 18 12.4477 18 13V20H19C19.2652 20 19.5196 19.8946 19.7071 19.7071C19.8946 19.5196 20 19.2652 20 19V8.41421L15.5858 4H9V7H16C16.5523 7 17 7.44772 17 8C17 8.55228 16.5523 9 16 9H8C7.44772 9 7 8.55228 7 8V4H5ZM8 14V20H16V14H8Z" fill="currentColor"/></svg>Save Log
           </button>
           <div style="flex:1"></div>
           <button class="btn btn-cancel" id="importCancelBtn" style="width:auto;padding:0 16px;height:38px;font-size:13px">Cancel</button>
@@ -1711,14 +1713,14 @@
           <div style="position:relative;flex:1" class="time-input-wrap">
             <input type="text" class="field-input" id="deStart" placeholder="Start time" autocomplete="off" style="padding-left:38px">
             <button type="button" class="tp-icon-btn" onclick="openTpModal('deStart',event)" title="Pick time">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
             </button>
           </div>
           <span class="modal-time-sep">–</span>
           <div style="position:relative;flex:1" class="time-input-wrap">
             <input type="text" class="field-input" id="deEnd" placeholder="End time (optional)" autocomplete="off" style="padding-left:38px">
             <button type="button" class="tp-icon-btn" onclick="openTpModal('deEnd',event)" title="Pick time">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
             </button>
           </div>
         </div>
@@ -2197,9 +2199,9 @@
 
       if (!notifs.length) { list.innerHTML = `<div class="notif-empty">No notifications right now.</div>`; return; }
 
-      const warnSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
-      const okSvg   = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
-      const infoSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+      const warnSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 5.5C12.5523 5.5 13 5.94772 13 6.5L13 13.5C13 14.0523 12.5523 14.5 12 14.5C11.4477 14.5 11 14.0523 11 13.5L11 6.5C11 5.94772 11.4477 5.5 12 5.5Z" fill="currentColor"/><path d="M12 18.5C12.8284 18.5 13.5 17.8284 13.5 17C13.5 16.1716 12.8284 15.5 12 15.5C11.1716 15.5 10.5 16.1716 10.5 17C10.5 17.8284 11.1716 18.5 12 18.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12ZM12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3Z" fill="currentColor"/></svg>`;
+      const okSvg   = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>`;
+      const infoSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 18.5C12.5523 18.5 13 18.0523 13 17.5L13 10.5C13 9.94772 12.5523 9.5 12 9.5C11.4477 9.5 11 9.94772 11 10.5L11 17.5C11 18.0523 11.4477 18.5 12 18.5Z" fill="currentColor"/><path d="M12 8.5C12.8284 8.5 13.5 7.82843 13.5 7C13.5 6.17157 12.8284 5.5 12 5.5C11.1716 5.5 10.5 6.17157 10.5 7C10.5 7.82843 11.1716 8.5 12 8.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1C5.92487 1 1 5.92487 1 12ZM12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z" fill="currentColor"/></svg>`;
 
       list.innerHTML = notifs.map(n => {
         const icon = n.type === 'warn' ? warnSvg : n.type === 'ok' ? okSvg : infoSvg;
@@ -2212,7 +2214,7 @@
           <div class="notif-icon ${n.type}">${icon}</div>
           <div class="notif-body"><div class="notif-text">${n.text}</div>${actions}</div>
           <button class="notif-dismiss" onclick="dismissNotif('${n.id}')" title="Dismiss">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M4.70711 3.29289C4.31658 2.90237 3.68342 2.90237 3.29289 3.29289C2.90237 3.68342 2.90237 4.31658 3.29289 4.70711L10.5858 12L3.29289 19.2929C2.90237 19.6834 2.90237 20.3166 3.29289 20.7071C3.68342 21.0976 4.31658 21.0976 4.70711 20.7071L12 13.4142L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L13.4142 12L20.7071 4.70711C21.0976 4.31658 21.0976 3.68342 20.7071 3.29289C20.3166 2.90237 19.6834 2.90237 19.2929 3.29289L12 10.5858L4.70711 3.29289Z" fill="currentColor"/></svg>
           </button>
         </div>`;
       }).join('');
@@ -2281,7 +2283,7 @@
         }
       }
 
-      const clockSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+      const clockSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>`;
 
       const ioHtml = `<div class="rc-io-row">
         <div class="rc-io-box${loginDate ? ' editable' : ''}" id="inTimeBox" ${loginDate ? `onclick="openTpModal('inTimeEditInput',event,'Log In',()=>saveInTimeEdit())"` : ''}>
@@ -3280,7 +3282,7 @@
           const editBtn = document.createElement('button');
           editBtn.className = 'wk-edit-icon-btn';
           editBtn.title = 'Edit day';
-          editBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+          editBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.4324 4C18.2266 4 18.0227 4.04055 17.8325 4.11933C17.6423 4.19811 17.4695 4.31358 17.3239 4.45914L5.25659 16.5265L4.42524 19.5748L7.47353 18.7434L19.5409 6.67608C19.6864 6.53051 19.8019 6.3577 19.8807 6.16751C19.9595 5.97732 20 5.77348 20 5.56761C20 5.36175 19.9595 5.1579 19.8807 4.96771C19.8019 4.77752 19.6864 4.60471 19.5409 4.45914C19.3953 4.31358 19.2225 4.19811 19.0323 4.11933C18.8421 4.04055 18.6383 4 18.4324 4ZM17.0671 2.27157C17.5 2.09228 17.9639 2 18.4324 2C18.9009 2 19.3648 2.09228 19.7977 2.27157C20.2305 2.45086 20.6238 2.71365 20.9551 3.04493C21.2864 3.37621 21.5492 3.7695 21.7285 4.20235C21.9077 4.63519 22 5.09911 22 5.56761C22 6.03611 21.9077 6.50003 21.7285 6.93288C21.5492 7.36572 21.2864 7.75901 20.9551 8.09029L8.69996 20.3454C8.57691 20.4685 8.42387 20.5573 8.25597 20.6031L3.26314 21.9648C2.91693 22.0592 2.54667 21.9609 2.29292 21.7071C2.03917 21.4534 1.94084 21.0831 2.03526 20.7369L3.39694 15.7441C3.44273 15.5762 3.53154 15.4231 3.6546 15.3001L15.9097 3.04493C16.241 2.71365 16.6343 2.45086 17.0671 2.27157Z" fill="currentColor"/></svg>';
           editBtn.addEventListener('click', e => { e.stopPropagation(); openDayEditModal(day.key); });
           rightWrap.appendChild(editBtn);
           row.appendChild(rightWrap);
@@ -3328,7 +3330,7 @@
             const missEditBtn = document.createElement('button');
             missEditBtn.className = 'wk-edit-icon-btn';
             missEditBtn.title = 'Edit day';
-            missEditBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+            missEditBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.4324 4C18.2266 4 18.0227 4.04055 17.8325 4.11933C17.6423 4.19811 17.4695 4.31358 17.3239 4.45914L5.25659 16.5265L4.42524 19.5748L7.47353 18.7434L19.5409 6.67608C19.6864 6.53051 19.8019 6.3577 19.8807 6.16751C19.9595 5.97732 20 5.77348 20 5.56761C20 5.36175 19.9595 5.1579 19.8807 4.96771C19.8019 4.77752 19.6864 4.60471 19.5409 4.45914C19.3953 4.31358 19.2225 4.19811 19.0323 4.11933C18.8421 4.04055 18.6383 4 18.4324 4ZM17.0671 2.27157C17.5 2.09228 17.9639 2 18.4324 2C18.9009 2 19.3648 2.09228 19.7977 2.27157C20.2305 2.45086 20.6238 2.71365 20.9551 3.04493C21.2864 3.37621 21.5492 3.7695 21.7285 4.20235C21.9077 4.63519 22 5.09911 22 5.56761C22 6.03611 21.9077 6.50003 21.7285 6.93288C21.5492 7.36572 21.2864 7.75901 20.9551 8.09029L8.69996 20.3454C8.57691 20.4685 8.42387 20.5573 8.25597 20.6031L3.26314 21.9648C2.91693 22.0592 2.54667 21.9609 2.29292 21.7071C2.03917 21.4534 1.94084 21.0831 2.03526 20.7369L3.39694 15.7441C3.44273 15.5762 3.53154 15.4231 3.6546 15.3001L15.9097 3.04493C16.241 2.71365 16.6343 2.45086 17.0671 2.27157Z" fill="currentColor"/></svg>';
             missEditBtn.addEventListener('click', e => { e.stopPropagation(); openDayEditModal(day.key); });
             rightWrap.appendChild(missEditBtn);
             row.appendChild(rightWrap);
@@ -3343,7 +3345,7 @@
           const editBtn = document.createElement('button');
           editBtn.className = 'wk-edit-icon-btn';
           editBtn.title = 'Edit day';
-          editBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+          editBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.4324 4C18.2266 4 18.0227 4.04055 17.8325 4.11933C17.6423 4.19811 17.4695 4.31358 17.3239 4.45914L5.25659 16.5265L4.42524 19.5748L7.47353 18.7434L19.5409 6.67608C19.6864 6.53051 19.8019 6.3577 19.8807 6.16751C19.9595 5.97732 20 5.77348 20 5.56761C20 5.36175 19.9595 5.1579 19.8807 4.96771C19.8019 4.77752 19.6864 4.60471 19.5409 4.45914C19.3953 4.31358 19.2225 4.19811 19.0323 4.11933C18.8421 4.04055 18.6383 4 18.4324 4ZM17.0671 2.27157C17.5 2.09228 17.9639 2 18.4324 2C18.9009 2 19.3648 2.09228 19.7977 2.27157C20.2305 2.45086 20.6238 2.71365 20.9551 3.04493C21.2864 3.37621 21.5492 3.7695 21.7285 4.20235C21.9077 4.63519 22 5.09911 22 5.56761C22 6.03611 21.9077 6.50003 21.7285 6.93288C21.5492 7.36572 21.2864 7.75901 20.9551 8.09029L8.69996 20.3454C8.57691 20.4685 8.42387 20.5573 8.25597 20.6031L3.26314 21.9648C2.91693 22.0592 2.54667 21.9609 2.29292 21.7071C2.03917 21.4534 1.94084 21.0831 2.03526 20.7369L3.39694 15.7441C3.44273 15.5762 3.53154 15.4231 3.6546 15.3001L15.9097 3.04493C16.241 2.71365 16.6343 2.45086 17.0671 2.27157Z" fill="currentColor"/></svg>';
           editBtn.addEventListener('click', e => { e.stopPropagation(); openDayEditModal(day.key); });
           rightWrap.appendChild(editBtn);
           row.appendChild(rightWrap);
@@ -3890,7 +3892,7 @@
     function renderPenalties() {
       const c = cfg();
       const now = new Date();
-      const refreshSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
+      const refreshSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M2.06095 10.8901C2.61379 5.88912 6.85202 2 12 2C14.2365 2 16.0402 2.88495 17.581 4.0323C18.4275 4.66267 19.2351 5.40719 20 6.14376V3C20 2.44771 20.4477 2 21 2C21.5523 2 22 2.44771 22 3V8.5C22 9.05228 21.5523 9.5 21 9.5H15.5C14.9477 9.5 14.5 9.05228 14.5 8.5C14.5 7.94772 14.9477 7.5 15.5 7.5H18.5243C17.8281 6.82979 17.1371 6.19538 16.3865 5.6364C15.054 4.64418 13.662 4 12 4C7.88281 4 4.4909 7.11098 4.04884 11.1099C3.98816 11.6588 3.49396 12.0546 2.94502 11.9939C2.39608 11.9333 2.00027 11.4391 2.06095 10.8901Z" fill="currentColor"/><path d="M21.9939 13.1099C21.441 18.1109 17.2028 22 12.0548 22C9.81834 22 8.0146 21.115 6.47383 19.9677C5.62731 19.3373 4.8197 18.5928 4.05481 17.8562V21C4.05481 21.5523 3.60709 22 3.05481 22C2.50253 22 2.05481 21.5523 2.05481 21V15.5C2.05481 14.9477 2.50253 14.5 3.05481 14.5H8.55481C9.1071 14.5 9.55481 14.9477 9.55481 15.5C9.55481 16.0523 9.1071 16.5 8.55481 16.5H5.53052C6.22675 17.1702 6.91769 17.8046 7.66834 18.3636C9.0008 19.3558 10.3928 20 12.0548 20C16.172 20 19.5639 16.889 20.006 12.8901C20.0667 12.3412 20.5608 11.9454 21.1098 12.0061C21.6587 12.0667 22.0545 12.5609 21.9939 13.1099Z" fill="currentColor"/></svg>`;
       const btn = el('penaltiesCheck');
       if (btn) btn.innerHTML = refreshSvg + ' Refresh';
       const container = el('penaltiesList');
@@ -4010,7 +4012,7 @@
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
             <button class="btn-sm" onclick="openEmailModal('${p.key}')">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M23 6V18C23 19.6523 21.6523 21 20 21H4C2.34772 21 1 19.6523 1 18V6C1 4.34315 2.34315 3 4 3H20C21.6569 3 23 4.34315 23 6ZM3.10658 5.55395C3.27196 5.22692 3.61204 5 4 5H20C20.388 5 20.728 5.22692 20.8934 5.55395L12 11.7793L3.10658 5.55395ZM3 7.92066L10.8531 13.4178C11.5417 13.8999 12.4583 13.8999 13.1469 13.4178L21 7.92066V18C21 18.5477 20.5477 19 20 19H4C3.45228 19 3 18.5477 3 18V7.92066Z" fill="currentColor"/></svg>
               Draft Email
             </button>
           </div>
@@ -5288,7 +5290,7 @@ ${sig}`
           statusEl.innerHTML = `
             <div style="background:var(--muted);border-radius:10px;padding:14px 16px;text-align:left;margin-top:4px;display:flex;flex-direction:column;gap:6px">
               <div style="font-size:12px;font-weight:700;color:var(--success);margin-bottom:2px;display:flex;align-items:center;gap:6px">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>
                 Import Successful
               </div>
               <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">File</span><span style="font-weight:500">${fileName || 'wh_log.json'}</span></div>
@@ -5458,7 +5460,7 @@ ${sig}`
         <div class="ob-title">Say Hello to Murph.</div>
         <div class="ob-desc">Your work hour tracker. Track your work hours effortlessly. Got a backup? Import it to restore your data.</div>
         <label class="ob-import-zone" for="obImportFile" id="obImportZone">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M11 4C8.37318 4 6.2324 5.99599 6.01793 8.51595C5.98608 8.89012 5.74729 9.21492 5.39963 9.35691C3.3976 10.1746 2 12.1199 2 14.3783C2 16.2952 3.00543 17.9848 4.53512 18.9537C5.00168 19.2493 5.14031 19.8671 4.84477 20.3336C4.54923 20.8002 3.93143 20.9388 3.46488 20.6433C1.38625 19.3266 0 17.0152 0 14.3783C0 11.4804 1.67256 8.9777 4.10178 7.75216C4.66997 4.47797 7.54913 2 11 2C13.8191 2 16.2533 3.65235 17.362 6.03971C19.4286 6.43792 21 8.24044 21 10.4206C21 10.7714 20.959 11.1133 20.8815 11.4415C22.7225 12.3197 24 14.186 24 16.3571C24 18.2066 23.0706 19.8374 21.6596 20.8205C21.2065 21.1362 20.5832 21.0248 20.2675 20.5717C19.9518 20.1185 20.0632 19.4952 20.5163 19.1795C21.4183 18.5511 22 17.5193 22 16.3571C22 14.7492 20.882 13.3863 19.3555 13.0085C19.056 12.9344 18.8075 12.7261 18.6821 12.4442C18.5567 12.1623 18.5684 11.8383 18.7139 11.5662C18.8965 11.2247 19 10.8359 19 10.4206C19 9.10788 17.9516 8.0197 16.6155 7.96031C16.2093 7.94225 15.8545 7.68006 15.7179 7.29708C15.0347 5.38045 13.1833 4 11 4Z" fill="currentColor"/><path d="M7.29289 16.7071C7.68342 17.0976 8.31658 17.0976 8.70711 16.7071L11 14.4142V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V14.4142L15.2929 16.7071C15.6834 17.0976 16.3166 17.0976 16.7071 16.7071C17.0976 16.3166 17.0976 15.6834 16.7071 15.2929L12.7071 11.2929C12.3166 10.9024 11.6834 10.9024 11.2929 11.2929L7.29289 15.2929C6.90237 15.6834 6.90237 16.3166 7.29289 16.7071Z" fill="currentColor"/></svg>
           <div class="ob-import-zone-text" id="obImportZoneText"><strong>Choose a file or drag &amp; drop here</strong><br>Supports .json files</div>
           <input type="file" id="obImportFile" accept=".json" style="display:none">
         </label>
@@ -5484,7 +5486,7 @@ ${sig}`
               <input type="text" id="obShiftStart" placeholder="From  09:00 AM" autocomplete="off"
                 style="height:40px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
               <button type="button" class="tp-icon-btn" onclick="openTpModal('obShiftStart',event)" title="Pick time">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
               </button>
             </div>
             <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">–</span>
@@ -5492,7 +5494,7 @@ ${sig}`
               <input type="text" id="obShiftEnd" placeholder="To  06:00 PM" autocomplete="off"
                 style="height:40px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
               <button type="button" class="tp-icon-btn" onclick="openTpModal('obShiftEnd',event)" title="Pick time">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
               </button>
             </div>
           </div>
@@ -5608,15 +5610,15 @@ ${sig}`
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted-fg)">
           <div style="display:flex;align-items:center;gap:8px">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>
             Log your daily work hours
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>
             Track weekly progress on the Dashboard
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>
             Adjust settings anytime in Settings
           </div>
         </div>
