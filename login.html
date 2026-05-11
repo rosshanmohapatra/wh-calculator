@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Murph — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #f5f5f7;
+      --card:      #ffffff;
+      --fg:        #09090b;
+      --muted:     #ebebee;
+      --muted-fg:  #71717a;
+      --border:    #dfe0e4;
+      --input-bg:  #f9f9fb;
+      --ring:      #09090b;
+      --brand:     #09090b;
+      --google-bg: #ffffff;
+      --github-bg: #24292f;
+      --radius:    12px;
+      --font:      'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --font-display: 'DM Serif Display', Georgia, serif;
+    }
+    .dark {
+      --bg:        #09090b;
+      --card:      #111113;
+      --fg:        #fafafa;
+      --muted:     #1a1a1d;
+      --muted-fg:  #a1a1aa;
+      --border:    #2c2c30;
+      --input-bg:  #222226;
+      --ring:      #e4e4e7;
+      --brand:     #fafafa;
+      --google-bg: #1a1a1d;
+      --github-bg: #1a1a1d;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      transition: background .2s, color .2s;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Top bar ── */
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 20px;
+      z-index: 10;
+    }
+
+    .theme-btn {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted-fg);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .theme-btn:hover { background: var(--muted); color: var(--fg); }
+
+    /* ── Branding ── */
+    .branding {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .brand-icon {
+      width: 48px; height: 48px;
+      background: var(--fg);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .brand-icon svg { color: var(--bg); transition: color .2s; }
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 26px;
+      color: var(--fg);
+      letter-spacing: -.3px;
+    }
+    .brand-tagline {
+      font-size: 13px;
+      color: var(--muted-fg);
+      margin-top: -4px;
+    }
+
+    /* ── Modal card ── */
+    .auth-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 24px 24px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.06), 0 1px 4px rgba(0,0,0,.04);
+      transition: background .2s, border-color .2s;
+    }
+
+    .auth-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 4px;
+    }
+    .auth-sub {
+      font-size: 13px;
+      color: var(--muted-fg);
+      margin-bottom: 22px;
+    }
+
+    /* ── Form fields ── */
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .field-label { font-size: 12px; font-weight: 500; color: var(--muted-fg); letter-spacing: .3px; text-transform: uppercase; }
+    .field-input {
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--fg);
+      font-family: var(--font);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      width: 100%;
+    }
+    .field-input::placeholder { color: var(--muted-fg); }
+    .field-input:focus {
+      border-color: var(--muted-fg);
+      box-shadow: 0 0 0 3px rgba(113,113,122,.1);
+    }
+
+    /* ── Password field with show/hide ── */
+    .pwd-wrap { position: relative; }
+    .pwd-wrap .field-input { padding-right: 44px; }
+    .pwd-toggle {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--muted-fg); padding: 4px;
+      display: flex; align-items: center; justify-content: center;
+      transition: color .12s;
+    }
+    .pwd-toggle:hover { color: var(--fg); }
+
+    /* ── Forgot password ── */
+    .forgot-link {
+      font-size: 12px;
+      color: var(--muted-fg);
+      text-decoration: none;
+      text-align: right;
+      display: block;
+      margin-top: -8px;
+      margin-bottom: 18px;
+      cursor: pointer;
+      transition: color .12s;
+    }
+    .forgot-link:hover { color: var(--fg); }
+
+    /* ── Primary button ── */
+    .btn-primary {
+      width: 100%;
+      height: 42px;
+      border-radius: 10px;
+      border: none;
+      background: var(--fg);
+      color: var(--bg);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 18px;
+    }
+    .btn-primary:hover { opacity: .86; }
+    .btn-primary:active { opacity: .75; }
+    .btn-primary:disabled { opacity: .4; cursor: default; }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 14px;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-text { font-size: 12px; color: var(--muted-fg); white-space: nowrap; }
+
+    /* ── OAuth buttons ── */
+    .btn-oauth {
+      width: 100%;
+      height: 42px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--muted);
+      color: var(--fg);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .btn-oauth:last-child { margin-bottom: 0; }
+    .btn-oauth:hover { background: var(--border); }
+    .btn-oauth svg { flex-shrink: 0; }
+
+    /* ── Footer toggle ── */
+    .auth-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted-fg);
+    }
+    .auth-footer-link {
+      color: var(--fg);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      margin-left: 4px;
+      transition: opacity .12s;
+    }
+    .auth-footer-link:hover { opacity: .7; }
+
+    /* ── Success state ── */
+    .auth-success {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 0 8px;
+    }
+    .auth-success.show { display: flex; }
+    .success-icon {
+      width: 48px; height: 48px;
+      background: #f0fdf4;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .dark .success-icon { background: #052e16; }
+    .success-title { font-size: 16px; font-weight: 600; color: var(--fg); }
+    .success-sub { font-size: 13px; color: var(--muted-fg); text-align: center; }
+
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: none;
+    }
+    .btn-primary.loading .spinner { display: block; }
+    .btn-primary.loading .btn-label { display: none; }
+
+    /* ── Slide transition ── */
+    @keyframes slide-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .auth-form { animation: slide-in .2s ease both; }
+
+    /* ── Name field (signup only) ── */
+    #nameField { overflow: hidden; max-height: 0; opacity: 0; transition: max-height .22s ease, opacity .18s; margin-bottom: 0; }
+    #nameField.show { max-height: 80px; opacity: 1; margin-bottom: 14px; }
+
+    /* ── Error message ── */
+    .field-error {
+      font-size: 11px;
+      color: #dc2626;
+      margin-top: -10px;
+      margin-bottom: 8px;
+      display: none;
+    }
+    .field-error.show { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- Theme toggle -->
+  <div class="top-bar">
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">
+      <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="themeIconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+
+  <!-- Branding -->
+  <div class="branding">
+    <div class="brand-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <path d="M8 21h8m-4-4v4"/>
+        <circle cx="12" cy="10" r="3" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand-name">Murph</div>
+    <div class="brand-tagline">Work Hour Tracker</div>
+  </div>
+
+  <!-- Auth card -->
+  <div class="auth-card">
+
+    <!-- Login / Signup form -->
+    <div id="authForm" class="auth-form">
+      <div class="auth-title" id="authTitle">Welcome back</div>
+      <div class="auth-sub" id="authSub">Sign in to your Murph account</div>
+
+      <!-- Name field (signup only) -->
+      <div class="field" id="nameField">
+        <div class="field-label">Full Name</div>
+        <input class="field-input" id="nameInput" type="text" placeholder="Alex Costa" autocomplete="name">
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <div class="field-label">Email</div>
+        <input class="field-input" id="emailInput" type="email" placeholder="you@company.com" autocomplete="email">
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <div class="field-label">Password</div>
+        <div class="pwd-wrap">
+          <input class="field-input" id="pwdInput" type="password" placeholder="••••••••" autocomplete="current-password">
+          <button class="pwd-toggle" type="button" onclick="togglePwd()" title="Show / hide password">
+            <svg id="eyeOpen" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="eyeClose" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Forgot password (login only) -->
+      <span class="forgot-link" id="forgotLink" onclick="handleForgot()">Forgot password?</span>
+
+      <!-- Primary CTA -->
+      <button class="btn-primary" id="submitBtn" onclick="handleSubmit()">
+        <div class="spinner"></div>
+        <span class="btn-label" id="submitLabel">Sign In</span>
+      </button>
+
+      <!-- OAuth divider -->
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">or continue with</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Google -->
+      <button class="btn-oauth" onclick="handleOAuth('Google')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <!-- GitHub -->
+      <button class="btn-oauth" onclick="handleOAuth('GitHub')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+        Continue with GitHub
+      </button>
+    </div>
+
+    <!-- Success state -->
+    <div class="auth-success" id="authSuccess">
+      <div class="success-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="success-title" id="successTitle">Signed in!</div>
+      <div class="success-sub" id="successSub">Taking you to your workspace…</div>
+    </div>
+
+  </div>
+
+  <!-- Footer toggle -->
+  <div class="auth-footer" id="authFooter">
+    <span id="footerText">Don't have an account?</span>
+    <a class="auth-footer-link" id="toggleLink" onclick="toggleMode()">Sign up</a>
+  </div>
+
+  <script>
+    // ── Theme ──────────────────────────────────────────
+    const saved = localStorage.getItem('wh_theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
+    let isDark = saved ? saved === 'dark' : prefersDark;
+    function applyTheme() {
+      document.documentElement.classList.toggle('dark', isDark);
+      document.getElementById('themeIconSun').style.display  = isDark ? '' : 'none';
+      document.getElementById('themeIconMoon').style.display = isDark ? 'none' : '';
+    }
+    function toggleTheme() {
+      isDark = !isDark;
+      localStorage.setItem('wh_theme', isDark ? 'dark' : 'light');
+      applyTheme();
+    }
+    applyTheme();
+
+    // ── Mode toggle (Login ↔ Signup) ───────────────────
+    let isSignup = false;
+    function toggleMode() {
+      isSignup = !isSignup;
+      const nameField = document.getElementById('nameField');
+      const forgotLink = document.getElementById('forgotLink');
+      document.getElementById('authTitle').textContent   = isSignup ? 'Create an account' : 'Welcome back';
+      document.getElementById('authSub').textContent     = isSignup ? 'Start tracking your work hours.' : 'Sign in to your Murph account';
+      document.getElementById('submitLabel').textContent = isSignup ? 'Create Account' : 'Sign In';
+      document.getElementById('footerText').textContent  = isSignup ? 'Already have an account?' : "Don't have an account?";
+      document.getElementById('toggleLink').textContent  = isSignup ? 'Log in' : 'Sign up';
+      document.getElementById('pwdInput').autocomplete  = isSignup ? 'new-password' : 'current-password';
+      nameField.classList.toggle('show', isSignup);
+      forgotLink.style.display = isSignup ? 'none' : '';
+
+      // Animate the form
+      const form = document.getElementById('authForm');
+      form.style.animation = 'none';
+      void form.offsetWidth;
+      form.style.animation = '';
+    }
+
+    // ── Password show/hide ─────────────────────────────
+    function togglePwd() {
+      const input = document.getElementById('pwdInput');
+      const isText = input.type === 'text';
+      input.type = isText ? 'password' : 'text';
+      document.getElementById('eyeOpen').style.display  = isText ? '' : 'none';
+      document.getElementById('eyeClose').style.display = isText ? 'none' : '';
+    }
+
+    // ── Submit (any input works) ───────────────────────
+    function handleSubmit() {
+      const btn = document.getElementById('submitBtn');
+      const email = document.getElementById('emailInput').value.trim();
+      const pwd   = document.getElementById('pwdInput').value;
+
+      // Minimal non-empty check (purely cosmetic)
+      if (!email || !pwd) {
+        document.getElementById('emailInput').focus();
+        return;
+      }
+
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      setTimeout(() => {
+        showSuccess(isSignup
+          ? `Account created for ${email.split('@')[0]}`
+          : `Signed in as ${email.split('@')[0]}`);
+      }, 900);
+    }
+
+    // ── OAuth ──────────────────────────────────────────
+    function handleOAuth(provider) {
+      const btn = event.currentTarget;
+      btn.disabled = true;
+      btn.style.opacity = '.5';
+      setTimeout(() => showSuccess(`Signed in with ${provider}`), 700);
+    }
+
+    // ── Forgot password ────────────────────────────────
+    function handleForgot() {
+      const link = document.getElementById('forgotLink');
+      link.textContent = 'Reset link sent ✓';
+      link.style.color = '#16a34a';
+      setTimeout(() => {
+        link.textContent = 'Forgot password?';
+        link.style.color = '';
+      }, 3000);
+    }
+
+    // ── Success state ──────────────────────────────────
+    function showSuccess(msg) {
+      document.getElementById('authForm').style.display = 'none';
+      document.getElementById('authFooter').style.display = 'none';
+      const s = document.getElementById('authSuccess');
+      document.getElementById('successTitle').textContent = isSignup ? 'You\'re all set!' : 'Signed in!';
+      document.getElementById('successSub').textContent = msg ? `${msg} — opening workspace…` : 'Taking you to your workspace…';
+      s.classList.add('show');
+      setTimeout(() => { window.location.href = 'index.html'; }, 1400);
+    }
+
+    // ── Enter key support ──────────────────────────────
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.getElementById('authForm').style.display !== 'none') {
+        handleSubmit();
+      }
+    });
+  </script>
+</body>
+</html>
