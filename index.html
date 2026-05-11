@@ -1540,56 +1540,46 @@
         <div class="dialog-title">Log out?</div>
         <div class="dialog-desc">You'll be taken back to the login screen. Your data stays safe.</div>
       </div>
-      <div class="dialog-foot-row" style="padding:0 20px 20px">
-        <button class="btn btn-cancel" onclick="el('logoutOverlay').classList.remove('open')" style="flex:1;height:40px">Cancel</button>
+      <div style="padding:20px;display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn btn-cancel" onclick="el('logoutOverlay').classList.remove('open')" style="height:40px;width:auto;padding:0 18px">Cancel</button>
         <button class="btn" onclick="confirmLogout()"
-          style="flex:1;height:40px;background:var(--destructive);color:#fff;border:none;font-weight:600">
+          style="height:40px;width:auto;padding:0 18px;background:var(--destructive);color:#fff;border:none;font-weight:600">
           Log Out
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ── Delete Profile Confirmation Modal ── -->
+  <!-- ── Delete Account Confirmation Modal ── -->
   <div class="overlay" id="deleteProfileOverlay">
     <div class="dialog" style="max-width:380px">
       <div class="dialog-head">
-        <div class="dialog-title">Delete your profile?</div>
-        <div class="dialog-desc">This action cannot be undone. Your account will be queued for deletion.</div>
+        <div class="dialog-title">Delete account?</div>
+        <div class="dialog-desc">This cannot be undone.</div>
       </div>
       <div class="dialog-body">
-        <div style="background:var(--destructive-bg);border:1px solid var(--destructive-border);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
-          <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--destructive)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            What happens next
-          </div>
-          <div style="font-size:12px;color:var(--muted-fg);line-height:1.6;display:flex;flex-direction:column;gap:5px">
-            <div style="display:flex;gap:8px;align-items:flex-start">
-              <span style="color:var(--destructive);margin-top:1px">→</span>
-              <span>Your account is immediately deactivated and you'll be signed out.</span>
-            </div>
-            <div style="display:flex;gap:8px;align-items:flex-start">
-              <span style="color:var(--destructive);margin-top:1px">→</span>
-              <span>All data is retained in our database for <strong style="color:var(--foreground)">48 hours</strong> — contact support to recover it.</span>
-            </div>
-            <div style="display:flex;gap:8px;align-items:flex-start">
-              <span style="color:var(--destructive);margin-top:1px">→</span>
-              <span>After 48 hours, your profile and all associated data are permanently erased.</span>
-            </div>
-          </div>
+        <div style="background:var(--destructive-bg);border:1px solid var(--destructive-border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--muted-fg);line-height:1.6">
+          We'll still have your data for <strong style="color:var(--foreground)">48 hours</strong>. After that it'll be permanently deleted from our database.
         </div>
         <div style="margin-top:14px">
-          <div class="form-label" style="margin-bottom:6px">Type <strong>DELETE</strong> to confirm</div>
-          <input class="field-input" id="deleteConfirmInput" type="text" placeholder="DELETE" autocomplete="off"
-            style="width:100%;text-transform:uppercase;letter-spacing:.5px"
-            oninput="el('deleteConfirmBtn').disabled = this.value.toUpperCase() !== 'DELETE'">
+          <div class="form-label" style="margin-bottom:6px">Enter your password to confirm</div>
+          <div style="position:relative">
+            <input class="field-input" id="deleteConfirmInput" type="password" placeholder="••••••••" autocomplete="current-password"
+              style="width:100%;padding-right:44px"
+              oninput="el('deleteConfirmBtn').disabled = this.value.length < 1">
+            <button type="button" onclick="toggleDeletePwd()" title="Show / hide"
+              style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted-fg);padding:4px;display:flex;align-items:center">
+              <svg id="delEyeOpen" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg id="delEyeClose" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
         </div>
       </div>
-      <div class="dialog-foot-row" style="padding:0 20px 20px">
-        <button class="btn btn-cancel" onclick="closeDeleteModal()" style="flex:1;height:40px">Cancel</button>
+      <div style="padding:0 20px 20px;display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn btn-cancel" onclick="closeDeleteModal()" style="height:40px;width:auto;padding:0 18px">Cancel</button>
         <button class="btn" id="deleteConfirmBtn" onclick="confirmDeleteProfile()" disabled
-          style="flex:1;height:40px;background:var(--destructive);color:#fff;border:none;font-weight:600;transition:opacity .15s">
-          Delete Forever
+          style="height:40px;width:auto;padding:0 18px;background:var(--destructive);color:#fff;border:none;font-weight:600;transition:opacity .15s">
+          Delete Account
         </button>
       </div>
     </div>
@@ -5231,13 +5221,24 @@ ${sig}`
     }
 
     function openDeleteModal() {
-      el('deleteConfirmInput').value = '';
+      const inp = el('deleteConfirmInput');
+      if (inp) { inp.value = ''; inp.type = 'password'; }
+      el('delEyeOpen') && (el('delEyeOpen').style.display = '');
+      el('delEyeClose') && (el('delEyeClose').style.display = 'none');
       el('deleteConfirmBtn').disabled = true;
       el('deleteProfileOverlay').classList.add('open');
     }
     function closeDeleteModal() {
       el('deleteProfileOverlay').classList.remove('open');
-      el('deleteConfirmInput').value = '';
+      const inp = el('deleteConfirmInput');
+      if (inp) { inp.value = ''; inp.type = 'password'; }
+    }
+    function toggleDeletePwd() {
+      const inp = el('deleteConfirmInput');
+      const isText = inp.type === 'text';
+      inp.type = isText ? 'password' : 'text';
+      el('delEyeOpen').style.display  = isText ? '' : 'none';
+      el('delEyeClose').style.display = isText ? 'none' : '';
     }
     function confirmDeleteProfile() {
       closeDeleteModal();
