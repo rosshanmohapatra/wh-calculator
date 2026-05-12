@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5pm — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #f5f5f7;
+      --card:      #ffffff;
+      --fg:        #09090b;
+      --muted:     #ebebee;
+      --muted-fg:  #71717a;
+      --border:    #dfe0e4;
+      --input-bg:  #f9f9fb;
+      --ring:      #09090b;
+      --font:      'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --radius: 12px;
+    }
+    .dark {
+      --bg:        #09090b;
+      --card:      #111113;
+      --fg:        #fafafa;
+      --muted:     #1a1a1d;
+      --muted-fg:  #a1a1aa;
+      --border:    #2c2c30;
+      --input-bg:  #222226;
+      --ring:      #e4e4e7;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      transition: background .2s, color .2s;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Top bar ── */
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 20px;
+      z-index: 10;
+    }
+    .theme-btn {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted-fg);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .theme-btn:hover { background: var(--muted); color: var(--fg); }
+
+    /* ── Branding ── */
+    .branding {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .brand-icon {
+      width: 64px; height: 64px;
+      background: #09090b;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,.22), 0 0 0 1px rgba(255,255,255,.05);
+      flex-shrink: 0;
+      transition: background .2s, box-shadow .2s;
+    }
+    .dark .brand-icon {
+      background: #ffffff;
+      box-shadow: 0 4px 20px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.06);
+    }
+    .brand-five {
+      font-family: var(--font);
+      font-size: 32px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1;
+      letter-spacing: -2px;
+      margin-top: 1px;
+      transition: color .2s;
+    }
+    .dark .brand-five { color: #09090b; }
+    .brand-pm {
+      position: absolute;
+      top: 10px;
+      right: 9px;
+      font-family: var(--font);
+      font-size: 8px;
+      font-weight: 700;
+      color: #a855f7;
+      line-height: 1;
+      letter-spacing: .5px;
+    }
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .brand-name {
+      font-family: var(--font);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--fg);
+      letter-spacing: -.5px;
+    }
+    .brand-tagline {
+      font-size: 13px;
+      color: var(--muted-fg);
+    }
+
+    /* ── Auth card ── */
+    .auth-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 24px 24px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.06), 0 1px 4px rgba(0,0,0,.04);
+      transition: background .2s, border-color .2s;
+    }
+
+    .auth-title { font-size: 18px; font-weight: 600; color: var(--fg); margin-bottom: 4px; }
+    .auth-sub   { font-size: 13px; color: var(--muted-fg); margin-bottom: 22px; line-height: 1.55; }
+
+    /* ── Form fields ── */
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .field-label { font-size: 12px; font-weight: 500; color: var(--muted-fg); letter-spacing: .3px; text-transform: uppercase; }
+    .field-input {
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--fg);
+      font-family: var(--font);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      width: 100%;
+    }
+    .field-input::placeholder { color: var(--muted-fg); }
+    .field-input:focus { border-color: var(--muted-fg); box-shadow: 0 0 0 3px rgba(113,113,122,.1); }
+    .field-input:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── Password field ── */
+    .pwd-wrap { position: relative; }
+    .pwd-wrap .field-input { padding-right: 44px; }
+    .pwd-toggle {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--muted-fg); padding: 4px;
+      display: flex; align-items: center;
+      transition: color .12s;
+    }
+    .pwd-toggle:hover { color: var(--fg); }
+
+    /* ── Forgot link ── */
+    .forgot-link {
+      font-size: 12px; color: var(--muted-fg);
+      text-align: right; display: flex; justify-content: flex-end;
+      margin-top: -8px; margin-bottom: 18px;
+      cursor: default;
+      background: none; border: none; font-family: var(--font);
+      width: 100%; padding: 0;
+    }
+    .forgot-link-text {
+      cursor: pointer; transition: color .12s;
+    }
+    .forgot-link-text:hover { color: var(--fg); }
+
+    /* ── Primary button ── */
+    .btn-primary {
+      width: 100%; height: 42px;
+      border-radius: 10px; border: none;
+      background: var(--fg); color: var(--bg);
+      font-family: var(--font); font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: opacity .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 16px;
+    }
+    .btn-primary:hover { opacity: .86; }
+    .btn-primary:active { opacity: .75; }
+    .btn-primary:disabled { opacity: .4; cursor: default; }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 12px;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-text { font-size: 12px; color: var(--muted-fg); white-space: nowrap; }
+
+    /* ── OAuth buttons ── */
+    .btn-oauth {
+      width: 100%; height: 42px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--muted);
+      color: var(--fg);
+      font-family: var(--font); font-size: 13px; font-weight: 500;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-bottom: 8px;
+    }
+    .btn-oauth:last-of-type { margin-bottom: 0; }
+    .btn-oauth:hover { background: var(--border); }
+    .btn-oauth svg { flex-shrink: 0; }
+
+    /* ── Back link ── */
+    .back-link {
+      display: flex; align-items: center; gap: 5px;
+      margin-top: 18px; font-size: 12px; color: var(--muted-fg);
+      cursor: pointer; background: none; border: none;
+      font-family: var(--font); padding: 0;
+      transition: color .12s;
+    }
+    .back-link:hover { color: var(--fg); }
+
+    /* ── Footer ── */
+    .auth-footer {
+      margin-top: 20px; text-align: center;
+      font-size: 13px; color: var(--muted-fg);
+    }
+    .auth-footer-link {
+      color: var(--fg); font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      margin-left: 4px; transition: opacity .12s;
+    }
+    .auth-footer-link:hover { opacity: .7; }
+
+    /* ── Success state ── */
+    .auth-success {
+      display: none; flex-direction: column;
+      align-items: center; gap: 10px;
+      padding: 20px 0 8px;
+    }
+    .auth-success.show { display: flex; }
+    .success-icon {
+      width: 48px; height: 48px; background: #f0fdf4;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+    .dark .success-icon { background: #052e16; }
+    .success-title { font-size: 16px; font-weight: 600; color: var(--fg); }
+    .success-sub { font-size: 13px; color: var(--muted-fg); text-align: center; }
+
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: none;
+    }
+    .btn-primary.loading .spinner { display: block; }
+    .btn-primary.loading .btn-label { display: none; }
+
+    /* ── Slide animation ── */
+    @keyframes slide-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .view-panel { animation: slide-in .2s ease both; }
+
+    /* ── Name field (signup) ── */
+    #nameField { overflow: hidden; max-height: 0; opacity: 0; transition: max-height .22s ease, opacity .18s; margin-bottom: 0; }
+    #nameField.show { max-height: 80px; opacity: 1; margin-bottom: 14px; }
+
+    /* ── Field error ── */
+    .field-error { font-size: 11px; color: #dc2626; margin-top: -10px; margin-bottom: 8px; display: none; }
+    .field-error.show { display: block; }
+
+    /* ── Timer display ── */
+    .timer-row { font-size: 13px; color: var(--muted-fg); text-align: center; margin-bottom: 14px; }
+    .timer-row span { font-weight: 600; color: var(--fg); }
+    .expired-row { font-size: 13px; color: #dc2626; text-align: center; margin-bottom: 14px; display: none; }
+    .expired-row a { color: #2563eb; cursor: pointer; text-decoration: none; }
+
+    /* ── Recovery code input ── */
+    .code-input {
+      text-align: center;
+      font-size: 22px; font-weight: 700;
+      letter-spacing: .2em;
+      margin-bottom: 14px;
+    }
+
+    /* ── Auth digit boxes ── */
+    .digit-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; }
+    .auth-digit {
+      width: 42px; height: 50px;
+      text-align: center;
+      font-size: 20px; font-weight: 700;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--fg);
+      font-family: var(--font);
+      transition: border-color .15s, box-shadow .15s;
+      -moz-appearance: textfield;
+      caret-color: transparent;
+      outline: none;
+    }
+    .auth-digit:focus { border-color: var(--muted-fg); box-shadow: 0 0 0 3px rgba(113,113,122,.1); }
+    .auth-digit::-webkit-outer-spin-button,
+    .auth-digit::-webkit-inner-spin-button { -webkit-appearance: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Theme toggle -->
+  <div class="top-bar">
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">
+      <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="themeIconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+
+  <!-- Branding -->
+  <div class="branding">
+    <div class="brand-icon">
+      <span class="brand-five">5</span>
+      <span class="brand-pm">PM</span>
+    </div>
+    <div class="brand-text">
+      <div class="brand-name">5pm</div>
+      <div class="brand-tagline">Work Hour Tracker</div>
+    </div>
+  </div>
+
+  <!-- Auth card -->
+  <div class="auth-card">
+
+    <!-- ── View: Login / Signup ── -->
+    <div id="viewLogin" class="view-panel">
+      <div class="auth-title" id="authTitle">Hey Hustler,</div>
+      <div class="auth-sub" id="authSub">Let us help you manage your time.</div>
+
+      <div class="field" id="nameField">
+        <div class="field-label">Full Name</div>
+        <input class="field-input" id="nameInput" type="text" placeholder="Alex Costa" autocomplete="name">
+      </div>
+
+      <div class="field">
+        <div class="field-label">Email</div>
+        <input class="field-input" id="emailInput" type="email" placeholder="you@company.com" autocomplete="email">
+      </div>
+
+      <div class="field">
+        <div class="field-label">Password</div>
+        <div class="pwd-wrap">
+          <input class="field-input" id="pwdInput" type="password" placeholder="••••••••" autocomplete="current-password">
+          <button class="pwd-toggle" type="button" onclick="togglePwd()" title="Show / hide password">
+            <svg id="eyeOpen" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="eyeClose" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="forgot-link" id="forgotLink" onclick="showRecovery()"><span class="forgot-link-text">Forgot password?</span></button>
+
+      <button class="btn-primary" id="submitBtn" onclick="handleSubmit()">
+        <div class="spinner"></div>
+        <span class="btn-label" id="submitLabel">Sign In</span>
+      </button>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">or continue with</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <button class="btn-oauth" onclick="handleOAuth('Google')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <button class="btn-oauth" onclick="handleOAuth('GitHub')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        Continue with GitHub
+      </button>
+    </div>
+
+    <!-- ── View: Account Recovery ── -->
+    <div id="viewRecovery" class="view-panel" style="display:none">
+      <div class="auth-title">Account Recovery</div>
+      <div class="auth-sub">Choose how you'd like to reset your access.</div>
+
+      <button class="btn-primary" id="recoverEmailBtn" onclick="startEmailRecovery()">
+        <div class="spinner"></div>
+        <span class="btn-label">Send an Email</span>
+      </button>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">or</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <button class="btn-oauth" onclick="handleOAuth('Google')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <button class="btn-oauth" onclick="handleOAuth('GitHub')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        Continue with GitHub
+      </button>
+      <button class="btn-oauth" onclick="showAuthDigits()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 2C3.79086 2 2 3.79086 2 6V18C2 20.2091 3.79086 22 6 22H18C20.2091 22 22 20.2091 22 18V6C22 3.79086 20.2091 2 18 2H6ZM7 7H9V9H7V7ZM9 11H7V13H9V11ZM7 15H9V17H7V15ZM11 7H13V9H11V7ZM13 11H11V13H13V11ZM11 15H13V17H11V15ZM17 7H15V9H17V7ZM15 11H17V13H15V11ZM17 15H15V17H17V15Z" fill="currentColor"/></svg>
+        Use Authenticator
+      </button>
+
+      <button class="back-link" onclick="backToLogin()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to sign in
+      </button>
+    </div>
+
+    <!-- ── View: Email OTP ── -->
+    <div id="viewOTP" class="view-panel" style="display:none">
+      <div class="auth-title">Check your inbox</div>
+      <div class="auth-sub">A 6-digit code was sent to <strong id="sentEmail"></strong>. Enter it before the timer runs out.</div>
+
+      <div class="timer-row" id="timerRow">Code expires in <span id="timerDisplay">1:00</span></div>
+      <div class="expired-row" id="expiredRow">Code expired. <a onclick="resendCode()">Resend email</a></div>
+
+      <input class="field-input code-input" id="recoveryCode" type="text" inputmode="numeric"
+        maxlength="6" placeholder="000000" autocomplete="one-time-code"
+        oninput="document.getElementById('verifyOTPBtn').disabled=this.value.length<6||recExpired">
+
+      <button class="btn-primary" id="verifyOTPBtn" onclick="completeRecovery()" disabled>Verify Code</button>
+
+      <button class="back-link" onclick="showRecovery()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Use a different method
+      </button>
+    </div>
+
+    <!-- ── View: Authenticator ── -->
+    <div id="viewAuth" class="view-panel" style="display:none">
+      <div class="auth-title">Authenticator Code</div>
+      <div class="auth-sub">Enter the 6-digit code from your authenticator app.</div>
+
+      <div class="digit-row">
+        <input class="auth-digit" id="rd0" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
+        <input class="auth-digit" id="rd1" type="text" inputmode="numeric" maxlength="1">
+        <input class="auth-digit" id="rd2" type="text" inputmode="numeric" maxlength="1">
+        <input class="auth-digit" id="rd3" type="text" inputmode="numeric" maxlength="1">
+        <input class="auth-digit" id="rd4" type="text" inputmode="numeric" maxlength="1">
+        <input class="auth-digit" id="rd5" type="text" inputmode="numeric" maxlength="1">
+      </div>
+
+      <button class="btn-primary" id="authDigitVerify" onclick="completeRecovery()" disabled>Verify Code</button>
+
+      <button class="back-link" onclick="showRecovery()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Use a different method
+      </button>
+    </div>
+
+    <!-- ── View: Success ── -->
+    <div class="auth-success" id="authSuccess">
+      <div class="success-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="success-title" id="successTitle">Signed in!</div>
+      <div class="success-sub" id="successSub">Taking you to your workspace…</div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="auth-footer" id="authFooter">
+    <span id="footerText">Don't have an account?</span>
+    <a class="auth-footer-link" id="toggleLink" onclick="toggleMode()">Sign up</a>
+  </div>
+
+  <script>
+    // ── Theme ──────────────────────────────────────────
+    const saved = localStorage.getItem('wh_theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
+    let isDark = saved ? saved === 'dark' : prefersDark;
+    function applyTheme() {
+      document.documentElement.classList.toggle('dark', isDark);
+      document.getElementById('themeIconSun').style.display  = isDark ? '' : 'none';
+      document.getElementById('themeIconMoon').style.display = isDark ? 'none' : '';
+    }
+    function toggleTheme() {
+      isDark = !isDark;
+      localStorage.setItem('wh_theme', isDark ? 'dark' : 'light');
+      applyTheme();
+    }
+    applyTheme();
+
+    // ── Helper ─────────────────────────────────────────
+    const $ = id => document.getElementById(id);
+
+    // ── View switcher ──────────────────────────────────
+    function showView(id) {
+      ['viewLogin','viewRecovery','viewOTP','viewAuth','authSuccess'].forEach(v => {
+        const el = $(v);
+        if (el) el.style.display = 'none';
+      });
+      // authSuccess uses display:flex in CSS — must set explicitly or '' reverts to none
+      $(id).style.display = id === 'authSuccess' ? 'flex' : '';
+      $(id).style.animation = 'none';
+      void $(id).offsetWidth;
+      $(id).style.animation = '';
+    }
+
+    // ── Mode toggle (Login ↔ Signup) ───────────────────
+    let isSignup = false;
+    function toggleMode() {
+      isSignup = !isSignup;
+      $('authTitle').textContent   = isSignup ? 'Create an account' : 'Hey Hustler,';
+      $('authSub').textContent     = isSignup ? 'Start tracking your work hours.' : 'Let us help you manage your time.';
+      $('submitLabel').textContent = isSignup ? 'Create Account' : 'Sign In';
+      $('footerText').textContent  = isSignup ? 'Already have an account?' : "Don't have an account?";
+      $('toggleLink').textContent  = isSignup ? 'Log in' : 'Sign up';
+      $('pwdInput').autocomplete   = isSignup ? 'new-password' : 'current-password';
+      $('nameField').classList.toggle('show', isSignup);
+      $('forgotLink').style.display = isSignup ? 'none' : '';
+    }
+
+    // ── Password show/hide ─────────────────────────────
+    function togglePwd() {
+      const input = $('pwdInput');
+      const isText = input.type === 'text';
+      input.type = isText ? 'password' : 'text';
+      $('eyeOpen').style.display  = isText ? '' : 'none';
+      $('eyeClose').style.display = isText ? 'none' : '';
+    }
+
+    // ── Submit ─────────────────────────────────────────
+    function handleSubmit() {
+      const email = $('emailInput').value.trim();
+      const pwd   = $('pwdInput').value;
+      if (!email || !pwd) { $('emailInput').focus(); return; }
+      const btn = $('submitBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+      setTimeout(() => showSuccess(isSignup
+        ? `Account created — welcome to 5pm!`
+        : `Signed in as ${email.split('@')[0]}`), 900);
+    }
+
+    // ── OAuth ──────────────────────────────────────────
+    function handleOAuth(provider) {
+      const btn = event.currentTarget;
+      btn.disabled = true; btn.style.opacity = '.5';
+      setTimeout(() => showSuccess(`Signed in with ${provider}`), 700);
+    }
+
+    // ── Success ────────────────────────────────────────
+    function showSuccess(msg) {
+      if (_recTimer) { clearInterval(_recTimer); _recTimer = null; }
+      $('authFooter').style.display = 'none';
+      showView('authSuccess');
+      $('successTitle').textContent = isSignup ? "You're all set!" : 'Signed in!';
+      $('successSub').textContent = msg ? `${msg} — opening workspace…` : 'Taking you to your workspace…';
+      localStorage.setItem('wh_auth', '1');
+      setTimeout(() => { window.location.href = 'index.html'; }, 1400);
+    }
+
+    // ── Account Recovery ───────────────────────────────
+    let _recTimer = null, recExpired = false;
+
+    function showRecovery() {
+      if (_recTimer) { clearInterval(_recTimer); _recTimer = null; }
+      $('authFooter').style.display = 'none';
+      showView('viewRecovery');
+      const btn = $('recoverEmailBtn');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+
+    function backToLogin() {
+      if (_recTimer) { clearInterval(_recTimer); _recTimer = null; }
+      $('authFooter').style.display = '';
+      showView('viewLogin');
+    }
+
+    function startEmailRecovery() {
+      const btn = $('recoverEmailBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      // Simulate async email send — timer starts ONLY after this resolves
+      setTimeout(() => {
+        const email = $('emailInput').value.trim() || 'your email';
+        $('sentEmail').textContent = email;
+        $('recoveryCode').value = '';
+        $('recoveryCode').disabled = false;
+        $('verifyOTPBtn').disabled = true;
+        $('timerRow').style.display = '';
+        $('expiredRow').style.display = 'none';
+        recExpired = false;
+        showView('viewOTP');
+        startRecTimer(60); // ← ONLY starts after email is "sent"
+      }, 800);
+    }
+
+    function startRecTimer(secs) {
+      if (_recTimer) clearInterval(_recTimer);
+      let rem = secs;
+      const fmt = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+      $('timerDisplay').textContent = fmt(rem);
+      _recTimer = setInterval(() => {
+        rem--;
+        if (rem <= 0) {
+          clearInterval(_recTimer); _recTimer = null;
+          recExpired = true;
+          $('timerRow').style.display = 'none';
+          $('expiredRow').style.display = '';
+          $('verifyOTPBtn').disabled = true;
+          $('recoveryCode').disabled = true;
+        } else {
+          $('timerDisplay').textContent = fmt(rem);
+        }
+      }, 1000);
+    }
+
+    function resendCode() {
+      recExpired = false;
+      $('recoveryCode').disabled = false;
+      $('recoveryCode').value = '';
+      $('verifyOTPBtn').disabled = true;
+      $('expiredRow').style.display = 'none';
+      $('timerRow').style.display = '';
+      startRecTimer(60);
+    }
+
+    function showAuthDigits() {
+      showView('viewAuth');
+      const digits = ['rd0','rd1','rd2','rd3','rd4','rd5'].map(id => $(id));
+      digits.forEach(d => { d.value = ''; d.disabled = false; });
+      $('authDigitVerify').disabled = true;
+      digits[0].focus();
+    }
+
+    function completeRecovery() {
+      showSuccess('Access restored');
+    }
+
+    // ── Digit inputs ───────────────────────────────────
+    function initDigits() {
+      const ids = ['rd0','rd1','rd2','rd3','rd4','rd5'];
+      const digits = ids.map(id => $(id));
+      const update = () => { $('authDigitVerify').disabled = !digits.every(d => /^\d$/.test(d.value)); };
+      digits.forEach((inp, i) => {
+        inp.addEventListener('input', () => {
+          inp.value = inp.value.replace(/\D/g, '').slice(-1);
+          if (inp.value && i < 5) digits[i + 1].focus();
+          update();
+        });
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Backspace') {
+            if (!inp.value && i > 0) { digits[i - 1].focus(); digits[i - 1].value = ''; e.preventDefault(); }
+            else if (inp.value) { inp.value = ''; e.preventDefault(); }
+            update();
+          } else if (e.key === 'ArrowLeft' && i > 0)  digits[i - 1].focus();
+            else if (e.key === 'ArrowRight' && i < 5) digits[i + 1].focus();
+        });
+        inp.addEventListener('paste', e => {
+          e.preventDefault();
+          const txt = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+          digits.forEach((d, j) => { d.value = txt[j] || ''; });
+          digits[Math.min(txt.length - 1, 5)].focus();
+          update();
+        });
+        inp.addEventListener('click', () => inp.select());
+      });
+    }
+    initDigits();
+
+    // ── Enter key ──────────────────────────────────────
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      if ($('viewLogin').style.display !== 'none') handleSubmit();
+    });
+  </script>
+</body>
+</html>

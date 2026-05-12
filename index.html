@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <!-- saved from url=(0053)file:///C:/Users/rosha/Downloads/WH%20Calculator.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Auth gate — block render entirely if not authenticated -->
+  <script>if(!localStorage.getItem('wh_auth')){document.documentElement.style.visibility='hidden';window.location.replace('login.html');}else{document.documentElement.style.visibility='';}</script>
   <!-- Apply theme before first paint to avoid flash -->
   <script>(function(){var s=localStorage.getItem('wh_theme');var p=window.matchMedia('(prefers-color-scheme:dark)').matches;if(s?s==='dark':p)document.documentElement.classList.add('dark');})()</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Murph - Work Hour Tracker</title>
+  <title>5pm - Work Hour Tracker</title>
   <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='%2309090b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='3' width='20' height='14' rx='2'/%3E%3Cpath d='M8 21h8m-4-4v4'/%3E%3Ccircle cx='12' cy='10' r='3' fill='%2309090b' stroke='none'/%3E%3Cpath d='M9 10c0-.8.4-1.5 1-2M15 10c0-.8-.4-1.5-1-2' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link href="./WH Calculator_files/css2" rel="stylesheet">
@@ -83,7 +85,8 @@
       width: 36px; height: 36px; flex-shrink: 0; background: transparent;
       border: none; border-radius: 8px; color: var(--muted-fg);
       transition: background .12s, color .12s; position: relative; }
-    .btn-icon:hover  { background: var(--muted); color: var(--foreground); }
+    .btn-icon:hover  { background: var(--card); color: var(--foreground); }
+    .dark .btn-icon:hover { background: var(--muted); }
     .btn-icon:active { opacity: .82; transform: scale(.97); }
     .btn-icon.notif-active { background: var(--foreground); color: var(--background); }
     .notif-badge { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px;
@@ -113,6 +116,53 @@
       color: var(--foreground); transition: background .12s; display: inline-flex;
       align-items: center; gap: 5px; }
     .btn-sm:hover { background: var(--border); }
+    /* Danger Zone button variants */
+    .btn-danger { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 600;
+      border-radius: 8px; font-family: var(--font); display: inline-flex; align-items: center;
+      background: var(--destructive); color: #fff; border: none; cursor: pointer;
+      transition: opacity .12s; white-space: nowrap; flex-shrink: 0; }
+    .btn-danger:hover { opacity: .88; }
+    .btn-ghost-danger { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 600;
+      border-radius: 8px; font-family: var(--font); display: inline-flex; align-items: center;
+      background: transparent; color: var(--foreground); border: 1px solid var(--border);
+      cursor: pointer; transition: background .15s, color .15s, border-color .15s;
+      white-space: nowrap; flex-shrink: 0; }
+    .btn-ghost-danger:hover { background: var(--destructive-bg); color: var(--destructive); border-color: var(--destructive-border); }
+    .btn-ghost-danger:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-ghost-danger:disabled:hover { background: transparent; color: var(--foreground); border-color: var(--border); }
+    .btn-secondary { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 500;
+      border-radius: 8px; font-family: var(--font); display: inline-flex; align-items: center;
+      background: var(--muted); color: var(--foreground); border: 1px solid var(--border);
+      cursor: pointer; transition: background .12s; white-space: nowrap; flex-shrink: 0; }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-ghost-destructive { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 600;
+      border-radius: 8px; font-family: var(--font); display: inline-flex; align-items: center;
+      background: transparent; color: var(--destructive); border: 1px solid var(--destructive-border);
+      cursor: pointer; transition: opacity .15s; white-space: nowrap; flex-shrink: 0; }
+    .btn-ghost-destructive:hover { opacity: .8; }
+    .btn-ghost-destructive:disabled { opacity: .4; cursor: not-allowed; }
+    .theme-icon-wrap { position: relative; display: inline-flex; width: 16px; height: 16px; }
+    .theme-icon-wrap .theme-icon-solid { position: absolute; top: 0; left: 0; opacity: 0; transition: opacity .18s ease; }
+    .theme-icon-wrap .theme-icon-outline { transition: opacity .18s ease; }
+    #themeBtn:hover .theme-icon-outline { opacity: 0; }
+    #themeBtn:hover .theme-icon-solid { opacity: 1; }
+    .fp-divider { display:flex;align-items:center;gap:10px;margin:2px 0;color:var(--muted-fg);font-size:11px; }
+    .fp-divider::before,.fp-divider::after { content:'';flex:1;height:1px;background:var(--border); }
+    .fp-oauth-btn { height:40px;display:flex;align-items:center;justify-content:center;gap:10px;
+      width:100%;border:1px solid var(--border);border-radius:8px;background:transparent;
+      color:var(--foreground);font-size:13px;font-weight:500;font-family:var(--font);
+      cursor:pointer;transition:background .12s,border-color .12s; }
+    .fp-oauth-btn:hover { background:var(--muted); }
+    .fp-code-input { height:52px;font-size:24px;font-weight:600;letter-spacing:.25em;text-align:center; }
+    .fp-timer { font-size:12px;color:var(--muted-fg);text-align:center;margin-top:10px; }
+    .fp-timer span { font-weight:600;color:var(--foreground); }
+    .auth-digit { width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;
+      border:1px solid var(--border);border-radius:8px;background:var(--input-bg);
+      color:var(--foreground);font-family:var(--font);transition:border-color .15s,box-shadow .15s;
+      -moz-appearance:textfield;caret-color:transparent; }
+    .auth-digit:focus { border-color:var(--ring);outline:none;box-shadow:0 0 0 3px rgba(9,9,11,.08); }
+    .dark .auth-digit:focus { box-shadow:0 0 0 3px rgba(250,250,250,.08); }
+    .auth-digit::-webkit-outer-spin-button,.auth-digit::-webkit-inner-spin-button { -webkit-appearance:none; }
 
     /* ── Input ── */
     .field-input { height: 40px; width: 100%; font-size: 14px; font-family: var(--font);
@@ -240,6 +290,31 @@
     .shift-combo-btn.resume-shift { background: var(--foreground); color: var(--background); border: none; }
     .shift-combo-btn.resume-shift:hover { opacity: .85; }
     .shift-combo-btn:disabled { opacity: .4; cursor: default; }
+    /* Split button (Pause / Resume + chevron + End Session dropdown) */
+    .split-btn-wrap { display: flex; align-items: stretch; }
+    .split-btn-wrap .shift-combo-btn { border-radius: 8px 0 0 8px; flex: 1; }
+    .split-chevron-btn { height: 38px; width: 34px; flex-shrink: 0; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; border-radius: 0 8px 8px 0;
+      transition: opacity .12s; }
+    .split-chevron-btn:hover { opacity: .85; }
+    .split-chevron-btn.pause-shift-chev { background: var(--muted); color: var(--foreground);
+      border: 1.5px solid var(--border); border-left: none; }
+    .split-chevron-btn.resume-shift-chev { background: var(--foreground); color: var(--background);
+      border-left: 1px solid rgba(255,255,255,.15); }
+    .split-dropdown { position: absolute; right: 0; top: calc(100% + 6px);
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.06);
+      overflow: hidden; z-index: 200; min-width: 150px; }
+    .split-dropdown-item { display: flex; align-items: center; gap: 8px;
+      width: 100%; padding: 10px 14px; border: none; background: none; text-align: left;
+      font-size: 13px; font-weight: 500; color: var(--destructive); cursor: pointer;
+      font-family: var(--font); transition: background .1s; }
+    .split-dropdown-item:hover { background: var(--destructive-bg); }
+    /* Custom target chip in Log Out box */
+    .custom-target-chip { font-size: 10px; font-weight: 600; letter-spacing: .04em;
+      background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border);
+      border-radius: 4px; padding: 1px 5px; text-transform: uppercase; line-height: 1.4;
+      flex-shrink: 0; }
     .shift-combo-active-label { flex: 1; font-size: 13px; font-weight: 500;
       color: var(--muted-fg); display: none; }
     .shift-combo.active-state .shift-combo-input { display: none; }
@@ -270,13 +345,13 @@
     .rc-body .rc-numbers { margin-bottom: -4px; }
     .rc-numbers { display: flex; align-items: baseline; gap: 12px; }
     .rc-left-col { display: flex; flex-direction: column; gap: 2px; }
-    .rc-right-col { display: flex; flex-direction: column; gap: 2px; margin-left: auto; text-align: right; }
+    .rc-elapsed-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: 2px; }
+    .rc-rem-sep { font-size: 11px; color: var(--muted-fg); opacity: 0.45; font-weight: 700; line-height: 1; }
+    .rc-rem-inline { font-size: 11px; font-weight: 600; letter-spacing: .04em; line-height: 1; }
+    .rc-rem-text { font-size: 11px; font-weight: 600; color: var(--muted-fg); letter-spacing: .06em; text-transform: uppercase; line-height: 1; }
     .rc-worked { font-size: 36px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
     .rc-elapsed-label { font-size: 11px; font-weight: 600; letter-spacing: .08em;
       text-transform: uppercase; color: var(--success); margin-top: 2px; }
-    .rc-remaining { font-size: 36px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
-    .rc-rem-label { font-size: 11px; font-weight: 600; letter-spacing: .08em;
-      text-transform: uppercase; color: var(--muted-fg); margin-top: 2px; }
     .progress-wrap { display: flex; flex-direction: column; gap: 6px; }
     .progress-track { height: 4px; background: var(--muted); border-radius: 99px; overflow: hidden; }
     .progress-fill { height: 100%; background: var(--foreground); border-radius: 99px;
@@ -432,7 +507,24 @@
       transform: scale(.96) translateY(8px);
       transition: transform .22s cubic-bezier(.34,1.35,.64,1); }
     .overlay.open .dialog { transform: scale(1) translateY(0); }
-    .dialog-head { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+    .dialog-head { padding: 20px 20px 16px; position: relative; }
+    /* Toast */
+    #appToast.toast-show { opacity: 1 !important; pointer-events: all !important; transform: translateX(-50%) translateY(0) !important; }
+    /* About Project card */
+    .about-dev-pic { width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--border); flex-shrink: 0; }
+    .about-social-btn { display:inline-flex;align-items:center;justify-content:center;
+      width:34px;height:34px;border-radius:8px;border:1px solid var(--border);
+      background:transparent;color:var(--muted-fg);text-decoration:none;
+      transition:color .15s,border-color .15s;cursor:pointer; }
+    .about-social-btn:hover { color:var(--foreground);border-color:var(--foreground); }
+    .sponsor-btn { display:inline-flex;align-items:center;gap:7px;padding:7px 14px;
+      border-radius:8px;border:1.5px solid var(--border);background:transparent;
+      color:var(--foreground);font-size:13px;font-weight:500;font-family:var(--font);
+      cursor:pointer;text-decoration:none;transition:background .12s,border-color .12s; }
+    .sponsor-btn:hover { background:var(--muted); }
+    .about-version-badge { font-size:11px;font-weight:600;letter-spacing:.06em;
+      background:var(--muted);color:var(--muted-fg);padding:2px 8px;border-radius:6px; }
     .dialog-title { font-size: 15px; font-weight: 600; color: var(--foreground); }
     .dialog-desc  { font-size: 12px; color: var(--muted-fg); margin-top: 3px; }
     .dialog-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
@@ -750,7 +842,7 @@
       .day-date { font-size: 14px; }
       .login-row { flex-wrap: wrap; }
       #loginInput { min-width: 0; }
-      .rc-worked, .rc-remaining { font-size: 30px; }
+      .rc-worked { font-size: 30px; }
       .target-day-picker { flex-wrap: wrap; }
     }
 
@@ -870,16 +962,41 @@
     .ob-panel input[type="text"]:focus { border-color: var(--ring) !important; box-shadow: 0 0 0 3px rgba(9,9,11,.08); }
     .dark .ob-panel input[type="text"]:focus { box-shadow: 0 0 0 3px rgba(250,250,250,.08); }
     .ob-import-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 28px 20px;
-      text-align: center; cursor: pointer; transition: border-color .15s, background .15s; display: flex;
+      text-align: center; cursor: pointer;
+      transition: border-color .22s ease, background .22s ease, box-shadow .22s ease; display: flex;
       flex-direction: column; align-items: center; gap: 8px; }
-    .ob-import-zone:hover { border-color: var(--foreground); }
-    .ob-import-zone.drag-over { border-color: var(--foreground); background: var(--muted); }
+    .ob-import-zone:hover { border-color: var(--muted-fg); }
+    .ob-import-zone.drag-over { border-color: var(--foreground); background: var(--muted);
+      box-shadow: 0 0 0 4px rgba(9,9,11,.06); }
+    .dark .ob-import-zone.drag-over { box-shadow: 0 0 0 4px rgba(250,250,250,.06); }
     .ob-import-zone svg { color: var(--muted-fg); }
     .ob-import-zone-text { font-size: 13px; color: var(--muted-fg); }
     .ob-import-zone-text strong { color: var(--foreground); }
     .ob-day-picker { display: flex; gap: 6px; flex-wrap: wrap; }
     .ob-done-card { background: var(--muted); border-radius: 12px; padding: 20px; text-align: center;
       display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    /* Leaving / deleting loader modal */
+    .leaving-spinner { width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--foreground);
+      border-radius:50%;animation:leaveSpin .7s linear infinite;flex-shrink:0; }
+    @keyframes leaveSpin { to { transform:rotate(360deg); } }
+    /* Delete feedback chips */
+    .del-chips { display:flex;flex-wrap:wrap;gap:6px; }
+    .del-chip { display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+      border:1px solid var(--border);border-radius:20px;font-size:12px;
+      font-weight:500;color:var(--muted-fg);background:var(--input-bg);cursor:pointer;
+      font-family:var(--font);transition:border-color .15s,color .15s,background .15s; }
+    .del-chip:hover { border-color:var(--muted-fg); }
+    .del-chip.selected { border-color:var(--foreground);color:var(--card);background:var(--foreground); }
+    .del-chip .chip-check { display:none;width:13px;height:13px;flex-shrink:0; }
+    .del-chip.selected .chip-check { display:block; }
+    /* Auto-expanding feedback textarea */
+    .del-feedback-ta { width:100%;resize:none;overflow:hidden;padding:10px 12px;
+      font-family:var(--font);font-size:13px;line-height:1.5;min-height:72px;
+      transition:height .2s cubic-bezier(0.4,0,0.2,1); }
+    /* Sliding Saturday row in onboarding routine step */
+    .ob-sat-row { overflow:hidden; max-height:0; opacity:0;
+      transition:max-height .32s cubic-bezier(0.4,0,0.2,1), opacity .25s ease; }
+    .ob-sat-row.show { max-height:80px; opacity:1; }
 
     /* ── Instagram Stories–style onboarding stepper ── */
     .ob-stories-wrap { display: flex; align-items: center; gap: 5px; margin-bottom: 24px; }
@@ -895,7 +1012,7 @@
     .day-selector.wk-back { animation: ds-slide-back .22s ease both; }
 
     /* ── Animated number ticker ── */
-    .rc-worked, .rc-remaining { will-change: contents; }
+    .rc-worked, .rc-rem-inline { will-change: contents; }
 
     /* ── Saturday pill entrance animation ── */
     @keyframes plan-btn-in { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: scale(1); } }
@@ -972,13 +1089,8 @@
         </div>
         <div class="nav-actions">
           <button class="btn-icon" id="themeBtn" title="Theme · D">
-            <svg id="sunIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display: none;">
-              <circle cx="12" cy="12" r="4"></circle>
-              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
-            </svg>
-            <svg id="moonIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display: block;">
-              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
-            </svg>
+            <span id="sunIconWrap" class="theme-icon-wrap" style="display:none"><svg class="theme-icon-outline" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 0C12.5523 0 13 0.447715 13 1V4C13 4.55228 12.5523 5 12 5C11.4477 5 11 4.55228 11 4V1C11 0.447715 11.4477 0 12 0Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z" fill="currentColor"/><path d="M20.4852 4.92894C20.8757 4.53841 20.8757 3.90525 20.4852 3.51472C20.0947 3.1242 19.4615 3.1242 19.071 3.51472L16.9496 5.63605C16.5591 6.02657 16.5591 6.65974 16.9496 7.05026C17.3402 7.44078 17.9733 7.44078 18.3639 7.05026L20.4852 4.92894Z" fill="currentColor"/><path d="M24 12C24 12.5523 23.5523 13 23 13H20C19.4477 13 19 12.5523 19 12C19 11.4477 19.4477 11 20 11H23C23.5523 11 24 11.4477 24 12Z" fill="currentColor"/><path d="M19.0711 20.4853C19.4616 20.8758 20.0948 20.8758 20.4853 20.4853C20.8758 20.0948 20.8758 19.4616 20.4853 19.0711L18.364 16.9498C17.9734 16.5592 17.3403 16.5592 16.9497 16.9498C16.5592 17.3403 16.5592 17.9735 16.9497 18.364L19.0711 20.4853Z" fill="currentColor"/><path d="M12 24C11.4477 24 11 23.5523 11 23V20C11 19.4477 11.4477 19 12 19C12.5523 19 13 19.4477 13 20V23C13 23.5523 12.5523 24 12 24Z" fill="currentColor"/><path d="M3.51482 19.0711C3.12429 19.4616 3.12429 20.0948 3.51482 20.4853C3.90534 20.8758 4.53851 20.8758 4.92903 20.4853L7.05035 18.364C7.44087 17.9734 7.44087 17.3403 7.05035 16.9497C6.65983 16.5592 6.02666 16.5592 5.63614 16.9497L3.51482 19.0711Z" fill="currentColor"/><path d="M0 12C0 11.4477 0.447715 11 1 11H4C4.55228 11 5 11.4477 5 12C5 12.5523 4.55228 13 4 13H1C0.447715 13 0 12.5523 0 12Z" fill="currentColor"/><path d="M4.92894 3.5147C4.53841 3.12417 3.90525 3.12417 3.51472 3.5147C3.1242 3.90522 3.1242 4.53838 3.51472 4.92891L5.63605 7.05023C6.02657 7.44075 6.65974 7.44075 7.05026 7.05023C7.44078 6.6597 7.44078 6.02654 7.05026 5.63601L4.92894 3.5147Z" fill="currentColor"/></svg><svg class="theme-icon-solid" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M11.75 5.5C11.1977 5.5 10.75 5.05228 10.75 4.5V2C10.75 1.44772 11.1977 1 11.75 1H12.25C12.8023 1 13.25 1.44772 13.25 2V4.5C13.25 5.05228 12.8023 5.5 12.25 5.5H11.75Z" fill="currentColor"/><path d="M16.4194 7.22698C16.0289 6.83646 16.0289 6.20329 16.4194 5.81277L18.1872 4.045C18.5777 3.65447 19.2109 3.65447 19.6014 4.045L19.9549 4.39855C20.3455 4.78908 20.3455 5.42224 19.9549 5.81277L18.1872 7.58053C17.7967 7.97106 17.1635 7.97106 16.773 7.58053L16.4194 7.22698Z" fill="currentColor"/><path d="M18.5 11.75C18.5 11.1977 18.9477 10.75 19.5 10.75H22C22.5523 10.75 23 11.1977 23 11.75V12.25C23 12.8023 22.5523 13.25 22 13.25H19.5C18.9477 13.25 18.5 12.8023 18.5 12.25V11.75Z" fill="currentColor"/><path d="M16.7728 16.4194C17.1633 16.0289 17.7965 16.0289 18.187 16.4194L19.9548 18.1872C20.3453 18.5777 20.3453 19.2109 19.9548 19.6014L19.6012 19.9549C19.2107 20.3455 18.5775 20.3455 18.187 19.9549L16.4192 18.1872C16.0287 17.7967 16.0287 17.1635 16.4192 16.773L16.7728 16.4194Z" fill="currentColor"/><path d="M12.25 18.5C12.8023 18.5 13.25 18.9477 13.25 19.5V22C13.25 22.5523 12.8023 23 12.25 23H11.75C11.1977 23 10.75 22.5523 10.75 22V19.5C10.75 18.9477 11.1977 18.5 11.75 18.5H12.25Z" fill="currentColor"/><path d="M7.58059 16.773C7.97111 17.1635 7.97111 17.7967 7.58059 18.1872L5.81282 19.955C5.4223 20.3455 4.78913 20.3455 4.39861 19.955L4.04505 19.6014C3.65453 19.2109 3.65453 18.5778 4.04505 18.1872L5.81282 16.4195C6.20334 16.0289 6.83651 16.0289 7.22703 16.4195L7.58059 16.773Z" fill="currentColor"/><path d="M5.5 12.25C5.5 12.8023 5.05228 13.25 4.5 13.25H2C1.44772 13.25 1 12.8023 1 12.25V11.75C1 11.1977 1.44772 10.75 2 10.75H4.5C5.05228 10.75 5.5 11.1977 5.5 11.75V12.25Z" fill="currentColor"/><path d="M7.22722 7.58059C6.8367 7.97111 6.20353 7.97111 5.81301 7.58059L4.04524 5.81282C3.65472 5.4223 3.65472 4.78913 4.04524 4.39861L4.3988 4.04505C4.78932 3.65453 5.42248 3.65453 5.81301 4.04505L7.58078 5.81282C7.9713 6.20334 7.9713 6.83651 7.58078 7.22703L7.22722 7.58059Z" fill="currentColor"/><path d="M7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12Z" fill="currentColor"/></svg></span>
+            <span id="moonIconWrap" class="theme-icon-wrap" style="display:inline-flex"><svg class="theme-icon-outline" width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.0972 2.53033C12.2913 2.86484 12.2752 3.2813 12.0557 3.59974C11.3898 4.56587 11 5.73589 11 6.99996C11 10.3137 13.6863 13 17 13C18.2641 13 19.4341 12.6102 20.4002 11.9443C20.7187 11.7248 21.1351 11.7086 21.4696 11.9027C21.8041 12.0968 21.9967 12.4664 21.9642 12.8518C21.5313 17.9764 17.236 22 12 22C6.47715 22 2 17.5228 2 12C2 6.76392 6.02351 2.46868 11.1481 2.03579C11.5335 2.00324 11.9031 2.19582 12.0972 2.53033ZM9.42424 4.42346C6.26994 5.49547 4 8.483 4 12C4 16.4182 7.58172 20 12 20C15.517 20 18.5045 17.73 19.5765 14.5757C18.7676 14.8508 17.9008 15 17 15C12.5817 15 9 11.4182 9 6.99996C9 6.09916 9.1492 5.23234 9.42424 4.42346Z" fill="currentColor"/></svg><svg class="theme-icon-solid" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12.0557 3.59974C12.2752 3.2813 12.2913 2.86484 12.0972 2.53033C11.9031 2.19582 11.5335 2.00324 11.1481 2.03579C6.02351 2.46868 2 6.76392 2 12C2 17.5228 6.47715 22 12 22C17.236 22 21.5313 17.9764 21.9642 12.8518C21.9967 12.4664 21.8041 12.0968 21.4696 11.9027C21.1351 11.7086 20.7187 11.7248 20.4002 11.9443C19.4341 12.6102 18.2641 13 17 13C13.6863 13 11 10.3137 11 6.99996C11 5.73589 11.3898 4.56587 12.0557 3.59974Z" fill="currentColor"/></svg></span>
           </button>
           <button class="btn-icon" id="notifBtn" title="Notifications">
             <div class="notif-badge" id="notifBadge" style="display:none"></div>
@@ -1035,10 +1147,10 @@
           <span class="this-week-label" id="thisWeekLabel">This Week</span>
           <div class="this-week-nav">
             <button class="this-week-btn" id="weekPrevBtn" onclick="navDaySelectorDay(-1)" title="Previous day">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.7071 3.29289C17.0976 3.68342 17.0976 4.31658 16.7071 4.70711L9.41421 12L16.7071 19.2929C17.0976 19.6834 17.0976 20.3166 16.7071 20.7071C16.3166 21.0976 15.6834 21.0976 15.2929 20.7071L7.29289 12.7071C6.90237 12.3166 6.90237 11.6834 7.29289 11.2929L15.2929 3.29289C15.6834 2.90237 16.3166 2.90237 16.7071 3.29289Z" fill="currentColor"/></svg>
             </button>
             <button class="this-week-btn" id="weekNextBtn" onclick="navDaySelectorDay(1)" title="Next day" disabled>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.29289 3.29289C7.68342 2.90237 8.31658 2.90237 8.70711 3.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L8.70711 20.7071C8.31658 21.0976 7.68342 21.0976 7.29289 20.7071C6.90237 20.3166 6.90237 19.6834 7.29289 19.2929L14.5858 12L7.29289 4.70711C6.90237 4.31658 6.90237 3.68342 7.29289 3.29289Z" fill="currentColor"/></svg>
             </button>
           </div>
         </div>
@@ -1076,7 +1188,7 @@
           </div>
           <div style="display:flex;align-items:center;gap:10px">
             <button class="rc-update-btn" id="rcUpdateEntryBtn" onclick="openDayEditModal(selectedDayKey)">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.4324 4C18.2266 4 18.0227 4.04055 17.8325 4.11933C17.6423 4.19811 17.4695 4.31358 17.3239 4.45914L5.25659 16.5265L4.42524 19.5748L7.47353 18.7434L19.5409 6.67608C19.6864 6.53051 19.8019 6.3577 19.8807 6.16751C19.9595 5.97732 20 5.77348 20 5.56761C20 5.36175 19.9595 5.1579 19.8807 4.96771C19.8019 4.77752 19.6864 4.60471 19.5409 4.45914C19.3953 4.31358 19.2225 4.19811 19.0323 4.11933C18.8421 4.04055 18.6383 4 18.4324 4ZM17.0671 2.27157C17.5 2.09228 17.9639 2 18.4324 2C18.9009 2 19.3648 2.09228 19.7977 2.27157C20.2305 2.45086 20.6238 2.71365 20.9551 3.04493C21.2864 3.37621 21.5492 3.7695 21.7285 4.20235C21.9077 4.63519 22 5.09911 22 5.56761C22 6.03611 21.9077 6.50003 21.7285 6.93288C21.5492 7.36572 21.2864 7.75901 20.9551 8.09029L8.69996 20.3454C8.57691 20.4685 8.42387 20.5573 8.25597 20.6031L3.26314 21.9648C2.91693 22.0592 2.54667 21.9609 2.29292 21.7071C2.03917 21.4534 1.94084 21.0831 2.03526 20.7369L3.39694 15.7441C3.44273 15.5762 3.53154 15.4231 3.6546 15.3001L15.9097 3.04493C16.241 2.71365 16.6343 2.45086 17.0671 2.27157Z" fill="currentColor"/></svg>
               Update Entry
             </button>
             <span class="rc-head-date" id="rcHeadDate"></span>
@@ -1089,11 +1201,12 @@
           <div class="rc-numbers">
             <div class="rc-left-col">
               <div class="rc-worked" id="rcWorked" style="color:var(--muted-fg)">—</div>
-              <div class="rc-elapsed-label" id="rcElapsedLabel">Not Started</div>
-            </div>
-            <div class="rc-right-col" id="rcRightCol" style="display:block">
-              <div class="rc-remaining" id="rcRemaining" style="color:var(--muted-fg)">10h 00m</div>
-              <div class="rc-rem-label">remaining</div>
+              <div class="rc-elapsed-row">
+                <div class="rc-elapsed-label" id="rcElapsedLabel">Not Started</div>
+                <span class="rc-rem-sep" id="rcRemSep" style="display:none">·</span>
+                <span class="rc-rem-inline" id="rcRemaining" style="color:var(--muted-fg);display:none">10h 00m</span>
+                <span class="rc-rem-text" id="rcRemText" style="display:none">remaining</span>
+              </div>
             </div>
           </div>
           <div class="progress-wrap">
@@ -1104,25 +1217,25 @@
           </div>
           <div id="rcToday"><div class="wk-target-row"><span class="section-label">Recommended</span><div class="wk-target-right"><span class="wk-target-val">9h 00m</span><span class="hint-sep">&nbsp;+&nbsp;</span><span class="hint-makeup">1h 00m</span></div></div></div>
           <div id="stayHint" class="stay-hint" style="display:none">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 18.5C12.5523 18.5 13 18.0523 13 17.5L13 10.5C13 9.94772 12.5523 9.5 12 9.5C11.4477 9.5 11 9.94772 11 10.5L11 17.5C11 18.0523 11.4477 18.5 12 18.5Z" fill="currentColor"/><path d="M12 8.5C12.8284 8.5 13.5 7.82843 13.5 7C13.5 6.17157 12.8284 5.5 12 5.5C11.1716 5.5 10.5 6.17157 10.5 7C10.5 7.82843 11.1716 8.5 12 8.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1C5.92487 1 1 5.92487 1 12ZM12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z" fill="currentColor"/></svg>
             <span id="stayHintText"></span>
           </div>
           <div class="banner banner-warning" id="otBanner">
             <div class="banner-left">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5.5C12.5523 5.5 13 5.94772 13 6.5L13 13.5C13 14.0523 12.5523 14.5 12 14.5C11.4477 14.5 11 14.0523 11 13.5L11 6.5C11 5.94772 11.4477 5.5 12 5.5Z" fill="currentColor"/><path d="M12 18.5C12.8284 18.5 13.5 17.8284 13.5 17C13.5 16.1716 12.8284 15.5 12 15.5C11.1716 15.5 10.5 16.1716 10.5 17C10.5 17.8284 11.1716 18.5 12 18.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12ZM12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3Z" fill="currentColor"/></svg>
               <span id="otMsg">+0h 00m overtime</span>
             </div>
             <span class="ot-quip" id="otQuip"></span>
           </div>
           <div class="banner banner-success" id="doneBanner">
             <div class="banner-left">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>
               <span id="doneMsg">You're done. Head out!</span>
             </div>
           </div>
           <div class="banner banner-autostop banner-warning" id="autostopBanner">
             <div class="banner-left">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5.5C12.5523 5.5 13 5.94772 13 6.5L13 13.5C13 14.0523 12.5523 14.5 12 14.5C11.4477 14.5 11 14.0523 11 13.5L11 6.5C11 5.94772 11.4477 5.5 12 5.5Z" fill="currentColor"/><path d="M12 18.5C12.8284 18.5 13.5 17.8284 13.5 17C13.5 16.1716 12.8284 15.5 12 15.5C11.1716 15.5 10.5 16.1716 10.5 17C10.5 17.8284 11.1716 18.5 12 18.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12ZM12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3Z" fill="currentColor"/></svg>
               <span id="autostopMsg">Tracking auto-stopped at daily target + buffer.</span>
             </div>
           </div>
@@ -1134,11 +1247,22 @@
         <!-- Single combo: input + button inside -->
         <div class="shift-combo" id="shiftInputRow">
           <button type="button" class="shift-tp-btn" id="loginTpBtn" onclick="openTpModal('loginInput',event)" title="Pick start time">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
           </button>
           <input class="shift-combo-input" id="loginInput" type="text" placeholder="Enter Time" autocomplete="off" spellcheck="false">
           <span class="shift-combo-active-label" id="shiftActiveLabel">—</span>
-          <button class="shift-combo-btn" id="calcBtn">Quick Start</button>
+          <div id="calcBtnWrap" style="position:relative;display:flex;align-items:stretch">
+            <button class="shift-combo-btn" id="calcBtn">Quick Start</button>
+            <button class="split-chevron-btn" id="calcBtnChevron" style="display:none" title="More options">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="split-dropdown" id="calcBtnDropdown" style="display:none">
+              <button class="split-dropdown-item" id="endSessionBtn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                End Session
+              </button>
+            </div>
+          </div>
         </div>
         <!-- Resume row (after End Session or auto-stop) -->
         <div class="shift-resume-row" id="resumeRow" style="display:none">
@@ -1159,11 +1283,11 @@
       <!-- Week navigation -->
       <div class="an-week-nav">
         <button class="an-nav-btn" id="wkPrevBtn" title="Previous week">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.7071 3.29289C17.0976 3.68342 17.0976 4.31658 16.7071 4.70711L9.41421 12L16.7071 19.2929C17.0976 19.6834 17.0976 20.3166 16.7071 20.7071C16.3166 21.0976 15.6834 21.0976 15.2929 20.7071L7.29289 12.7071C6.90237 12.3166 6.90237 11.6834 7.29289 11.2929L15.2929 3.29289C15.6834 2.90237 16.3166 2.90237 16.7071 3.29289Z" fill="currentColor"/></svg>
         </button>
         <span class="an-week-nav-label" id="wkNavLabel">April 13–17</span>
         <button class="an-nav-btn" id="wkNextBtn" title="Next week" disabled="">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.29289 3.29289C7.68342 2.90237 8.31658 2.90237 8.70711 3.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L8.70711 20.7071C8.31658 21.0976 7.68342 21.0976 7.29289 20.7071C6.90237 20.3166 6.90237 19.6834 7.29289 19.2929L14.5858 12L7.29289 4.70711C6.90237 4.31658 6.90237 3.68342 7.29289 3.29289Z" fill="currentColor"/></svg>
         </button>
       </div>
 
@@ -1238,7 +1362,7 @@
         <div class="analytics-card-head">
           <span class="analytics-card-title">Your Penalties</span>
           <button class="btn-sm" id="penaltiesCheck">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M2.06095 10.8901C2.61379 5.88912 6.85202 2 12 2C14.2365 2 16.0402 2.88495 17.581 4.0323C18.4275 4.66267 19.2351 5.40719 20 6.14376V3C20 2.44771 20.4477 2 21 2C21.5523 2 22 2.44771 22 3V8.5C22 9.05228 21.5523 9.5 21 9.5H15.5C14.9477 9.5 14.5 9.05228 14.5 8.5C14.5 7.94772 14.9477 7.5 15.5 7.5H18.5243C17.8281 6.82979 17.1371 6.19538 16.3865 5.6364C15.054 4.64418 13.662 4 12 4C7.88281 4 4.4909 7.11098 4.04884 11.1099C3.98816 11.6588 3.49396 12.0546 2.94502 11.9939C2.39608 11.9333 2.00027 11.4391 2.06095 10.8901Z" fill="currentColor"/><path d="M21.9939 13.1099C21.441 18.1109 17.2028 22 12.0548 22C9.81834 22 8.0146 21.115 6.47383 19.9677C5.62731 19.3373 4.8197 18.5928 4.05481 17.8562V21C4.05481 21.5523 3.60709 22 3.05481 22C2.50253 22 2.05481 21.5523 2.05481 21V15.5C2.05481 14.9477 2.50253 14.5 3.05481 14.5H8.55481C9.1071 14.5 9.55481 14.9477 9.55481 15.5C9.55481 16.0523 9.1071 16.5 8.55481 16.5H5.53052C6.22675 17.1702 6.91769 17.8046 7.66834 18.3636C9.0008 19.3558 10.3928 20 12.0548 20C16.172 20 19.5639 16.889 20.006 12.8901C20.0667 12.3412 20.5608 11.9454 21.1098 12.0061C21.6587 12.0667 22.0545 12.5609 21.9939 13.1099Z" fill="currentColor"/></svg>
             Refresh
           </button>
         </div>
@@ -1269,7 +1393,7 @@
           <div style="display:flex;gap:12px">
             <div style="flex:1;display:flex;flex-direction:column;gap:6px">
               <div class="form-label">Your Name</div>
-              <input type="text" class="field-input" id="inpName" placeholder="Nickname" autocomplete="off" maxlength="40">
+              <input type="text" class="field-input" id="inpName" placeholder="Full Name" autocomplete="off" maxlength="40">
             </div>
             <div style="flex:1;display:flex;flex-direction:column;gap:6px">
               <div class="form-label">Position</div>
@@ -1282,7 +1406,7 @@
         <div class="settings-card" id="cardGeneral">
           <div class="settings-card-head" onclick="toggleCard('cardGeneral')">
             <div class="section-label">Basic</div>
-            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.29289 7.29289C3.68342 6.90237 4.31658 6.90237 4.70711 7.29289L12 14.5858L19.2929 7.29289C19.6834 6.90237 20.3166 6.90237 20.7071 7.29289C21.0976 7.68342 21.0976 8.31658 20.7071 8.70711L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L3.29289 8.70711C2.90237 8.31658 2.90237 7.68342 3.29289 7.29289Z" fill="currentColor"/></svg>
           </div>
           <div class="settings-card-body">
           <div class="settings-group">
@@ -1317,6 +1441,60 @@
               </div>
             </div>
 
+            <div class="sep-inner"></div>
+
+            <!-- Allow Notifications (moved here from System card) -->
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifOn').click()">
+              <div>
+                <div class="form-label">Allow Notifications</div>
+                <div class="form-sub">Native push alerts for your shift milestones.</div>
+              </div>
+              <label class="toggle" onclick="event.stopPropagation()">
+                <input type="checkbox" id="inpNotifOn" onchange="onNotifToggleChange()">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+
+            <!-- Sub-toggles (expand smoothly when notifications enabled) -->
+            <div id="notifSubGroup" style="overflow:hidden;max-height:0;transition:max-height .3s cubic-bezier(.4,0,.2,1),opacity .22s;opacity:0;pointer-events:none">
+              <div style="padding-top:12px;display:flex;flex-direction:column;gap:14px;padding-left:12px;border-left:2px solid var(--border)">
+
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifTarget').click()">
+                  <div>
+                    <div class="form-label" style="font-size:13px">Daily Target</div>
+                    <div class="form-sub">When your daily target is complete.</div>
+                  </div>
+                  <label class="toggle" style="flex-shrink:0;margin-top:2px" onclick="event.stopPropagation()">
+                    <input type="checkbox" id="inpNotifTarget" onchange="autoSaveSettings()">
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifKickstart').click()">
+                  <div>
+                    <div class="form-label" style="font-size:13px">Kickstart</div>
+                    <div class="form-sub">5 minutes before your target. Time to wrap up.</div>
+                  </div>
+                  <label class="toggle" style="flex-shrink:0;margin-top:2px" onclick="event.stopPropagation()">
+                    <input type="checkbox" id="inpNotifKickstart" onchange="autoSaveSettings()">
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifOvertime').click()">
+                  <div>
+                    <div class="form-label" style="font-size:13px">Overtime</div>
+                    <div class="form-sub">5 minutes past your target. A nudge to leave.</div>
+                  </div>
+                  <label class="toggle" style="flex-shrink:0;margin-top:2px" onclick="event.stopPropagation()">
+                    <input type="checkbox" id="inpNotifOvertime" onchange="autoSaveSettings()">
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+
           </div>
           </div><!-- /settings-card-body -->
         </div><!-- /General Card -->
@@ -1325,7 +1503,7 @@
         <div class="settings-card" id="cardAdvanced">
           <div class="settings-card-head" onclick="toggleCard('cardAdvanced')">
             <div class="section-label">Advanced</div>
-            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.29289 7.29289C3.68342 6.90237 4.31658 6.90237 4.70711 7.29289L12 14.5858L19.2929 7.29289C19.6834 6.90237 20.3166 6.90237 20.7071 7.29289C21.0976 7.68342 21.0976 8.31658 20.7071 8.70711L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L3.29289 8.70711C2.90237 8.31658 2.90237 7.68342 3.29289 7.29289Z" fill="currentColor"/></svg>
           </div>
           <div class="settings-card-body">
           <div class="settings-group">
@@ -1341,7 +1519,7 @@
                   <input type="time" id="inpShiftStartPicker" tabindex="-1"
                     style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
                   <button type="button" class="tp-icon-btn" onclick="openTpModal('inpShiftStart',event)" title="Pick time">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
                   </button>
                 </div>
                 <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">to</span>
@@ -1351,24 +1529,11 @@
                   <input type="time" id="inpShiftEndPicker" tabindex="-1"
                     style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
                   <button type="button" class="tp-icon-btn" onclick="openTpModal('inpShiftEnd',event)" title="Pick time">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
                   </button>
                 </div>
               </div>
             </div>
-
-            <!-- Include Saturday Toggle -->
-            <div class="toggle-row" onclick="el('inpIncludeSat').click()">
-              <div>
-                <div class="form-label">Include Saturday</div>
-                <div class="form-sub">Enable if Saturday is a working day for you.</div>
-              </div>
-              <label class="toggle" onclick="event.stopPropagation()">
-                <input type="checkbox" id="inpIncludeSat" onchange="toggleIncludeSaturday(this.checked)">
-                <span class="toggle-track"></span>
-              </label>
-            </div>
-            <input type="hidden" id="inpWorkDays" value="5">
 
             <!-- Penalty Calculation -->
             <div class="form-field">
@@ -1383,6 +1548,19 @@
                 </div>
               </div>
             </div>
+
+            <!-- Include Saturday Toggle -->
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpIncludeSat').click()">
+              <div>
+                <div class="form-label">Include Saturday</div>
+                <div class="form-sub">Enable if Saturday is a working day for you.</div>
+              </div>
+              <label class="toggle" onclick="event.stopPropagation()">
+                <input type="checkbox" id="inpIncludeSat" onchange="toggleIncludeSaturday(this.checked)">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <input type="hidden" id="inpWorkDays" value="5">
 
             <!-- Leave Early Plan (multi-select) -->
             <div class="target-day-block">
@@ -1422,21 +1600,18 @@
         <div class="settings-card" id="cardOther">
           <div class="settings-card-head" onclick="toggleCard('cardOther')">
             <div class="section-label">System</div>
-            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="settings-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.29289 7.29289C3.68342 6.90237 4.31658 6.90237 4.70711 7.29289L12 14.5858L19.2929 7.29289C19.6834 6.90237 20.3166 6.90237 20.7071 7.29289C21.0976 7.68342 21.0976 8.31658 20.7071 8.70711L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L3.29289 8.70711C2.90237 8.31658 2.90237 7.68342 3.29289 7.29289Z" fill="currentColor"/></svg>
           </div>
           <div class="settings-card-body">
           <div class="settings-group">
 
-            <!-- Allow Notifications -->
-            <div class="toggle-row" onclick="el('inpNotifOn').click()">
+            <!-- Update Password -->
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
               <div>
-                <div class="form-label">Allow Notifications</div>
-                <div class="form-sub">We'll notify you when your working hours are elapsed.</div>
+                <div class="form-label">Update Password</div>
+                <div class="form-sub">Verify your identity to set a new password.</div>
               </div>
-              <label class="toggle" onclick="event.stopPropagation()">
-                <input type="checkbox" id="inpNotifOn">
-                <span class="toggle-track"></span>
-              </label>
+              <button class="btn-secondary" onclick="openUpwdModal()">Update</button>
             </div>
 
             <div class="sep-inner"></div>
@@ -1450,50 +1625,403 @@
                 </div>
                 <div style="display:flex;gap:8px;flex-shrink:0">
                   <label class="btn-sm" style="height:36px;font-size:13px;padding:0 14px;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M11 4C8.37318 4 6.2324 5.99599 6.01793 8.51595C5.98608 8.89012 5.74729 9.21492 5.39963 9.35691C3.3976 10.1746 2 12.1199 2 14.3783C2 16.2952 3.00543 17.9848 4.53512 18.9537C5.00168 19.2493 5.14031 19.8671 4.84477 20.3336C4.54923 20.8002 3.93143 20.9388 3.46488 20.6433C1.38625 19.3266 0 17.0152 0 14.3783C0 11.4804 1.67256 8.9777 4.10178 7.75216C4.66997 4.47797 7.54913 2 11 2C13.8191 2 16.2533 3.65235 17.362 6.03971C19.4286 6.43792 21 8.24044 21 10.4206C21 10.7714 20.959 11.1133 20.8815 11.4415C22.7225 12.3197 24 14.186 24 16.3571C24 18.2066 23.0706 19.8374 21.6596 20.8205C21.2065 21.1362 20.5832 21.0248 20.2675 20.5717C19.9518 20.1185 20.0632 19.4952 20.5163 19.1795C21.4183 18.5511 22 17.5193 22 16.3571C22 14.7492 20.882 13.3863 19.3555 13.0085C19.056 12.9344 18.8075 12.7261 18.6821 12.4442C18.5567 12.1623 18.5684 11.8383 18.7139 11.5662C18.8965 11.2247 19 10.8359 19 10.4206C19 9.10788 17.9516 8.0197 16.6155 7.96031C16.2093 7.94225 15.8545 7.68006 15.7179 7.29708C15.0347 5.38045 13.1833 4 11 4Z" fill="currentColor"/><path d="M7.29289 16.7071C7.68342 17.0976 8.31658 17.0976 8.70711 16.7071L11 14.4142V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V14.4142L15.2929 16.7071C15.6834 17.0976 16.3166 17.0976 16.7071 16.7071C17.0976 16.3166 17.0976 15.6834 16.7071 15.2929L12.7071 11.2929C12.3166 10.9024 11.6834 10.9024 11.2929 11.2929L7.29289 15.2929C6.90237 15.6834 6.90237 16.3166 7.29289 16.7071Z" fill="currentColor"/></svg>
                     Import
                     <input type="file" id="logFileInput" accept=".json" style="display:none">
                   </label>
                   <button class="btn-sm" id="manualExportBtn" style="height:36px;font-size:13px;padding:0 14px">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M7.70711 10.2929L11 13.5858L11 3C11 2.44771 11.4477 2 12 2C12.5523 2 13 2.44771 13 3L13 13.5858L16.2929 10.2929C16.6834 9.90237 17.3166 9.90237 17.7071 10.2929C18.0976 10.6834 18.0976 11.3166 17.7071 11.7071L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L6.29289 11.7071C5.90237 11.3166 5.90237 10.6834 6.29289 10.2929C6.68342 9.90237 7.31658 9.90237 7.70711 10.2929Z" fill="currentColor"/><path d="M4 22C3.44772 22 3 21.5523 3 21C3 20.4477 3.44772 20 4 20H20C20.5523 20 21 20.4477 21 21C21 21.5523 20.5523 22 20 22H4Z" fill="currentColor"/></svg>
                     Export
                   </button>
                 </div>
               </div>
             </div>
 
+            <div style="height:1px;background:var(--border);margin:8px 0"></div>
+
+            <!-- Danger Zone (merged) -->
+            <div class="section-label" style="color:var(--destructive);margin-bottom:2px">Danger Zone</div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <div>
+                <div class="form-label">Manage Account</div>
+                <div class="form-sub">We'll keep your data for 48 hours before permanently removing it.</div>
+              </div>
+              <button class="btn-secondary" onclick="openDeleteModal()">Delete Account</button>
+            </div>
+
+            <div class="sep-inner"></div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <div>
+                <div class="form-label">Log Out</div>
+                <div class="form-sub">Sign out of your 5pm account on this device.</div>
+              </div>
+              <button class="btn-ghost-destructive" onclick="openLogoutModal()">Log Out</button>
+            </div>
+
           </div>
           </div><!-- /settings-card-body -->
         </div><!-- /Other Settings Card -->
 
-        <!-- About Developer -->
+        <!-- About Project -->
         <div class="settings-card">
           <div class="settings-card-head" style="cursor:default">
-            <div class="section-label">About Developer</div>
+            <div class="section-label">About Project</div>
           </div>
-          <div class="settings-card-body" style="padding-top:0">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-              <div style="display:flex;flex-direction:column;gap:2px">
-                <div style="font-size:13px;font-weight:600;color:var(--foreground)">Roshan Mohapatra</div>
-                <div style="font-size:12px;color:var(--muted-fg)">Mumbai, Maharashtra</div>
+          <div class="settings-card-body" style="padding-top:0;display:flex;flex-direction:column;gap:20px">
+
+            <!-- Versioning -->
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <div>
+                <div class="form-label">5pm — Work Hour Tracker</div>
+                <div class="form-sub">Open source. Built for people who actually want to leave on time.</div>
               </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <a href="https://github.com/rosshanmohapatra/wh-calculator" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted-fg);text-decoration:none;transition:color .15s,border-color .15s" onmouseover="this.style.color='var(--foreground)';this.style.borderColor='var(--foreground)'" onmouseout="this.style.color='var(--muted-fg)';this.style.borderColor='var(--border)'" title="GitHub">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              <span class="about-version-badge">v0.9.0</span>
+            </div>
+
+            <div style="height:1px;background:var(--border)"></div>
+
+            <!-- Developer -->
+            <div>
+              <div class="section-label" style="margin-bottom:10px">Developer</div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <img class="about-dev-pic" src="https://framerusercontent.com/images/u88DE05m7bwVdrx5jcyopewNaE.jpg?width=200&height=200" alt="Roshan Mohapatra">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:600;color:var(--foreground);line-height:1.2">Roshan Mohapatra</div>
+                  <div class="form-sub" style="margin-top:1px">Product Designer & Developer</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <!-- GitHub -->
+                  <a href="https://github.com/rosshanmohapatra/wh-calculator" target="_blank" rel="noopener" class="about-social-btn" title="GitHub">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                  </a>
+                  <!-- Framer -->
+                  <a href="https://roshan.framer.wiki/" target="_blank" rel="noopener" class="about-social-btn" title="Portfolio">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 0h16v8h-8zM4 8h8l8 8H4zM4 16h8v8z"/></svg>
+                  </a>
+                  <!-- Threads -->
+                  <a href="https://www.threads.com/@rosshan_1" target="_blank" rel="noopener" class="about-social-btn" title="Threads">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.781 3.63 2.695 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.371-.888h-.048c-.832 0-1.979.228-2.721 1.332l-1.7-1.159c.951-1.395 2.444-2.166 4.421-2.177h.06c3.738 0 5.95 2.247 6.1 6.162.38.208.733.437 1.051.683 1.225.929 2.023 2.168 2.312 3.578.433 2.118-.04 4.832-2.234 6.996-1.929 1.919-4.265 2.825-7.498 2.847zm1.586-8.965c-.348 0-.7.012-1.05.035-1.357.081-2.243.474-2.629.786-.287.247-.42.541-.396.876.058 1.073 1.395 1.568 2.587 1.503 1.018-.055 1.958-.48 2.504-1.158.24-.297.462-.765.567-1.509a10.237 10.237 0 0 0-1.583-.533z"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:1px;background:var(--border)"></div>
+
+            <!-- Sponsorship -->
+            <div>
+              <div class="section-label" style="margin-bottom:10px">Support the Project</div>
+              <div class="form-sub" style="margin-bottom:12px">If 5pm saves you an hour a day, consider buying me a coffee.</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <a href="#" class="sponsor-btn" title="PayPal (coming soon)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.144 19.532l1.049-5.751c.11-.606.691-1.041 1.296-.962 2.89.368 5.998.145 7.852-1.961 1.09-1.242 1.494-2.894 1.416-4.44C19.473 2.873 16.762 2 13.64 2H4.97a1.282 1.282 0 0 0-1.27 1.085L1.012 18.903c-.09.55.328 1.05.882 1.05h4.13a1.282 1.282 0 0 0 1.12-.421zm9.575-12.365c.187 3.37-2.33 5.584-6.387 5.584H8.956l-1.04 5.716H4.12L6.015 3.5h7.625c1.994 0 2.983.695 3.079 3.667z"/></svg>
+                  PayPal
                 </a>
-                <a href="https://roshan.framer.wiki/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted-fg);text-decoration:none;transition:color .15s,border-color .15s" onmouseover="this.style.color='var(--foreground)';this.style.borderColor='var(--foreground)'" onmouseout="this.style.color='var(--muted-fg)';this.style.borderColor='var(--border)'" title="Framer">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 0h16v8h-8zM4 8h8l8 8H4zM4 16h8v8z"/></svg>
+                <a href="#" class="sponsor-btn" title="Buy Me a Coffee (coming soon)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.216 6.415l-.132-.666c-.119-.598-.388-1.163-1.001-1.379-.197-.069-.42-.098-.57-.241-.152-.143-.196-.366-.231-.572-.065-.378-.125-.756-.192-1.133-.057-.325-.102-.69-.25-.987-.195-.4-.597-.634-.996-.788a5.723 5.723 0 0 0-.626-.194c-1-.263-2.05-.36-3.077-.416a25.834 25.834 0 0 0-3.7.062c-.915.083-1.88.184-2.75.5-.318.116-.646.256-.382.668.145.228.37.responsible.402.428.142.155.224.373.15.567-.089.234-.367.263-.581.284a1.44 1.44 0 0 0-.66.255c-.246.197-.395.502-.493.78-.13.362-.103.773.044 1.126.15.362.437.629.762.838.313.2.668.304 1.015.399.617.171 1.275.26 1.897.418.626.159 1.298.4 1.634 1.002.278.495.188 1.094-.07 1.565-.248.45-.6.824-.982 1.147-.754.638-1.64 1.096-2.568 1.415-.919.315-1.869.48-2.846.592-.993.114-2.004.173-3 .097-.47-.036-.972-.093-1.369-.362-.398-.27-.58-.74-.483-1.186.08-.376.34-.682.637-.912.31-.243.678-.403 1.046-.56.36-.152.748-.277 1.064-.517.387-.294.56-.795.3-1.22-.165-.269-.445-.412-.729-.518-.248-.092-.518-.15-.785-.181a14.69 14.69 0 0 0-1.804-.07c-.397.018-.8.06-1.19.149-.781.178-1.583.519-2.06 1.175-.298.407-.42.916-.3 1.402.116.471.42.866.78 1.163.334.28.72.477 1.11.643.764.32 1.576.495 2.39.614.813.119 1.638.172 2.459.177.84.006 1.695-.048 2.516-.206 1.638-.315 3.23-.937 4.558-1.942 1.364-1.032 2.397-2.503 2.397-4.24 0-1.273-.59-2.491-1.512-3.373-.37-.35-.782-.647-1.203-.917.18-.118.37-.225.55-.346.375-.249.74-.511 1.09-.788.352-.277.682-.574 1.007-.876.35-.326.69-.666.95-1.065.256-.395.424-.846.378-1.32zm-9.956 7.785c.004 0-.002 0 0 0zm.185-4.937h.002c.107.001.214.003.32.01l-.322-.01z"/></svg>
+                  Buy Me a Coffee
                 </a>
               </div>
             </div>
+
           </div>
         </div>
+
 
       </div>
     </main>
   </div>
 
   <!-- App footer removed -->
+
+  <!-- ── End Session Confirmation Modal ── -->
+  <div class="overlay" id="endSessionOverlay">
+    <div class="dialog" style="max-width:360px">
+      <div class="dialog-head">
+        <div class="dialog-title">End Session?</div>
+        <div class="dialog-desc" id="endSessionDesc">You still have time remaining until your daily target.</div>
+      </div>
+      <div id="endSessionHalfDayNote" style="display:none;margin:0 20px 4px;padding:10px 12px;background:var(--warning-bg);border:1px solid var(--warning-border);border-radius:8px;font-size:12px;color:var(--warning);font-weight:500;line-height:1.4">
+        Since you're leaving before the halfway mark, today will be logged as a Half Day.
+      </div>
+      <div style="padding:16px 20px 20px;display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn-secondary" id="endSessionCancelBtn">Keep Going</button>
+        <button class="btn-ghost-destructive" id="endSessionConfirmBtn">End Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast Notification ── -->
+  <div id="appToast" style="
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--foreground);color:var(--card);border-radius:10px;
+    padding:10px 14px;display:flex;align-items:center;gap:12px;
+    font-size:13px;font-weight:500;white-space:nowrap;
+    box-shadow:0 4px 20px rgba(0,0,0,.22);z-index:9999;
+    opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;font-family:var(--font)">
+    <span id="appToastMsg">Entry deleted.</span>
+    <button id="appToastUndo" style="background:none;border:none;cursor:pointer;font-family:inherit;
+      font-size:13px;font-weight:700;color:var(--card);opacity:.8;padding:0;letter-spacing:.03em"
+      onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.8">UNDO</button>
+  </div>
+
+  <!-- ── Logout Confirmation Modal ── -->
+  <div class="overlay" id="logoutOverlay">
+    <div class="dialog" style="max-width:360px">
+      <div class="dialog-head">
+        <div class="dialog-title">Log out?</div>
+        <div class="dialog-desc">You'll be taken back to the login screen. Your data stays safe.</div>
+      </div>
+      <div style="padding:20px;display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn-secondary" onclick="el('logoutOverlay').classList.remove('open')">Stay Back</button>
+        <button class="btn-ghost-destructive" onclick="confirmLogout()">Log Out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Delete Account – Feedback Modal ── -->
+  <div class="overlay" id="deleteProfileOverlay">
+    <div class="dialog" style="max-width:400px">
+
+      <!-- View 1: Feedback -->
+      <div id="delViewFeedback">
+        <div class="dialog-head">
+          <div class="dialog-title">What made you delete your account?</div>
+          <div class="dialog-desc">Your feedback helps improve 5pm for everyone.</div>
+        </div>
+        <div class="dialog-body" style="padding-top:0">
+          <div class="del-chips" id="delChips">
+            <button class="del-chip" onclick="toggleDelChip(this)"><svg class="chip-check" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.707 5.293a1 1 0 010 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 15.586 19.293 5.293a1 1 0 011.414 0z" fill="currentColor"/></svg>Missing Features</button>
+            <button class="del-chip" onclick="toggleDelChip(this)"><svg class="chip-check" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.707 5.293a1 1 0 010 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 15.586 19.293 5.293a1 1 0 011.414 0z" fill="currentColor"/></svg>Too Buggy</button>
+            <button class="del-chip" onclick="toggleDelChip(this)"><svg class="chip-check" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.707 5.293a1 1 0 010 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 15.586 19.293 5.293a1 1 0 011.414 0z" fill="currentColor"/></svg>Didn't Need It</button>
+            <button class="del-chip" onclick="toggleDelChip(this)"><svg class="chip-check" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.707 5.293a1 1 0 010 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 15.586 19.293 5.293a1 1 0 011.414 0z" fill="currentColor"/></svg>Hard To Use</button>
+            <button class="del-chip" onclick="toggleDelChip(this)"><svg class="chip-check" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.707 5.293a1 1 0 010 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 15.586 19.293 5.293a1 1 0 011.414 0z" fill="currentColor"/></svg>Other</button>
+          </div>
+          <div>
+            <div class="form-label" style="margin-bottom:6px">Tell us more. <span style="font-weight:400;color:var(--muted-fg)">(optional)</span></div>
+            <textarea class="field-input del-feedback-ta" id="delFeedbackText" rows="3" placeholder="Tell us more. (optional)"
+              oninput="autoExpandTa(this)"></textarea>
+          </div>
+        </div>
+        <div style="padding:0 20px 20px;display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+          <button class="btn-secondary" style="background:var(--foreground);color:var(--card);border-color:var(--foreground)" onclick="goToDeletePwd()">Continue</button>
+        </div>
+      </div>
+
+      <!-- View 2: Password Verification -->
+      <div id="delViewPassword" style="display:none">
+        <div class="dialog-head">
+          <div class="dialog-title">Verify Your Identity</div>
+          <div class="dialog-desc">Enter your password to confirm account deletion.</div>
+        </div>
+        <div class="dialog-body" style="padding-top:0">
+          <div>
+            <div class="form-label" style="margin-bottom:6px">Password</div>
+            <div style="position:relative">
+              <input class="field-input" id="deleteConfirmInput" type="password" placeholder="••••••••" autocomplete="current-password"
+                style="width:100%;padding-right:44px"
+                oninput="el('delPwdContinueBtn').disabled = this.value.length < 1">
+              <button type="button" onclick="toggleDeletePwd()" title="Show / hide"
+                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted-fg);padding:4px;display:flex;align-items:center">
+                <svg id="delEyeOpen" width="15" height="15" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 7.5C9.51472 7.5 7.5 9.51472 7.5 12C7.5 14.4853 9.51472 16.5 12 16.5C14.4853 16.5 16.5 14.4853 16.5 12C16.5 9.51472 14.4853 7.5 12 7.5ZM9.5 12C9.5 10.6193 10.6193 9.5 12 9.5C13.3807 9.5 14.5 10.6193 14.5 12C14.5 13.3807 13.3807 14.5 12 14.5C10.6193 14.5 9.5 13.3807 9.5 12Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 4.5C7.80929 4.5 4.80639 6.84327 2.90291 9.0685C1.94666 10.1864 1.24437 11.2998 0.780976 12.1325C0.548666 12.55 0.374765 12.8998 0.257664 13.1484C0.199077 13.2727 0.154596 13.372 0.124031 13.4419C0.108745 13.4769 0.096929 13.5046 0.08856 13.5245L0.07858 13.5483L0.07553 13.5557L0.07448 13.5583L0.07408 13.5593L0 11.9371L0.07408 13.5593L0 11.9371C0 11.9371 0.06469 12.291 0.06469 12.291L0.06508 12.292L0.06608 12.2947L0.06899 12.3023L0.07847 12.3266C0.08641 12.3469 0.09762 12.3751 0.11215 12.4107C0.14119 12.482 0.1835 12.583 0.23944 12.7095C0.35125 12.9623 0.5179 13.318 0.74225 13.7424C1.18972 14.5889 1.87318 15.7209 2.81783 16.8577C4.70146 19.1243 7.70693 21.5 12 21.5C16.293 21.5 19.2985 19.1243 21.1821 16.8577C22.1267 15.7209 22.8102 14.5889 23.2577 13.7424C23.482 13.318 23.6487 12.9623 23.7605 12.7095C23.8164 12.583 23.8587 12.482 23.8878 12.4107C23.9023 12.3751 23.9135 12.3469 23.9215 12.3266L23.9309 12.3023L23.9338 12.2947L23.9348 12.292L23.9352 12.291C23.9352 12.291 24.074 11.9233 24 11.9371L23.9352 12.291L24.074 11.9233L23.9258 11.5593C23.903 11.5046 23.8912 11.4769 23.8759 11.4419C23.8453 11.372 23.8008 11.2727 23.7423 11.1484C23.6252 10.8998 23.4513 10.55 23.2189 10.1325C22.7556 9.29981 22.0533 8.18638 21.097 7.0685C19.1935 4.84327 16.1906 2.5 12 2.5C7.80929 2.5 4.80639 4.84327 2.90291 7.0685ZM2.5104 12.8077C2.32531 12.4576 2.18603 12.1632 2.09077 11.9504C2.1909 11.7404 2.33654 11.4501 2.52859 11.105C2.94555 10.3558 3.57468 9.35995 4.42272 8.36857C6.12781 6.37527 8.62491 4.5 12 4.5C15.375 4.5 17.8721 6.37527 19.5772 8.36857C20.4252 9.35995 21.0544 10.3558 21.4713 11.105C21.6634 11.4501 21.809 11.7404 21.9092 11.9504C21.8139 12.1632 21.6746 12.4576 21.4895 12.8077C21.0883 13.5667 20.4782 14.5754 19.6439 15.5794C17.9696 17.5942 15.475 19.5 12 19.5C8.52489 19.5 6.03035 17.5942 4.35602 15.5794C3.52168 14.5754 2.91166 13.5667 2.5104 12.8077Z" fill="currentColor"/></svg>
+                <svg id="delEyeClose" width="15" height="15" viewBox="0 0 24 24" fill="none" style="display:none"><path fill-rule="evenodd" clip-rule="evenodd" d="M23.7071 0.292893C24.0976 0.683417 24.0976 1.31658 23.7071 1.70711L1.70711 23.7071C1.31658 24.0976 0.683417 24.0976 0.292893 23.7071C-0.0976311 23.3166 -0.0976311 22.6834 0.292893 22.2929L4.23434 18.3514C2.9164 17.1406 1.94176 15.7855 1.2732 14.6799C0.867646 14.0092 0.5691 13.421 0.370612 12.9971C0.271255 12.785 0.196646 12.6133 0.145961 12.4922C0.12061 12.4317 0.101217 12.3838 0.0876805 12.3497L0.0717465 12.3091L0.067044 12.2969L0.0655043 12.2928L0.0649367 12.2913C0.0645038 12.2902 1.00008 11.9371 0.074198 11.5593C0.0746014 11.5583 0.0756485 11.5557 0.0787059 11.5483L0.0886819 11.5245C0.0970512 11.5046 0.108867 11.4769 0.124153 11.4419C0.154718 11.372 0.199199 11.2727 0.257786 11.1484C0.374887 10.8998 0.548788 10.55 0.781098 10.1325C1.24449 9.29981 1.94679 8.18638 2.90303 7.0685C4.80651 4.84327 7.80941 2.5 12.0001 2.5C14.4526 2.5 16.5053 3.30553 18.165 4.42081L22.2929 0.292893C22.6834 -0.0976311 23.3166 -0.0976311 23.7071 0.292893Z" fill="currentColor"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div style="padding:0 20px 20px;display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn-secondary" onclick="backToDeleteFeedback()">Back</button>
+          <button class="btn-ghost-destructive" id="delPwdContinueBtn" onclick="confirmDeleteProfile()" disabled>Delete Forever</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Signing Out / Deleting Loader Modal ── -->
+  <div class="overlay" id="signingOutOverlay" style="z-index:2500">
+    <div class="dialog" style="max-width:300px;text-align:center">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:36px 24px">
+        <div class="leaving-spinner"></div>
+        <div class="dialog-title" id="signingOutTitle">Logging Out</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Forgot Password Modal ── -->
+  <div class="overlay" id="fpOverlay" style="z-index:2200">
+    <div class="dialog" style="max-width:360px">
+      <!-- View 1: Email request -->
+      <div id="fpViewEmail">
+        <div class="dialog-head">
+          <div class="dialog-title">Account Recovery</div>
+          <div class="dialog-desc">Enter your email and we'll send you a reset code.</div>
+        </div>
+        <div class="dialog-body">
+          <input class="field-input" id="fpEmailInput" type="email" placeholder="you@example.com" autocomplete="email">
+          <div class="err-msg" id="fpEmailErr" style="margin-top:6px">Enter a valid email address.</div>
+        </div>
+        <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:8px">
+          <button id="fpSendEmailBtn" class="ob-btn-primary" style="height:40px;font-size:13px;width:100%;border-radius:8px" onclick="fpSendEmail()">Send an Email</button>
+          <div class="fp-divider">or</div>
+          <button class="fp-oauth-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
+          <button class="fp-oauth-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            Continue with GitHub
+          </button>
+          <button class="fp-oauth-btn" onclick="openAuthView()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 2C3.79086 2 2 3.79086 2 6V18C2 20.2091 3.79086 22 6 22H18C20.2091 22 22 20.2091 22 18V6C22 3.79086 20.2091 2 18 2H6ZM7 7H9V9H7V7ZM9 11H7V13H9V11ZM7 15H9V17H7V15ZM11 7H13V9H11V7ZM13 11H11V13H13V11ZM11 15H13V17H11V15ZM17 7H15V9H17V7ZM15 11H17V13H15V11ZM17 15H15V17H17V15Z" fill="currentColor"/></svg>
+            Use Authenticator
+          </button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="closeFpModal()">Back to setup</button>
+        </div>
+      </div>
+      <!-- View 3: Authenticator -->
+      <div id="fpViewAuth" style="display:none">
+        <div class="dialog-head">
+          <div class="dialog-title">Authenticator Code</div>
+          <div class="dialog-desc">Enter the 6-digit code from your authenticator app.</div>
+        </div>
+        <div class="dialog-body">
+          <div style="display:flex;gap:8px;justify-content:center">
+            <input class="auth-digit" id="authD0" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" autocomplete="one-time-code">
+            <input class="auth-digit" id="authD1" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]">
+            <input class="auth-digit" id="authD2" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]">
+            <input class="auth-digit" id="authD3" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]">
+            <input class="auth-digit" id="authD4" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]">
+            <input class="auth-digit" id="authD5" type="text" inputmode="numeric" maxlength="1" pattern="[0-9]">
+          </div>
+        </div>
+        <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:8px">
+          <button class="ob-btn-primary" id="authVerifyBtn" style="height:40px;font-size:13px;width:100%;border-radius:8px" onclick="authVerify()" disabled>Verify Code</button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="fpBackToEmail()">Use a different method</button>
+        </div>
+      </div>
+      <!-- View 2: OTP code -->
+      <div id="fpViewOTP" style="display:none">
+        <div class="dialog-head">
+          <div class="dialog-title">Enter Code</div>
+          <div class="dialog-desc">A 6-digit code was sent to <strong id="fpEmailDisplay"></strong>. It expires in 1 minute.</div>
+        </div>
+        <div class="dialog-body">
+          <input class="field-input fp-code-input" id="fpOtpInput" type="text" inputmode="numeric" maxlength="6" placeholder="000000" oninput="el('fpVerifyBtn').disabled=this.value.length<6||fpExpired">
+          <div class="fp-timer" id="fpTimerWrap">Code expires in <span id="fpTimerDisplay">1:00</span></div>
+          <div id="fpExpiredMsg" style="display:none;font-size:12px;color:var(--destructive);text-align:center;margin-top:10px">
+            Code expired. <button style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer;font-family:var(--font);padding:0" onclick="fpResend()">Resend</button>
+          </div>
+        </div>
+        <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:8px">
+          <button class="ob-btn-primary" id="fpVerifyBtn" style="height:40px;font-size:13px;width:100%;border-radius:8px" onclick="fpVerify()" disabled>Verify Code</button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="fpBackToEmail()">Use a different email</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Update Password Modal ── -->
+  <div class="overlay" id="upwdOverlay" style="z-index:2100">
+    <div class="dialog" style="max-width:360px">
+
+      <!-- View 1: Method selection -->
+      <div id="upwdViewMethod">
+        <div class="dialog-head">
+          <div class="dialog-title">Update Password</div>
+          <div class="dialog-desc">Choose how you'd like to verify your identity.</div>
+        </div>
+        <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:8px">
+          <button class="fp-oauth-btn" onclick="upwdShowEmail()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.5"/></svg>
+            Send an Email
+          </button>
+          <div class="fp-divider">or</div>
+          <button class="fp-oauth-btn" onclick="upwdShowAuth()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 2C3.79086 2 2 3.79086 2 6V18C2 20.2091 3.79086 22 6 22H18C20.2091 22 22 20.2091 22 18V6C22 3.79086 20.2091 2 18 2H6ZM7 7H9V9H7V7ZM9 11H7V13H9V11ZM7 15H9V17H7V15ZM11 7H13V9H11V7ZM13 11H11V13H13V11ZM11 15H13V17H11V15ZM17 7H15V9H17V7ZM15 11H17V13H15V11ZM17 15H15V17H17V15Z" fill="currentColor"/></svg>
+            Use Authenticator
+          </button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="closeUpwdModal()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- View 2a: Email OTP -->
+      <div id="upwdViewEmail" style="display:none">
+        <div class="dialog-head">
+          <div class="dialog-title">Verify via Email</div>
+          <div class="dialog-desc">Enter your email — we'll send a 6-digit code.</div>
+        </div>
+        <div class="dialog-body" style="padding-top:0">
+          <input class="field-input" id="upwdEmailInput" type="email" placeholder="you@example.com" autocomplete="email">
+          <div class="err-msg" id="upwdEmailErr" style="margin-top:6px">Enter a valid email address.</div>
+        </div>
+        <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:8px">
+          <button id="upwdSendBtn" class="ob-btn-primary" style="height:40px;font-size:13px;width:100%;border-radius:8px" onclick="upwdSendEmail()">Send Code</button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="upwdShowMethod()">← Back</button>
+        </div>
+      </div>
+
+      <!-- View 2b: Email OTP code entry -->
+      <div id="upwdViewOTP" style="display:none">
+        <div class="dialog-head">
+          <div class="dialog-title">Enter Code</div>
+          <div class="dialog-desc">A 6-digit code was sent to <strong id="upwdEmailDisplay"></strong>. It expires in 1 minute.</div>
+        </div>
+        <div class="dialog-body" style="padding-top:0">
+          <input class="field-input fp-code-input" id="upwdOtpInput" type="text" inputmode="numeric" maxlength="6" placeholder="000000"
+            oninput="el('upwdVerifyBtn').disabled=this.value.length<6||upwdExpired">
+          <div class="fp-timer" id="upwdTimerWrap">Code expires in <span id="upwdTimerDisplay">1:00</span></div>
+          <div id="upwdExpiredMsg" style="display:none;font-size:12px;color:var(--destructive);text-align:center;margin-top:10px">
+            Code expired. <button style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer;font-family:var(--font);padding:0" onclick="upwdResend()">Resend</button>
+          </div>
+        </div>
+        <div style="padding:0 20px 12px">
+          <button class="ob-btn-primary" id="upwdVerifyBtn" style="height:40px;font-size:13px;width:100%;border-radius:8px" onclick="upwdVerify()" disabled>Verify &amp; Update</button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="upwdShowEmail()">Use a different email</button>
+        </div>
+      </div>
+
+      <!-- View 3: Authenticator -->
+      <div id="upwdViewAuth" style="display:none">
+        <div class="dialog-head">
+          <div class="dialog-title">Authenticator Code</div>
+          <div class="dialog-desc">Enter the 6-digit code from your authenticator app.</div>
+        </div>
+        <div class="dialog-body" style="padding-top:0">
+          <div style="display:flex;gap:6px;justify-content:center">
+            <input class="auth-digit" id="upwdD0" type="text" inputmode="numeric" maxlength="1">
+            <input class="auth-digit" id="upwdD1" type="text" inputmode="numeric" maxlength="1">
+            <input class="auth-digit" id="upwdD2" type="text" inputmode="numeric" maxlength="1">
+            <input class="auth-digit" id="upwdD3" type="text" inputmode="numeric" maxlength="1">
+            <input class="auth-digit" id="upwdD4" type="text" inputmode="numeric" maxlength="1">
+            <input class="auth-digit" id="upwdD5" type="text" inputmode="numeric" maxlength="1">
+          </div>
+        </div>
+        <div style="padding:0 20px 12px">
+          <button class="ob-btn-primary" id="upwdAuthVerifyBtn" style="height:40px;font-size:13px;width:100%;border-radius:8px" onclick="upwdAuthVerify()" disabled>Verify &amp; Update</button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="upwdShowMethod()">← Back</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   <!-- Toast -->
   <div class="wh-toast" id="ieToast">
@@ -1521,7 +2049,7 @@
       <div class="tp-fade-bot"></div>
     </div>
     <div class="tp-footer">
-      <button class="tp-cancel-btn" onclick="closeTpModal()">Cancel</button>
+      <button class="tp-cancel-btn" id="tpCancelBtn" onclick="cancelOrClearTpModal()">Cancel</button>
       <button class="tp-set-btn" onclick="confirmTpModal()">Set</button>
     </div>
   </div>
@@ -1597,7 +2125,7 @@
       <div class="dialog-foot">
         <div style="display:flex;align-items:center;gap:8px">
           <button class="btn-sm" id="importSaveLogBtn" style="height:34px;font-size:12px;padding:0 12px;flex-shrink:0">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Save Log
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px"><path fill-rule="evenodd" clip-rule="evenodd" d="M5 2C4.20435 2 3.44129 2.31607 2.87868 2.87868C2.31607 3.44129 2 4.20435 2 5V19C2 19.7957 2.31607 20.5587 2.87868 21.1213C3.44129 21.6839 4.20435 22 5 22H19C19.7957 22 20.5587 21.6839 21.1213 21.1213C21.6839 20.5587 22 19.7957 22 19V8C22 7.73478 21.8946 7.48043 21.7071 7.29289L16.7071 2.29289C16.5196 2.10536 16.2652 2 16 2H5ZM5 4C4.73478 4 4.48043 4.10536 4.29289 4.29289C4.10536 4.48043 4 4.73478 4 5V19C4 19.2652 4.10536 19.5196 4.29289 19.7071C4.48043 19.8946 4.73478 20 5 20H6V13C6 12.4477 6.44772 12 7 12H17C17.5523 12 18 12.4477 18 13V20H19C19.2652 20 19.5196 19.8946 19.7071 19.7071C19.8946 19.5196 20 19.2652 20 19V8.41421L15.5858 4H9V7H16C16.5523 7 17 7.44772 17 8C17 8.55228 16.5523 9 16 9H8C7.44772 9 7 8.55228 7 8V4H5ZM8 14V20H16V14H8Z" fill="currentColor"/></svg>Save Log
           </button>
           <div style="flex:1"></div>
           <button class="btn btn-cancel" id="importCancelBtn" style="width:auto;padding:0 16px;height:38px;font-size:13px">Cancel</button>
@@ -1610,9 +2138,17 @@
   <!-- Day Edit Modal -->
   <div class="overlay" id="dayEditOverlay">
     <div class="dialog">
-      <div class="dialog-head">
+      <div class="dialog-head" style="position:relative">
         <div class="dialog-title" id="dayEditTitle">Edit Day</div>
         <div class="dialog-desc" id="dayEditDesc">Update times or mark a special day</div>
+        <button id="dayEditDeleteBtn" title="Delete entry" onclick="deleteDayEntry()"
+          style="position:absolute;top:0;right:0;background:none;border:none;cursor:pointer;
+            padding:4px;border-radius:6px;color:var(--muted-fg);transition:color .15s;display:flex;align-items:center;justify-content:center"
+          onmouseover="this.style.color='var(--destructive)'" onmouseout="this.style.color='var(--muted-fg)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+        </button>
       </div>
       <div class="dialog-body">
         <div class="modal-override-row">
@@ -1624,14 +2160,14 @@
           <div style="position:relative;flex:1" class="time-input-wrap">
             <input type="text" class="field-input" id="deStart" placeholder="Start time" autocomplete="off" style="padding-left:38px">
             <button type="button" class="tp-icon-btn" onclick="openTpModal('deStart',event)" title="Pick time">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
             </button>
           </div>
           <span class="modal-time-sep">–</span>
           <div style="position:relative;flex:1" class="time-input-wrap">
             <input type="text" class="field-input" id="deEnd" placeholder="End time (optional)" autocomplete="off" style="padding-left:38px">
             <button type="button" class="tp-icon-btn" onclick="openTpModal('deEnd',event)" title="Pick time">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
             </button>
           </div>
         </div>
@@ -1719,10 +2255,15 @@
   </div>
 
   <script>
+    // Auth gate — redirect to login if not authenticated
+    if (!localStorage.getItem('wh_auth')) {
+      window.location.replace('login.html');
+    }
+
     // Test release — wipe all previous data on version change
-    const APP_VERSION = '0.9.0';
+    const APP_VERSION = '0.9.1';
     if (localStorage.getItem('wh_ver') !== APP_VERSION) {
-      Object.keys(localStorage).filter(k => k.startsWith('wh_') && k !== 'wh_theme').forEach(k => localStorage.removeItem(k));
+      Object.keys(localStorage).filter(k => k.startsWith('wh_') && k !== 'wh_theme' && k !== 'wh_auth').forEach(k => localStorage.removeItem(k));
       localStorage.setItem('wh_ver', APP_VERSION);
     }
 
@@ -1762,8 +2303,12 @@
     }
 
     // ── CONFIG ─────────────────────────────────────────
-    const CFG_DEF = { dailyH:9, weeklyH:45, weeklyOn:true, lateDays:[], earlyLeaveEntries:[], lateEntries:[], notifOn:false, name:'', position:'', targetDay:null, autoStopBuf:0.5, tzOffset:330, shiftType:'morning', workDays:5 };
+    const CFG_DEF = { dailyH:9, weeklyH:45, weeklyOn:true, lateDays:[], earlyLeaveEntries:[], lateEntries:[], notifOn:false, notifTarget:true, notifKickstart:true, notifOvertime:true, name:'', position:'', targetDay:null, autoStopBuf:0.5, tzOffset:330, shiftType:'morning', workDays:5 };
     function cfg() { const r=Store.getCfg(); return r?{...CFG_DEF,...r}:{...CFG_DEF}; }
+
+    // ── ANON USER ID (persists across sessions, used as push subscription key) ──
+    if (!localStorage.getItem('wh_uid')) localStorage.setItem('wh_uid', crypto.randomUUID());
+    const WH_UID = localStorage.getItem('wh_uid');
     // saveCfg defined in persistence layer
 
     function nowTz() {
@@ -1893,13 +2438,133 @@
       const d = new Date(); d.setHours(h, m, s, 0); return d;
     }
 
-    // ── NOTIFY ─────────────────────────────────────────
+    // ── NOTIFY (in-tab fallback) ────────────────────────
     function notify(s) {
       if (!cfg().notifOn) return;
+      // Web Push handles the real notification via service worker.
+      // This fallback fires only if the tab is open and SW isn't active.
       if ('Notification' in window && Notification.permission === 'granted' && !notifSent) {
         const n = new Notification('Time to go! 🎉', { body: `${dur(s)} logged. Click to check out.` });
         n.onclick = () => { window.focus(); if (loginDate) checkout(); };
         notifSent = true;
+      }
+    }
+
+    // ── NOTIFICATION ENGINE (browser-native, no external scheduler) ───
+    // Scheduling uses client-side setTimeout + SW showNotification().
+    // Works globally — no QStash/region dependency.
+    // Notifications fire as long as the browser is open (which it must
+    // be anyway for tracking). SW keeps them native even when tab is hidden.
+
+    let _swReg        = null;
+    let _notifTimers  = [];   // active setTimeout IDs
+
+    const _NOTIF_MSGS = {
+      kickstart: {
+        title: 'Almost there 👀',
+        body:  '5 minutes left in your shift. Time to start wrapping up.',
+        tag:   'kickstart',
+      },
+      target: {
+        title: 'Time to go! 🎉',
+        body:  "You've hit your daily target. Head out — you've earned it.",
+        tag:   'target',
+      },
+      overtime: {
+        title: 'You should leave now ⏰',
+        body:  "It's been 5 minutes past your target. Close the laptop and go.",
+        tag:   'overtime',
+        requireInteraction: true,
+      },
+    };
+
+    async function initServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      try {
+        _swReg = await navigator.serviceWorker.register('/sw.js');
+      } catch (e) { console.warn('[5pm] SW register failed:', e); }
+    }
+
+    async function requestPushPermission() {
+      if (!('Notification' in window)) return false;
+      if (Notification.permission === 'denied') return false;
+      const perm = await Notification.requestPermission();
+      return perm === 'granted';
+    }
+
+    async function _fireNotif(type) {
+      const msg = _NOTIF_MSGS[type]; if (!msg) return;
+      try {
+        // Prefer SW showNotification — works when tab is backgrounded
+        const reg = _swReg || await navigator.serviceWorker.ready;
+        await reg.showNotification(msg.title, {
+          body:               msg.body,
+          tag:                msg.tag,
+          icon:               '/icon-192.png',
+          badge:              '/icon-72.png',
+          renotify:           true,
+          requireInteraction: !!msg.requireInteraction,
+        });
+      } catch (_) {
+        // Fallback to basic Notification API
+        if (Notification.permission === 'granted') new Notification(msg.title, { body: msg.body, tag: msg.tag });
+      }
+    }
+
+    function scheduleNotifications(loginTimestamp) {
+      const c = cfg();
+      cancelScheduledNotifications(); // clear any previous timers
+      if (!c.notifOn || Notification.permission !== 'granted') return;
+
+      const targetSecs = effSecs();
+      const baseMs     = new Date(loginTimestamp).getTime();
+      const now        = Date.now();
+
+      const jobs = [
+        { type: 'kickstart', offsetSecs: targetSecs - 300, enabled: c.notifKickstart !== false },
+        { type: 'target',    offsetSecs: targetSecs,       enabled: c.notifTarget    !== false },
+        { type: 'overtime',  offsetSecs: targetSecs + 300, enabled: c.notifOvertime  !== false },
+      ];
+
+      for (const job of jobs) {
+        if (!job.enabled) continue;
+        const delay = baseMs + job.offsetSecs * 1000 - now;
+        if (delay < 0) continue; // already passed
+        _notifTimers.push(setTimeout(() => _fireNotif(job.type), delay));
+      }
+    }
+
+    function cancelScheduledNotifications() {
+      _notifTimers.forEach(id => clearTimeout(id));
+      _notifTimers = [];
+    }
+
+    // Toggle visibility of the inline remaining time display (next to elapsed label)
+    function showRem(show) {
+      const d = show ? '' : 'none';
+      ['rcRemSep','rcRemaining','rcRemText'].forEach(id => { const e = el(id); if (e) e.style.display = d; });
+    }
+
+    async function onNotifToggleChange() {
+      autoSaveSettings();
+      const sub = el('notifSubGroup');
+      const isOn = el('inpNotifOn').checked;
+      if (sub) {
+        if (isOn) {
+          sub.style.pointerEvents = '';
+          sub.style.maxHeight = sub.scrollHeight + 200 + 'px';
+          sub.style.opacity   = '1';
+        } else {
+          sub.style.pointerEvents = 'none';
+          sub.style.maxHeight = '0';
+          sub.style.opacity   = '0';
+        }
+      }
+      if (isOn) {
+        const granted = await requestPushPermission();
+        if (granted && loginDate) scheduleNotifications(loginDate.toISOString());
+      } else {
+        cancelScheduledNotifications();
       }
     }
 
@@ -1967,6 +2632,7 @@
     // ── END SHIFT: finalises the day, shows insights modal ──────────────────
     function checkout() {
       if (!loginDate) return;
+      cancelScheduledNotifications(); // cancel pending push notifications
       if (ticker) { clearInterval(ticker); ticker = null; }
       const now = new Date();
       const tk = todayKey(), ex = dayLog(tk) || {};
@@ -1989,10 +2655,7 @@
       // Reset state — clearLogin() is called inside closeCheckoutModal
       _sessionAccSecs = 0; _sessionCheckoutTime = null;
       loginDate = null; autoStopped = false;
-      el('calcBtn').textContent = 'Quick Start';
-      el('calcBtn').classList.remove('end-shift', 'pause-shift', 'resume-shift');
-      el('calcBtn').dataset.state = 'start';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('start');
       el('shiftInputRow').classList.remove('active-state', 'hidden');
     }
 
@@ -2016,11 +2679,7 @@
       });
       Store.clearSession();
       loginDate = null; autoStopped = false;
-      el('calcBtn').textContent = 'Resume';
-      el('calcBtn').classList.remove('end-shift', 'pause-shift');
-      el('calcBtn').classList.add('resume-shift');
-      el('calcBtn').dataset.state = 'ended';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('ended');
       el('shiftInputRow').classList.remove('active-state', 'hidden');
       el('shiftActiveLabel').textContent = '—';
       el('autostopBanner').classList.remove('show');
@@ -2110,9 +2769,9 @@
 
       if (!notifs.length) { list.innerHTML = `<div class="notif-empty">No notifications right now.</div>`; return; }
 
-      const warnSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
-      const okSvg   = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
-      const infoSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+      const warnSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 5.5C12.5523 5.5 13 5.94772 13 6.5L13 13.5C13 14.0523 12.5523 14.5 12 14.5C11.4477 14.5 11 14.0523 11 13.5L11 6.5C11 5.94772 11.4477 5.5 12 5.5Z" fill="currentColor"/><path d="M12 18.5C12.8284 18.5 13.5 17.8284 13.5 17C13.5 16.1716 12.8284 15.5 12 15.5C11.1716 15.5 10.5 16.1716 10.5 17C10.5 17.8284 11.1716 18.5 12 18.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12ZM12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3Z" fill="currentColor"/></svg>`;
+      const okSvg   = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>`;
+      const infoSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 18.5C12.5523 18.5 13 18.0523 13 17.5L13 10.5C13 9.94772 12.5523 9.5 12 9.5C11.4477 9.5 11 9.94772 11 10.5L11 17.5C11 18.0523 11.4477 18.5 12 18.5Z" fill="currentColor"/><path d="M12 8.5C12.8284 8.5 13.5 7.82843 13.5 7C13.5 6.17157 12.8284 5.5 12 5.5C11.1716 5.5 10.5 6.17157 10.5 7C10.5 7.82843 11.1716 8.5 12 8.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1C5.92487 1 1 5.92487 1 12ZM12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z" fill="currentColor"/></svg>`;
 
       list.innerHTML = notifs.map(n => {
         const icon = n.type === 'warn' ? warnSvg : n.type === 'ok' ? okSvg : infoSvg;
@@ -2125,7 +2784,7 @@
           <div class="notif-icon ${n.type}">${icon}</div>
           <div class="notif-body"><div class="notif-text">${n.text}</div>${actions}</div>
           <button class="notif-dismiss" onclick="dismissNotif('${n.id}')" title="Dismiss">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M4.70711 3.29289C4.31658 2.90237 3.68342 2.90237 3.29289 3.29289C2.90237 3.68342 2.90237 4.31658 3.29289 4.70711L10.5858 12L3.29289 19.2929C2.90237 19.6834 2.90237 20.3166 3.29289 20.7071C3.68342 21.0976 4.31658 21.0976 4.70711 20.7071L12 13.4142L19.2929 20.7071C19.6834 21.0976 20.3166 21.0976 20.7071 20.7071C21.0976 20.3166 21.0976 19.6834 20.7071 19.2929L13.4142 12L20.7071 4.70711C21.0976 4.31658 21.0976 3.68342 20.7071 3.29289C20.3166 2.90237 19.6834 2.90237 19.2929 3.29289L12 10.5858L4.70711 3.29289Z" fill="currentColor"/></svg>
           </button>
         </div>`;
       }).join('');
@@ -2167,12 +2826,13 @@
       } else if (diff < 0) {
         rightHtml = `<span class="wk-target-val">${dur(eff)}</span><span class="hint-sep">&nbsp;—&nbsp;</span><span class="hint-early">${dur(Math.abs(diff))} saved</span>`;
       } else {
-        rightHtml = `<span class="wk-target-val">${dur(c.dailyH * 3600)}</span><span class="hint-sep">&nbsp;+&nbsp;</span><span class="hint-makeup">${dur(diff)}</span>`;
+        const cappedDiff = Math.min(diff, 3600); // cap surplus display at +1hr above daily target
+        rightHtml = `<span class="wk-target-val">${dur(c.dailyH * 3600)}</span><span class="hint-sep">&nbsp;+&nbsp;</span><span class="hint-makeup">${dur(cappedDiff)}</span>`;
       }
       const inVal  = loginDate ? short(loginDate) : '—';
       // Log Out: show personal target if set, otherwise projected leave
       const outVal   = earlyTarget ? earlyTarget : (leaveDate ? short(leaveDate) : '—');
-      const outLabel = earlyTarget ? 'Target Out' : 'Log Out';
+      const outLabel = 'Log Out';
 
       // Early leave target status
       let eltStatusHtml = '';
@@ -2194,7 +2854,7 @@
         }
       }
 
-      const clockSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+      const clockSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>`;
 
       const ioHtml = `<div class="rc-io-row">
         <div class="rc-io-box${loginDate ? ' editable' : ''}" id="inTimeBox" ${loginDate ? `onclick="openTpModal('inTimeEditInput',event,'Log In',()=>saveInTimeEdit())"` : ''}>
@@ -2204,10 +2864,11 @@
           </div>
           <input type="hidden" id="inTimeEditInput" value="${inVal}">
         </div>
-        <div class="rc-io-box editable" id="outTimeBox" onclick="openTpModal('outTargetEditInput',event,'${outLabel}',()=>saveOutTargetEdit())">
-          <div class="rc-io-label">${outLabel}</div>
+        <div class="rc-io-box editable" id="outTimeBox" onclick="openTpModal('outTargetEditInput',event,'Log Out',()=>saveOutTargetEdit(),${earlyTarget ? '()=>clearOutTarget()' : 'null'})">
+          <div class="rc-io-label">Log Out</div>
           <div class="rc-io-val-row">
-            <div class="rc-io-val" id="metaTarget" style="${earlyTarget ? 'color:var(--blue)' : ''}">${outVal}</div>
+            <div class="rc-io-val" id="metaTarget">${outVal}</div>
+            ${earlyTarget ? `<span class="custom-target-chip">Custom</span>` : ''}
             ${earlyTarget ? `<button class="rc-io-edit-btn" title="Clear target" onclick="event.stopPropagation();clearOutTarget()" style="color:var(--muted-fg)">✕</button>` : ''}
           </div>
           <input type="hidden" id="outTargetEditInput" value="${earlyTarget||''}">
@@ -2240,7 +2901,7 @@
     }
 
     // ── WHEEL TIME PICKER ────────────────────────────────
-    let _tpTargetId = null, _tpCallback = null;
+    let _tpTargetId = null, _tpCallback = null, _tpClearFn = null;
     let _tpHIdx = 11, _tpMIdx = 0, _tpApIdx = 0;
     const TP_HOURS = ['01','02','03','04','05','06','07','08','09','10','11','12'];
     const TP_MINS  = Array.from({length:60}, (_, i) => String(i).padStart(2, '0'));
@@ -2332,10 +2993,13 @@
       });
     }
 
-    function openTpModal(targetInputId, event, title, onConfirm) {
+    function openTpModal(targetInputId, event, title, onConfirm, onClear) {
       if (event) { event.stopPropagation(); event.preventDefault(); }
       _tpTargetId = targetInputId;
       _tpCallback = onConfirm || null;
+      _tpClearFn  = onClear  || null;
+      const cancelBtn = el('tpCancelBtn');
+      if (cancelBtn) cancelBtn.textContent = onClear ? 'Clear' : 'Cancel';
       const modal = el('tpModal');
       if (!modal) return;
 
@@ -2390,7 +3054,14 @@
     function closeTpModal() {
       el('tpModal')?.classList.remove('open');
       document.removeEventListener('mousedown', _tpOutsideClick);
-      _tpTargetId = null; _tpCallback = null;
+      _tpTargetId = null; _tpCallback = null; _tpClearFn = null;
+      const cancelBtn = el('tpCancelBtn');
+      if (cancelBtn) cancelBtn.textContent = 'Cancel';
+    }
+
+    function cancelOrClearTpModal() {
+      if (_tpClearFn) { const fn = _tpClearFn; closeTpModal(); fn(); }
+      else closeTpModal();
     }
 
     function confirmTpModal() {
@@ -2587,9 +3258,9 @@
       el('rcElapsedLabel').textContent = 'Not Started';
       el('rcElapsedLabel').style.color = 'var(--muted-fg)';
       _setTodayDateChip();
-      el('rcRightCol').style.display = 'block';
       el('rcRemaining').textContent = dur(eff);
       el('rcRemaining').style.color = 'var(--muted-fg)';
+      showRem(eff > 0);
       el('progFill').style.width = '0%';
       el('progFill').classList.remove('done');
       el('progLabel').textContent = '';
@@ -2618,11 +3289,7 @@
         lastUpdated:  now.toISOString(),
         sessionTag:   'autostopped'
       });
-      el('calcBtn').textContent = 'Resume';
-      el('calcBtn').classList.remove('end-shift', 'pause-shift');
-      el('calcBtn').classList.add('resume-shift');
-      el('calcBtn').dataset.state = 'ended';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('ended');
       el('shiftInputRow').classList.remove('active-state');
       el('autostopBanner').classList.add('show');
       el('autostopMsg').textContent = `Auto-stopped at ${short(now)} — target + buffer reached.`;
@@ -2717,16 +3384,16 @@
         const rem = eff - worked;
         const remText = rem < 60 ? `${Math.max(0, rem)}s` : dur(rem);
         animateDuration('rcRemaining', remText);
-        el('rcRightCol').style.display = 'block';
+        showRem(true);
         el('otBanner').classList.remove('show');
       } else if (isDone) {
-        el('rcRightCol').style.display = 'none';
+        showRem(false);
         const otMins = Math.floor((worked - eff) / 60);
         el('otMsg').textContent = `+${dur(worked - eff)} overtime`;
         el('otQuip').textContent = OT_QUIPS[Math.floor(otMins / 15) % OT_QUIPS.length];
         el('otBanner').classList.add('show');
       } else {
-        el('rcRightCol').style.display = 'none';
+        showRem(false);
         el('otBanner').classList.remove('show');
       }
 
@@ -2756,19 +3423,7 @@
         el('doneBanner').classList.remove('show');
       }
 
-      if (isDone) {
-        if (el('calcBtn').dataset.state !== 'ending') {
-          el('calcBtn').textContent = 'End Shift';
-          el('calcBtn').classList.remove('pause-shift');
-          el('calcBtn').classList.add('end-shift');
-          el('calcBtn').dataset.state = 'ending';
-        }
-      } else if (el('calcBtn').dataset.state === 'ending') {
-        el('calcBtn').textContent = 'Pause';
-        el('calcBtn').classList.remove('end-shift');
-        el('calcBtn').classList.add('pause-shift');
-        el('calcBtn').dataset.state = 'running';
-      }
+      // Split button stays in its current running/ended state — End Session is in the dropdown
       if (isDone && !wasDone) wasDone = true;
       else if (!isDone) wasDone = false;
 
@@ -3053,7 +3708,7 @@
       function _clearCardState() {
         el('rcElapsedLabel').textContent = '';
         el('rcElapsedLabel').style.color = '';
-        el('rcRightCol').style.display = 'none';
+        showRem(false);
         el('progFill').style.width = '0%';
         el('progFill').classList.remove('done');
         el('stayHint').style.display = 'none';
@@ -3088,8 +3743,8 @@
       if (!log || log.hoursWorked == null) {
         el('rcWorked').textContent = '—'; el('rcWorked').style.color = 'var(--muted-fg)';
         _setTodayDateChip();
-        el('rcRightCol').style.display = isFutureDay ? 'block' : 'none';
         el('rcRemaining').textContent = dur(target); el('rcRemaining').style.color = 'var(--muted-fg)';
+        showRem(isFutureDay);
         el('progFill').style.width = '0%'; el('progFill').classList.remove('done');
         el('progLabel').textContent = isFutureDay ? '' : 'No data logged for this day';
         el('rcToday').innerHTML = targetRow + `<div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">—</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">—</div></div></div>`;
@@ -3102,16 +3757,16 @@
       el('rcWorked').textContent = dur(worked); el('rcWorked').style.color = '';
       el('rcRemaining').style.color = '';
       if (isDone) {
-        el('rcRightCol').style.display = 'none';
+        showRem(false);
         const ot = worked - target;
         if (ot > 120) { el('otMsg').textContent = `+${dur(ot)} overtime`; el('otQuip').textContent = ''; el('otBanner').classList.add('show'); }
         else { el('otBanner').classList.remove('show'); }
         el('doneMsg').textContent = `${dur(worked)} logged`;
         el('doneBanner').classList.add('show');
       } else {
-        el('rcRightCol').style.display = 'block';
         el('rcRemaining').textContent = dur(target - worked);
         el('rcRemaining').style.color = 'var(--warning)';
+        showRem(true);
         el('otBanner').classList.remove('show'); el('doneBanner').classList.remove('show');
       }
       const pct = Math.min((worked / target) * 100, 100);
@@ -3193,7 +3848,7 @@
           const editBtn = document.createElement('button');
           editBtn.className = 'wk-edit-icon-btn';
           editBtn.title = 'Edit day';
-          editBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+          editBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.4324 4C18.2266 4 18.0227 4.04055 17.8325 4.11933C17.6423 4.19811 17.4695 4.31358 17.3239 4.45914L5.25659 16.5265L4.42524 19.5748L7.47353 18.7434L19.5409 6.67608C19.6864 6.53051 19.8019 6.3577 19.8807 6.16751C19.9595 5.97732 20 5.77348 20 5.56761C20 5.36175 19.9595 5.1579 19.8807 4.96771C19.8019 4.77752 19.6864 4.60471 19.5409 4.45914C19.3953 4.31358 19.2225 4.19811 19.0323 4.11933C18.8421 4.04055 18.6383 4 18.4324 4ZM17.0671 2.27157C17.5 2.09228 17.9639 2 18.4324 2C18.9009 2 19.3648 2.09228 19.7977 2.27157C20.2305 2.45086 20.6238 2.71365 20.9551 3.04493C21.2864 3.37621 21.5492 3.7695 21.7285 4.20235C21.9077 4.63519 22 5.09911 22 5.56761C22 6.03611 21.9077 6.50003 21.7285 6.93288C21.5492 7.36572 21.2864 7.75901 20.9551 8.09029L8.69996 20.3454C8.57691 20.4685 8.42387 20.5573 8.25597 20.6031L3.26314 21.9648C2.91693 22.0592 2.54667 21.9609 2.29292 21.7071C2.03917 21.4534 1.94084 21.0831 2.03526 20.7369L3.39694 15.7441C3.44273 15.5762 3.53154 15.4231 3.6546 15.3001L15.9097 3.04493C16.241 2.71365 16.6343 2.45086 17.0671 2.27157Z" fill="currentColor"/></svg>';
           editBtn.addEventListener('click', e => { e.stopPropagation(); openDayEditModal(day.key); });
           rightWrap.appendChild(editBtn);
           row.appendChild(rightWrap);
@@ -3241,7 +3896,7 @@
             const missEditBtn = document.createElement('button');
             missEditBtn.className = 'wk-edit-icon-btn';
             missEditBtn.title = 'Edit day';
-            missEditBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+            missEditBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.4324 4C18.2266 4 18.0227 4.04055 17.8325 4.11933C17.6423 4.19811 17.4695 4.31358 17.3239 4.45914L5.25659 16.5265L4.42524 19.5748L7.47353 18.7434L19.5409 6.67608C19.6864 6.53051 19.8019 6.3577 19.8807 6.16751C19.9595 5.97732 20 5.77348 20 5.56761C20 5.36175 19.9595 5.1579 19.8807 4.96771C19.8019 4.77752 19.6864 4.60471 19.5409 4.45914C19.3953 4.31358 19.2225 4.19811 19.0323 4.11933C18.8421 4.04055 18.6383 4 18.4324 4ZM17.0671 2.27157C17.5 2.09228 17.9639 2 18.4324 2C18.9009 2 19.3648 2.09228 19.7977 2.27157C20.2305 2.45086 20.6238 2.71365 20.9551 3.04493C21.2864 3.37621 21.5492 3.7695 21.7285 4.20235C21.9077 4.63519 22 5.09911 22 5.56761C22 6.03611 21.9077 6.50003 21.7285 6.93288C21.5492 7.36572 21.2864 7.75901 20.9551 8.09029L8.69996 20.3454C8.57691 20.4685 8.42387 20.5573 8.25597 20.6031L3.26314 21.9648C2.91693 22.0592 2.54667 21.9609 2.29292 21.7071C2.03917 21.4534 1.94084 21.0831 2.03526 20.7369L3.39694 15.7441C3.44273 15.5762 3.53154 15.4231 3.6546 15.3001L15.9097 3.04493C16.241 2.71365 16.6343 2.45086 17.0671 2.27157Z" fill="currentColor"/></svg>';
             missEditBtn.addEventListener('click', e => { e.stopPropagation(); openDayEditModal(day.key); });
             rightWrap.appendChild(missEditBtn);
             row.appendChild(rightWrap);
@@ -3256,7 +3911,7 @@
           const editBtn = document.createElement('button');
           editBtn.className = 'wk-edit-icon-btn';
           editBtn.title = 'Edit day';
-          editBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+          editBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.4324 4C18.2266 4 18.0227 4.04055 17.8325 4.11933C17.6423 4.19811 17.4695 4.31358 17.3239 4.45914L5.25659 16.5265L4.42524 19.5748L7.47353 18.7434L19.5409 6.67608C19.6864 6.53051 19.8019 6.3577 19.8807 6.16751C19.9595 5.97732 20 5.77348 20 5.56761C20 5.36175 19.9595 5.1579 19.8807 4.96771C19.8019 4.77752 19.6864 4.60471 19.5409 4.45914C19.3953 4.31358 19.2225 4.19811 19.0323 4.11933C18.8421 4.04055 18.6383 4 18.4324 4ZM17.0671 2.27157C17.5 2.09228 17.9639 2 18.4324 2C18.9009 2 19.3648 2.09228 19.7977 2.27157C20.2305 2.45086 20.6238 2.71365 20.9551 3.04493C21.2864 3.37621 21.5492 3.7695 21.7285 4.20235C21.9077 4.63519 22 5.09911 22 5.56761C22 6.03611 21.9077 6.50003 21.7285 6.93288C21.5492 7.36572 21.2864 7.75901 20.9551 8.09029L8.69996 20.3454C8.57691 20.4685 8.42387 20.5573 8.25597 20.6031L3.26314 21.9648C2.91693 22.0592 2.54667 21.9609 2.29292 21.7071C2.03917 21.4534 1.94084 21.0831 2.03526 20.7369L3.39694 15.7441C3.44273 15.5762 3.53154 15.4231 3.6546 15.3001L15.9097 3.04493C16.241 2.71365 16.6343 2.45086 17.0671 2.27157Z" fill="currentColor"/></svg>';
           editBtn.addEventListener('click', e => { e.stopPropagation(); openDayEditModal(day.key); });
           rightWrap.appendChild(editBtn);
           row.appendChild(rightWrap);
@@ -3344,6 +3999,30 @@
       renderEmptyState();
     }
 
+    // ── SPLIT BUTTON STATE ────────────────────────────
+    function setCalcBtnState(state) {
+      const btn = el('calcBtn'), chev = el('calcBtnChevron'),
+            dd  = el('calcBtnDropdown'), wrap = el('calcBtnWrap');
+      if (!btn) return;
+      btn.classList.remove('end-shift', 'pause-shift', 'resume-shift');
+      btn.disabled = false;
+      btn.dataset.state = state;
+      if (dd) dd.style.display = 'none';
+      if (state === 'running') {
+        btn.textContent = 'Pause'; btn.classList.add('pause-shift');
+        wrap?.classList.add('split-btn-wrap');
+        if (chev) { chev.style.display = ''; chev.className = 'split-chevron-btn pause-shift-chev'; }
+      } else if (state === 'ended') {
+        btn.textContent = 'Resume'; btn.classList.add('resume-shift');
+        wrap?.classList.add('split-btn-wrap');
+        if (chev) { chev.style.display = ''; chev.className = 'split-chevron-btn resume-shift-chev'; }
+      } else { // 'start' — plain full-width button, no split styling
+        btn.textContent = 'Quick Start';
+        wrap?.classList.remove('split-btn-wrap');
+        if (chev) chev.style.display = 'none';
+      }
+    }
+
     function calculate() {
       const raw = el('loginInput').value.trim();
       let p;
@@ -3359,11 +4038,7 @@
       loginDate = p; wasDone = false; notifSent = false; autoStopped = false;
       if (el('metaLogin')) el('metaLogin').textContent = short(p);
       // Switch CTA to "Pause" combo active state
-      el('calcBtn').textContent = 'Pause';
-      el('calcBtn').classList.add('pause-shift');
-      el('calcBtn').classList.remove('end-shift', 'resume-shift');
-      el('calcBtn').dataset.state = 'running';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('running');
       el('shiftInputRow').classList.add('active-state');
       el('shiftActiveLabel').textContent = `Started at ${short(p)}`;
       el('autostopBanner').classList.remove('show');
@@ -3372,9 +4047,11 @@
       render();
       if (ticker) clearInterval(ticker);
       ticker = setInterval(render, 1000);
+      scheduleNotifications(loginDate.toISOString()); // schedule Web Push for this shift
     }
 
     function clearLogin() {
+      cancelScheduledNotifications(); // cancel any pending push notifications
       loginDate = null; wasDone = false; notifSent = false; autoStopped = false;
       _sessionAccSecs = 0; _sessionCheckoutTime = null;
       Store.clearSession();
@@ -3383,10 +4060,7 @@
       el('loginInput').classList.remove('err');
       el('errMsg').classList.remove('show');
       // Restore CTA to Quick Start
-      el('calcBtn').textContent = 'Quick Start';
-      el('calcBtn').classList.remove('end-shift', 'pause-shift', 'resume-shift');
-      el('calcBtn').dataset.state = 'start';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('start');
       el('shiftInputRow').classList.remove('active-state', 'hidden');
       el('autostopBanner').classList.remove('show');
       selectedDayKey = todayKey();
@@ -3412,6 +4086,12 @@
       el('inpWeeklyM').value    = _wm;
       el('inpWeeklyOn').checked = c.weeklyOn;
       el('inpNotifOn').checked  = c.notifOn;
+      if (el('inpNotifTarget'))    el('inpNotifTarget').checked    = c.notifTarget    !== false;
+      if (el('inpNotifKickstart')) el('inpNotifKickstart').checked = c.notifKickstart !== false;
+      if (el('inpNotifOvertime'))  el('inpNotifOvertime').checked  = c.notifOvertime  !== false;
+      // Restore sub-toggle visibility if notifications are already on
+      const _nsg = el('notifSubGroup');
+      if (_nsg && c.notifOn) { _nsg.style.maxHeight = '400px'; _nsg.style.opacity = '1'; _nsg.style.pointerEvents = ''; }
       const satToggle = el('inpIncludeSat'); if (satToggle) satToggle.checked = (c.workDays === 6);
       el('pcTabDaily')?.classList.toggle('active', !c.weeklyOn);
       el('pcTabWeekly')?.classList.toggle('active', !!c.weeklyOn);
@@ -3472,13 +4152,13 @@
 
     function switchStTab(tab) {
       const isWeekly = tab === 'weekly';
-      el('inpWeeklyOn').checked = isWeekly;
+      // NOTE: do NOT touch inpWeeklyOn here — that's owned by Penalty Calculation
       el('stTabDaily').classList.toggle('active', !isWeekly);
       el('stTabWeekly').classList.toggle('active', isWeekly);
       const lbl = el('stTargetLabel');
       if (lbl) lbl.textContent = isWeekly ? 'Weekly Target' : 'Daily Target';
       updateWeeklyCalc();
-      autoSaveSettings();
+      // don't call autoSaveSettings — tab is display-only, no save needed
     }
 
     function updateWeeklyCalc() {
@@ -3489,11 +4169,12 @@
       const days = (cfg().workDays || 5);
       const weekly = daily * days;
       const wh = Math.floor(weekly), wm = Math.round((weekly - wh) * 60);
-      const isWeekly = el('inpWeeklyOn')?.checked;
+      // Read from the tab state, NOT from inpWeeklyOn (penalty calc)
+      const isWeekly = el('stTabWeekly')?.classList.contains('active');
       if (isWeekly) {
-        info.textContent = `Based on ${dh}h${dm ? ' ' + dm + 'm' : ''} daily x ${days} days, that would be ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly.`;
+        info.textContent = `Based on ${dh}h${dm ? ' ' + dm + 'm' : ''} daily × ${days} days, that's ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly.`;
       } else {
-        info.textContent = `That would be ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly (${days} working days).`;
+        info.textContent = `That's ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly (${days} working days).`;
       }
       // Sync hidden weekly inputs so calculations still work
       el('inpWeeklyH').value = wh;
@@ -3509,6 +4190,24 @@
     function obToggleIncludeSaturday(checked) {
       const n = checked ? 6 : 5;
       const inp = el('obWorkDays'); if (inp) inp.value = n;
+      const dialog = document.querySelector('.ob-dialog');
+      const curH = dialog ? dialog.offsetHeight : 0;
+      updateObWeeklyCalc();
+      obBuildStep3Pickers(); // rebuild pickers so Saturday appears/disappears
+      if (dialog && curH > 0) {
+        requestAnimationFrame(() => {
+          const newH = dialog.scrollHeight;
+          if (Math.abs(newH - curH) > 2) {
+            dialog.style.height = curH + 'px';
+            dialog.style.overflow = 'hidden';
+            dialog.style.transition = 'height .3s cubic-bezier(0.4,0,0.2,1)';
+            requestAnimationFrame(() => {
+              dialog.style.height = newH + 'px';
+              setTimeout(() => { dialog.style.height = ''; dialog.style.overflow = ''; dialog.style.transition = ''; }, 320);
+            });
+          }
+        });
+      }
     }
 
     function switchPenaltyMode(mode) {
@@ -3531,7 +4230,10 @@
       const lateDays       = [...document.querySelectorAll('.plan-btn[data-sday].selected')].map(b => +b.dataset.sday);
       const earlyLeaveDays = [...document.querySelectorAll('.plan-btn[data-tday].selected')].map(b => +b.dataset.tday);
       const targetDay      = earlyLeaveDays.length > 0 ? earlyLeaveDays[0] : null;
-      const notifOn    = el('inpNotifOn').checked;
+      const notifOn        = el('inpNotifOn').checked;
+      const notifTarget    = el('inpNotifTarget')?.checked ?? true;
+      const notifKickstart = el('inpNotifKickstart')?.checked ?? true;
+      const notifOvertime  = el('inpNotifOvertime')?.checked ?? true;
       const name       = el('inpName').value.trim();
       const position   = el('inpPosition')?.value.trim() || '';
       const weeklyH    = (_wHVal > 0 || _wMVal > 0) ? _wHVal + _wMVal / 60 : cfg().weeklyH;
@@ -3540,13 +4242,21 @@
       const shiftType  = deriveShiftType(shiftStart);
       const now = nowTz();
       const workDays = parseInt(el('inpWorkDays')?.value || '5', 10) || 5;
-      saveCfg({ dailyH: daily, weeklyH, weeklyOn: on, lateDays, earlyLeaveDays, notifOn, name, position,
+      saveCfg({ dailyH: daily, weeklyH, weeklyOn: on, lateDays, earlyLeaveDays, notifOn, notifTarget, notifKickstart, notifOvertime, name, position,
                 targetDay, shiftType, shiftStart, shiftEnd, tzOffset, workDays,
                 autoStopBuf: cfg().autoStopBuf || 0.5 });
       renderDaySelector(); // refresh strip in case work-days changed
       updateWeeklyCalc();
       el('settingsLastSaved').textContent = `Last updated just now`;
-      if (notifOn && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+      if (notifOn && 'Notification' in window) {
+        if (Notification.permission === 'default') {
+          Notification.requestPermission().then(p => {
+            if (p === 'granted' && loginDate) scheduleNotifications(loginDate.toISOString());
+          });
+        } else if (Notification.permission === 'granted' && loginDate) {
+          scheduleNotifications(loginDate.toISOString());
+        }
+      }
       if (loginDate) render(); else renderEmptyState();
     }
 
@@ -3803,7 +4513,7 @@
     function renderPenalties() {
       const c = cfg();
       const now = new Date();
-      const refreshSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`;
+      const refreshSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M2.06095 10.8901C2.61379 5.88912 6.85202 2 12 2C14.2365 2 16.0402 2.88495 17.581 4.0323C18.4275 4.66267 19.2351 5.40719 20 6.14376V3C20 2.44771 20.4477 2 21 2C21.5523 2 22 2.44771 22 3V8.5C22 9.05228 21.5523 9.5 21 9.5H15.5C14.9477 9.5 14.5 9.05228 14.5 8.5C14.5 7.94772 14.9477 7.5 15.5 7.5H18.5243C17.8281 6.82979 17.1371 6.19538 16.3865 5.6364C15.054 4.64418 13.662 4 12 4C7.88281 4 4.4909 7.11098 4.04884 11.1099C3.98816 11.6588 3.49396 12.0546 2.94502 11.9939C2.39608 11.9333 2.00027 11.4391 2.06095 10.8901Z" fill="currentColor"/><path d="M21.9939 13.1099C21.441 18.1109 17.2028 22 12.0548 22C9.81834 22 8.0146 21.115 6.47383 19.9677C5.62731 19.3373 4.8197 18.5928 4.05481 17.8562V21C4.05481 21.5523 3.60709 22 3.05481 22C2.50253 22 2.05481 21.5523 2.05481 21V15.5C2.05481 14.9477 2.50253 14.5 3.05481 14.5H8.55481C9.1071 14.5 9.55481 14.9477 9.55481 15.5C9.55481 16.0523 9.1071 16.5 8.55481 16.5H5.53052C6.22675 17.1702 6.91769 17.8046 7.66834 18.3636C9.0008 19.3558 10.3928 20 12.0548 20C16.172 20 19.5639 16.889 20.006 12.8901C20.0667 12.3412 20.5608 11.9454 21.1098 12.0061C21.6587 12.0667 22.0545 12.5609 21.9939 13.1099Z" fill="currentColor"/></svg>`;
       const btn = el('penaltiesCheck');
       if (btn) btn.innerHTML = refreshSvg + ' Refresh';
       const container = el('penaltiesList');
@@ -3923,7 +4633,7 @@
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
             <button class="btn-sm" onclick="openEmailModal('${p.key}')">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M23 6V18C23 19.6523 21.6523 21 20 21H4C2.34772 21 1 19.6523 1 18V6C1 4.34315 2.34315 3 4 3H20C21.6569 3 23 4.34315 23 6ZM3.10658 5.55395C3.27196 5.22692 3.61204 5 4 5H20C20.388 5 20.728 5.22692 20.8934 5.55395L12 11.7793L3.10658 5.55395ZM3 7.92066L10.8531 13.4178C11.5417 13.8999 12.4583 13.8999 13.1469 13.4178L21 7.92066V18C21 18.5477 20.5477 19 20 19H4C3.45228 19 3 18.5477 3 18V7.92066Z" fill="currentColor"/></svg>
               Draft Email
             </button>
           </div>
@@ -4004,6 +4714,92 @@ ${sig}`
       else                       { ap = h>=12?'PM':'AM'; }
       const display = `${p2(h > 12 ? h - 12 : h || 12)}:${p2(m)} ${ap}`;
       input.value = display;
+    }
+
+    // ── END SESSION MODAL ─────────────────────────────
+    function openEndSessionModal() {
+      const c = cfg();
+      const dailySecs = c.dailyH * 3600;
+      const halfSecs  = dailySecs / 2;
+      // Compute how much has been worked so far
+      let workedSecs = _sessionAccSecs;
+      if (loginDate) workedSecs += Math.max(0, Math.floor((new Date() - loginDate) / 1000));
+      const remSecs = Math.max(0, dailySecs - workedSecs);
+      const isHalfDay = workedSecs <= halfSecs;
+      const desc = el('endSessionDesc');
+      const note = el('endSessionHalfDayNote');
+      const confirmBtn = el('endSessionConfirmBtn');
+      if (remSecs > 0) {
+        desc.textContent = `You still have ${dur(remSecs)} remaining until your daily target.`;
+      } else {
+        desc.textContent = "You've hit your daily target. Great work today!";
+      }
+      if (isHalfDay && workedSecs > 0) {
+        note.style.display = '';
+        confirmBtn.textContent = 'End & Mark Half Day';
+      } else {
+        note.style.display = 'none';
+        confirmBtn.textContent = 'End Session';
+      }
+      el('endSessionOverlay').classList.add('open');
+    }
+
+    function confirmEndSession() {
+      const c = cfg();
+      const dailySecs = c.dailyH * 3600;
+      const halfSecs  = dailySecs / 2;
+      let workedSecs = _sessionAccSecs;
+      if (loginDate) workedSecs += Math.max(0, Math.floor((new Date() - loginDate) / 1000));
+      const isHalfDay = workedSecs > 0 && workedSecs <= halfSecs;
+      el('endSessionOverlay').classList.remove('open');
+      // Mark half day in log before checkout
+      if (isHalfDay) {
+        const tk = todayKey(), ex = dayLog(tk) || {};
+        saveDayLog(tk, { ...ex, override: 'halfday' });
+      }
+      checkout();
+    }
+
+    // ── TOAST SYSTEM ──────────────────────────────────
+    let _toastTimer = null, _toastUndoFn = null;
+    function showToast(msg, undoFn, durationMs = 4000) {
+      const toast = el('appToast');
+      const msgEl = el('appToastMsg');
+      const undoBtn = el('appToastUndo');
+      if (!toast) return;
+      if (_toastTimer) { clearTimeout(_toastTimer); toast.classList.remove('toast-show'); }
+      msgEl.textContent = msg;
+      _toastUndoFn = undoFn || null;
+      undoBtn.style.display = undoFn ? '' : 'none';
+      requestAnimationFrame(() => {
+        toast.classList.add('toast-show');
+        _toastTimer = setTimeout(() => {
+          toast.classList.remove('toast-show');
+          _toastTimer = null; _toastUndoFn = null;
+        }, durationMs);
+      });
+    }
+
+    // ── DELETE DAY ENTRY ───────────────────────────────
+    let _deletedEntryKey = null, _deletedEntryData = null;
+    function deleteDayEntry() {
+      if (!_dayEditKey) return;
+      const key = _dayEditKey;
+      const backup = dayLog(key);
+      _deletedEntryKey = key; _deletedEntryData = backup || null;
+      // Remove from Store
+      Store.remove(KEY.day + key);
+      closeDayEditModal();
+      renderDaySelector();
+      if (key === todayKey()) renderEmptyState();
+      showToast('Entry deleted.', () => {
+        if (_deletedEntryKey && _deletedEntryData) {
+          saveDayLog(_deletedEntryKey, _deletedEntryData);
+          renderDaySelector();
+          if (_deletedEntryKey === todayKey() && loginDate) render();
+        }
+        _deletedEntryKey = null; _deletedEntryData = null;
+      });
     }
 
     function openDayEditModal(key) {
@@ -4352,22 +5148,14 @@ ${sig}`
         const d=new Date(s.loginISO);
         if (isNaN(d.getTime())||d>new Date()) { Store.clearSession(); return; }
         loginDate=d;
-        el('calcBtn').textContent='Pause';
-        el('calcBtn').classList.add('pause-shift');
-        el('calcBtn').classList.remove('end-shift','resume-shift');
-        el('calcBtn').dataset.state='running';
-        el('calcBtn').disabled=false;
+        setCalcBtnState('running');
         el('shiftInputRow').classList.add('active-state');
         el('shiftActiveLabel').textContent=`Started at ${short(loginDate)}`;
         el('autostopBanner').classList.remove('show');
         if (ticker) clearInterval(ticker);
         ticker=setInterval(render,1000);
       } else if (_sessionAccSecs>0) {
-        el('calcBtn').textContent='Resume';
-        el('calcBtn').classList.remove('end-shift','pause-shift');
-        el('calcBtn').classList.add('resume-shift');
-        el('calcBtn').dataset.state='ended';
-        el('calcBtn').disabled=false;
+        setCalcBtnState('ended');
       }
     }
 
@@ -4525,11 +5313,7 @@ ${sig}`
         } else {
           // No active session — start one from the given time
           loginDate = s; wasDone = false; notifSent = false; autoStopped = false;
-          el('calcBtn').textContent = 'Pause';
-          el('calcBtn').classList.add('pause-shift');
-          el('calcBtn').classList.remove('end-shift', 'resume-shift');
-          el('calcBtn').dataset.state = 'running';
-          el('calcBtn').disabled = false;
+          setCalcBtnState('running');
           el('shiftInputRow').classList.add('active-state');
           el('shiftActiveLabel').textContent = `Started at ${short(s)}`;
           persistSession();
@@ -4719,16 +5503,13 @@ ${sig}`
         _sessionAccSecs = Math.round(prevLog.hoursWorked * 3600);
       }
       loginDate = now; wasDone = false; notifSent = false; autoStopped = false;
-      el('calcBtn').textContent = 'Pause';
-      el('calcBtn').classList.add('pause-shift');
-      el('calcBtn').classList.remove('end-shift', 'resume-shift');
-      el('calcBtn').dataset.state = 'running';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('running');
       el('shiftInputRow').classList.add('active-state');
       el('shiftActiveLabel').textContent = `Resumed · ${dur(_sessionAccSecs)} prior`;
       el('autostopBanner').classList.remove('show');
       saveDayLog(tk, { ...prevLog, sessionTag: 'realtime', autostopped: false });
       persistSession();
+      scheduleNotifications(loginDate.toISOString()); // reschedule on resume
       selectDay(tk); render();
       if (ticker) clearInterval(ticker);
       ticker = setInterval(render, 1000);
@@ -4740,8 +5521,8 @@ ${sig}`
     function applyTheme(d) {
       dark = d;
       document.documentElement.classList.toggle('dark', d);
-      el('sunIcon').style.display  = d ? 'none'  : 'block';
-      el('moonIcon').style.display = d ? 'block' : 'none';
+      el('sunIconWrap').style.display  = d ? 'none'  : 'inline-flex';
+      el('moonIconWrap').style.display = d ? 'inline-flex' : 'none';
       localStorage.setItem('wh_theme', d ? 'dark' : 'light');
       const fav = document.getElementById('favicon');
       if (fav) fav.href = d ? _faviconDark : _faviconLight;
@@ -4749,6 +5530,7 @@ ${sig}`
     const _savedTheme = localStorage.getItem('wh_theme');
     applyTheme(_savedTheme ? _savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme:dark)').matches);
     el('themeBtn').addEventListener('click', () => applyTheme(!dark));
+    initServiceWorker(); // register service worker for Web Push
 
     // ── EVENTS ─────────────────────────────────────────
     document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -4773,7 +5555,7 @@ ${sig}`
       el(id)?.addEventListener('input', autoSaveSettings);
     });
     /* inpWeeklyOn is a hidden checkbox now toggled via switchStTab — no direct listener needed */
-    el('inpNotifOn').addEventListener('change', autoSaveSettings);
+    // inpNotifOn change handled by onNotifToggleChange() inline
     document.querySelectorAll('.plan-btn[data-sday]').forEach(btn => {
       btn.addEventListener('click', () => { btn.classList.toggle('selected'); autoSaveSettings(); });
     });
@@ -4786,10 +5568,26 @@ ${sig}`
     // Shift presets handled by renderShiftPresets() / applyShiftPreset()
     el('calcBtn').addEventListener('click', () => {
       const state = el('calcBtn').dataset.state || 'start';
-      if (state === 'ending') checkout();
-      else if (state === 'running') endSession();
+      if (state === 'running') endSession();
       else if (state === 'ended') resumeShift();
       else calculate();
+    });
+
+    // Split button: chevron toggles End Session dropdown
+    el('calcBtnChevron').addEventListener('click', e => {
+      e.stopPropagation();
+      const dd = el('calcBtnDropdown');
+      if (!dd) return;
+      dd.style.display = dd.style.display === 'none' ? '' : 'none';
+    });
+    document.addEventListener('click', () => {
+      const dd = el('calcBtnDropdown');
+      if (dd) dd.style.display = 'none';
+    });
+    el('endSessionBtn').addEventListener('click', e => {
+      e.stopPropagation();
+      const dd = el('calcBtnDropdown'); if (dd) dd.style.display = 'none';
+      openEndSessionModal();
     });
     el('coDone').addEventListener('click', closeCheckoutModal);
     el('checkoutOverlay').addEventListener('click', e => { if (e.target === el('checkoutOverlay')) closeCheckoutModal(); });
@@ -4836,6 +5634,18 @@ ${sig}`
     el('dayEditSave').addEventListener('click', saveDayEditModal);
     el('dayEditCancel').addEventListener('click', closeDayEditModal);
     el('dayEditOverlay').addEventListener('click', e => { if (e.target === el('dayEditOverlay')) closeDayEditModal(); });
+
+    // End Session modal
+    el('endSessionCancelBtn').addEventListener('click', () => el('endSessionOverlay').classList.remove('open'));
+    el('endSessionConfirmBtn').addEventListener('click', confirmEndSession);
+    el('endSessionOverlay').addEventListener('click', e => { if (e.target === el('endSessionOverlay')) el('endSessionOverlay').classList.remove('open'); });
+
+    // Toast undo button
+    el('appToastUndo').addEventListener('click', () => {
+      if (_toastUndoFn) { const fn = _toastUndoFn; _toastUndoFn = null; fn(); }
+      if (_toastTimer) { clearTimeout(_toastTimer); _toastTimer = null; }
+      el('appToast').classList.remove('toast-show');
+    });
 
     // Week plan modal
     el('weekPlanSave').addEventListener('click', saveWeekPlan);
@@ -4890,7 +5700,6 @@ ${sig}`
     // Clear button (removed in combo design — no longer needed)
 
     document.addEventListener('keydown', e => {
-      if (e.key === 'd' && !e.metaKey && !e.ctrlKey && document.activeElement.tagName !== 'INPUT') applyTheme(!dark);
       if (e.key === 'Escape') {
         closeTpModal();
         closeDayEditModal();
@@ -4933,8 +5742,28 @@ ${sig}`
       _obIsWeekly = tab === 'weekly';
       el('obTabDaily').classList.toggle('active', !_obIsWeekly);
       el('obTabWeekly').classList.toggle('active', _obIsWeekly);
-      el('obPanelDaily').style.display = _obIsWeekly ? 'none' : '';
-      el('obPanelWeekly').style.display = _obIsWeekly ? '' : 'none';
+      const lbl = el('obTargetLabel');
+      if (lbl) lbl.textContent = _obIsWeekly ? 'Weekly Target' : 'Daily Target';
+      updateObWeeklyCalc();
+    }
+
+    function updateObWeeklyCalc() {
+      const info = el('obWeeklyCalcInfo'); if (!info) return;
+      const dh = parseFloat(el('obDailyH')?.value) || 0;
+      const dm = parseFloat(el('obDailyM')?.value) || 0;
+      const days = parseInt(el('obWorkDays')?.value || '5', 10) || 5;
+      const isWeekly = _obIsWeekly;
+      const totalMins = (dh * 60 + dm) * days;
+      const wh = Math.floor(totalMins / 60);
+      const wm = totalMins % 60;
+      if (isWeekly) {
+        info.textContent = `Based on ${dh}h${dm ? ' ' + dm + 'm' : ''} daily × ${days} days, that's ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly.`;
+      } else {
+        info.textContent = `That's ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly (${days} working days).`;
+      }
+      // Sync hidden weekly fields so obSaveStep3 can read them
+      const whi = el('obWeeklyH'); if (whi) whi.value = wh;
+      const wmi = el('obWeeklyM'); if (wmi) wmi.value = wm;
     }
 
     function obAnimateTo(step, dir) {
@@ -4996,57 +5825,54 @@ ${sig}`
       const shiftStart = (el('obShiftStart')?.value || '09:00 AM').trim();
       const shiftEnd = (el('obShiftEnd')?.value || '06:00 PM').trim();
       const shiftType = deriveShiftType(shiftStart);
-      const workDays = parseInt(el('obWorkDays')?.value || '5', 10) || 5;
       const c = cfg();
-      saveCfg({ ...c, name, position, shiftStart, shiftEnd, shiftType, workDays });
+      saveCfg({ ...c, name, position, shiftStart, shiftEnd, shiftType });
     }
 
-    function obPopulateStep3Days() {
-      const wdays = workDayNames();
+    function obBuildStep3Pickers() {
+      const days = parseInt(el('obWorkDays')?.value || '5', 10) || 5;
+      const names = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].slice(0, days);
       const earlyPicker = el('obEarlyPicker');
       if (earlyPicker) {
-        earlyPicker.innerHTML = wdays.map((n, i) =>
-          `<button type="button" class="plan-btn" data-oday="${i+1}">${n}</button>`
+        const prev = [...earlyPicker.querySelectorAll('.plan-btn.selected')].map(b => +b.dataset.oday);
+        earlyPicker.innerHTML = names.map((n,i) =>
+          `<button type="button" class="plan-btn${prev.includes(i+1)?' selected':''}" data-oday="${i+1}">${n}</button>`
         ).join('');
         earlyPicker.querySelectorAll('[data-oday]').forEach(b => b.addEventListener('click', () => b.classList.toggle('selected')));
       }
       const latePicker = el('obLatePicker');
       if (latePicker) {
-        latePicker.innerHTML = wdays.map((n, i) =>
-          `<button type="button" class="plan-btn" data-lday="${i+1}">${n}</button>`
+        const prev = [...latePicker.querySelectorAll('.plan-btn.selected')].map(b => +b.dataset.lday);
+        latePicker.innerHTML = names.map((n,i) =>
+          `<button type="button" class="plan-btn${prev.includes(i+1)?' selected':''}" data-lday="${i+1}">${n}</button>`
         ).join('');
         latePicker.querySelectorAll('[data-lday]').forEach(b => b.addEventListener('click', () => b.classList.toggle('selected')));
       }
     }
 
+    function obPopulateStep3Days() {
+      updateObWeeklyCalc();
+      obBuildStep3Pickers();
+    }
+
     function obSaveStep3() {
       const c = cfg();
-      let dailyH, weeklyH, weeklyOn;
-      if (_obIsWeekly) {
-        const dh = parseInt(el('obDailyHW')?.value, 10) || 9;
-        const dm = parseInt(el('obDailyMW')?.value, 10) || 0;
-        const wh = parseInt(el('obWeeklyH')?.value, 10) || 45;
-        const wm = parseInt(el('obWeeklyM')?.value, 10) || 0;
-        dailyH = dh + dm / 60;
-        weeklyH = wh + wm / 60;
-        weeklyOn = true;
-      } else {
-        const dh = parseInt(el('obDailyH')?.value, 10) || 9;
-        const dm = parseInt(el('obDailyM')?.value, 10) || 0;
-        dailyH = dh + dm / 60;
-        weeklyH = c.weeklyH || 45;
-        weeklyOn = false;
-      }
+      const dh = parseInt(el('obDailyH')?.value, 10) || 9;
+      const dm = parseInt(el('obDailyM')?.value, 10) || 0;
+      const dailyH = dh + dm / 60;
+      const wh = parseInt(el('obWeeklyH')?.value, 10) || 45;
+      const wm = parseInt(el('obWeeklyM')?.value, 10) || 0;
+      const weeklyH = wh + wm / 60;
+      const weeklyOn = _obIsWeekly;
+      const workDays = parseInt(el('obWorkDays')?.value || '5', 10) || 5;
       const earlyLeaveDays = [...document.querySelectorAll('#obEarlyPicker .plan-btn.selected')].map(b => +b.dataset.oday);
       const lateDays = [...document.querySelectorAll('#obLatePicker .plan-btn.selected')].map(b => +b.dataset.lday);
       const targetDay = earlyLeaveDays.length ? earlyLeaveDays[0] : null;
-      saveCfg({ ...c, dailyH, weeklyH, weeklyOn, earlyLeaveDays, lateDays, targetDay });
+      saveCfg({ ...c, dailyH, weeklyH, weeklyOn, workDays, earlyLeaveDays, lateDays, targetDay });
     }
 
     function obPopulateWeekPanel() {
-      const c = cfg(), wk = week(0), tk = todayKey();
-
-      // Day override rows
+      const wk = week(0), tk = todayKey();
       const rows = el('obWpDayRows');
       if (rows) {
         rows.innerHTML = wk.map(day => {
@@ -5064,40 +5890,10 @@ ${sig}`
           </div>`;
         }).join('');
       }
-
-      // Early leave picker (1-indexed: Mon=1)
-      const earlyPicker = el('obWpEarly');
-      if (earlyPicker) {
-        earlyPicker.innerHTML = FULL_DAY_NAMES.map((n, i) =>
-          `<button class="plan-btn${(c.targetDay === i+1)?' selected':''}" data-obwp-tday="${i+1}">${n}</button>`
-        ).join('');
-        earlyPicker.querySelectorAll('[data-obwp-tday]').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const isSelected = btn.classList.contains('selected');
-            earlyPicker.querySelectorAll('[data-obwp-tday]').forEach(b => b.classList.remove('selected'));
-            if (!isSelected) btn.classList.add('selected');
-          });
-        });
-      }
-
-      // Stay late picker (0-indexed: Mon=0 to match saveWeekPlan)
-      const latePicker = el('obWpLate');
-      if (latePicker) {
-        latePicker.innerHTML = FULL_DAY_NAMES.map((n, i) =>
-          `<button class="plan-btn${(c.lateDays||[]).includes(i)?' selected':''}" data-obwp-sday="${i}">${n}</button>`
-        ).join('');
-        latePicker.querySelectorAll('[data-obwp-sday]').forEach(btn => {
-          btn.addEventListener('click', () => btn.classList.toggle('selected'));
-        });
-      }
     }
 
     function obSaveWeekPanel() {
-      const c = cfg();
-      const selTday = el('obWpEarly')?.querySelector('[data-obwp-tday].selected');
-      const targetDay = selTday ? +selTday.dataset.obwpTday : (c.targetDay || null);
-      const lateDays = [...(el('obWpLate')?.querySelectorAll('[data-obwp-sday].selected') || [])].map(b => +b.dataset.obwpSday);
-      saveCfg({ ...c, targetDay, lateDays });
+      // Day overrides are saved live via wpSetOverride; nothing extra to save here
     }
 
     function obStep(dir) {
@@ -5117,6 +5913,324 @@ ${sig}`
     function obSkip() {
       obFinish();
     }
+
+    // ── Forgot Password ──────────────────────────────────────────────────────
+    let _fpTimer = null, fpExpired = false;
+    function openFpModal() {
+      el('fpOverlay').classList.add('open');
+      el('fpViewEmail').style.display = '';
+      el('fpViewOTP').style.display = 'none';
+      el('fpEmailInput').value = '';
+      el('fpEmailErr').classList.remove('show');
+    }
+    function closeFpModal() {
+      el('fpOverlay').classList.remove('open');
+      if (_fpTimer) { clearInterval(_fpTimer); _fpTimer = null; }
+    }
+    function fpSendEmail() {
+      const email = el('fpEmailInput').value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        el('fpEmailErr').classList.add('show'); return;
+      }
+      el('fpEmailErr').classList.remove('show');
+      // Loading state on button during simulated send
+      const btn = el('fpSendEmailBtn');
+      const origText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      btn.style.opacity = '0.7';
+      // Simulate async email send — timer starts ONLY after this resolves
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = origText;
+        btn.style.opacity = '';
+        el('fpEmailDisplay').textContent = email;
+        el('fpViewEmail').style.display = 'none';
+        el('fpViewOTP').style.display = '';
+        el('fpOtpInput').value = '';
+        el('fpOtpInput').disabled = false;
+        el('fpVerifyBtn').disabled = true;
+        el('fpExpiredMsg').style.display = 'none';
+        el('fpTimerWrap').style.display = '';
+        fpExpired = false;
+        fpStartTimer(60);
+      }, 800);
+    }
+    function fpStartTimer(secs) {
+      if (_fpTimer) clearInterval(_fpTimer);
+      let remaining = secs;
+      const fmt = s => Math.floor(s/60)+':'+(String(s%60).padStart(2,'0'));
+      el('fpTimerDisplay').textContent = fmt(remaining);
+      _fpTimer = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(_fpTimer); _fpTimer = null;
+          fpExpired = true;
+          el('fpTimerWrap').style.display = 'none';
+          el('fpExpiredMsg').style.display = '';
+          el('fpVerifyBtn').disabled = true;
+          el('fpOtpInput').disabled = true;
+        } else {
+          el('fpTimerDisplay').textContent = fmt(remaining);
+        }
+      }, 1000);
+    }
+    function fpResend() {
+      fpExpired = false;
+      el('fpOtpInput').disabled = false;
+      el('fpOtpInput').value = '';
+      el('fpVerifyBtn').disabled = true;
+      el('fpExpiredMsg').style.display = 'none';
+      el('fpTimerWrap').style.display = '';
+      fpStartTimer(60);
+    }
+    function fpBackToEmail() {
+      if (_fpTimer) { clearInterval(_fpTimer); _fpTimer = null; }
+      el('fpViewEmail').style.display = '';
+      el('fpViewOTP').style.display = 'none';
+      el('fpViewAuth').style.display = 'none';
+    }
+    function fpVerify() {
+      closeFpModal();
+      showToast('Verification pending', 'info', 'Supabase integration coming soon.');
+    }
+    function openAuthView() {
+      el('fpViewEmail').style.display = 'none';
+      el('fpViewOTP').style.display = 'none';
+      el('fpViewAuth').style.display = '';
+      const digits = ['authD0','authD1','authD2','authD3','authD4','authD5'].map(id => el(id));
+      digits.forEach(d => { d.value = ''; d.disabled = false; });
+      el('authVerifyBtn').disabled = true;
+      digits[0].focus();
+    }
+    function authVerify() {
+      closeFpModal();
+      showToast('Authenticator pending', 'info', 'Supabase integration coming soon.');
+    }
+    function _initAuthDigits() {
+      const ids = ['authD0','authD1','authD2','authD3','authD4','authD5'];
+      const digits = ids.map(id => el(id));
+      const update = () => { el('authVerifyBtn').disabled = !digits.every(d => /^\d$/.test(d.value)); };
+      digits.forEach((inp, i) => {
+        inp.addEventListener('input', () => {
+          inp.value = inp.value.replace(/\D/g,'').slice(-1);
+          if (inp.value && i < 5) digits[i+1].focus();
+          update();
+        });
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Backspace') {
+            if (!inp.value && i > 0) { digits[i-1].focus(); digits[i-1].value = ''; e.preventDefault(); }
+            else if (inp.value) { inp.value = ''; e.preventDefault(); }
+            update();
+          } else if (e.key === 'ArrowLeft' && i > 0) digits[i-1].focus();
+          else if (e.key === 'ArrowRight' && i < 5) digits[i+1].focus();
+        });
+        inp.addEventListener('paste', e => {
+          e.preventDefault();
+          const txt = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+          digits.forEach((d, j) => { d.value = txt[j] || ''; });
+          digits[Math.min(txt.length - 1, 5)].focus();
+          update();
+        });
+        inp.addEventListener('click', () => inp.select());
+      });
+    }
+    _initAuthDigits();
+
+    // ── Update Password ──────────────────────────────────────────────────────
+    let _upwdTimer = null, upwdExpired = false;
+
+    function openUpwdModal() {
+      upwdShowMethod();
+      el('upwdOverlay').classList.add('open');
+    }
+    function closeUpwdModal() {
+      el('upwdOverlay').classList.remove('open');
+      if (_upwdTimer) { clearInterval(_upwdTimer); _upwdTimer = null; }
+    }
+    function upwdShowMethod() {
+      el('upwdViewMethod').style.display = '';
+      el('upwdViewEmail').style.display = 'none';
+      el('upwdViewOTP').style.display = 'none';
+      el('upwdViewAuth').style.display = 'none';
+      if (_upwdTimer) { clearInterval(_upwdTimer); _upwdTimer = null; }
+    }
+    function upwdShowEmail() {
+      el('upwdViewMethod').style.display = 'none';
+      el('upwdViewEmail').style.display = '';
+      el('upwdViewOTP').style.display = 'none';
+      el('upwdViewAuth').style.display = 'none';
+      el('upwdEmailInput').value = '';
+      el('upwdEmailErr').classList.remove('show');
+      setTimeout(() => el('upwdEmailInput').focus(), 50);
+    }
+    function upwdSendEmail() {
+      const email = el('upwdEmailInput').value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        el('upwdEmailErr').classList.add('show'); return;
+      }
+      el('upwdEmailErr').classList.remove('show');
+      const btn = el('upwdSendBtn');
+      btn.disabled = true; btn.textContent = 'Sending…'; btn.style.opacity = '.7';
+      setTimeout(() => {
+        btn.disabled = false; btn.textContent = 'Send Code'; btn.style.opacity = '';
+        el('upwdEmailDisplay').textContent = email;
+        el('upwdViewEmail').style.display = 'none';
+        el('upwdViewOTP').style.display = '';
+        el('upwdOtpInput').value = '';
+        el('upwdOtpInput').disabled = false;
+        el('upwdVerifyBtn').disabled = true;
+        el('upwdExpiredMsg').style.display = 'none';
+        el('upwdTimerWrap').style.display = '';
+        upwdExpired = false;
+        _upwdStartTimer(60);
+      }, 800);
+    }
+    function _upwdStartTimer(secs) {
+      if (_upwdTimer) clearInterval(_upwdTimer);
+      let rem = secs;
+      const fmt = s => Math.floor(s/60)+':'+(String(s%60).padStart(2,'0'));
+      el('upwdTimerDisplay').textContent = fmt(rem);
+      _upwdTimer = setInterval(() => {
+        rem--;
+        if (rem <= 0) {
+          clearInterval(_upwdTimer); _upwdTimer = null;
+          upwdExpired = true;
+          el('upwdTimerWrap').style.display = 'none';
+          el('upwdExpiredMsg').style.display = '';
+          el('upwdVerifyBtn').disabled = true;
+          el('upwdOtpInput').disabled = true;
+        } else {
+          el('upwdTimerDisplay').textContent = fmt(rem);
+        }
+      }, 1000);
+    }
+    function upwdResend() {
+      upwdExpired = false;
+      el('upwdOtpInput').disabled = false;
+      el('upwdOtpInput').value = '';
+      el('upwdVerifyBtn').disabled = true;
+      el('upwdExpiredMsg').style.display = 'none';
+      el('upwdTimerWrap').style.display = '';
+      _upwdStartTimer(60);
+    }
+    function upwdVerify() {
+      closeUpwdModal();
+      showToast('Password updated', 'success', 'Supabase integration coming soon.');
+    }
+    function upwdShowAuth() {
+      el('upwdViewMethod').style.display = 'none';
+      el('upwdViewEmail').style.display = 'none';
+      el('upwdViewOTP').style.display = 'none';
+      el('upwdViewAuth').style.display = '';
+      const digits = ['upwdD0','upwdD1','upwdD2','upwdD3','upwdD4','upwdD5'].map(id => el(id));
+      digits.forEach(d => { d.value = ''; d.disabled = false; });
+      el('upwdAuthVerifyBtn').disabled = true;
+      setTimeout(() => digits[0].focus(), 50);
+    }
+    function upwdAuthVerify() {
+      closeUpwdModal();
+      showToast('Password updated', 'success', 'Supabase integration coming soon.');
+    }
+    // Wire up upwd auth digits (paste + keyboard)
+    (function _initUpwdDigits() {
+      const ids = ['upwdD0','upwdD1','upwdD2','upwdD3','upwdD4','upwdD5'];
+      const digits = ids.map(id => el(id));
+      const update = () => { el('upwdAuthVerifyBtn').disabled = !digits.every(d => /^\d$/.test(d.value)); };
+      digits.forEach((inp, i) => {
+        inp.addEventListener('input', () => {
+          inp.value = inp.value.replace(/\D/g,'').slice(-1);
+          if (inp.value && i < 5) digits[i+1].focus();
+          update();
+        });
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Backspace') {
+            if (!inp.value && i > 0) { digits[i-1].focus(); digits[i-1].value = ''; e.preventDefault(); }
+            else if (inp.value) { inp.value = ''; e.preventDefault(); }
+            update();
+          } else if (e.key === 'ArrowLeft' && i > 0) digits[i-1].focus();
+          else if (e.key === 'ArrowRight' && i < 5) digits[i+1].focus();
+        });
+        inp.addEventListener('paste', e => {
+          e.preventDefault();
+          const txt = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+          digits.forEach((d, j) => { d.value = txt[j] || ''; });
+          digits[Math.min(txt.length - 1, 5)].focus();
+          update();
+        });
+        inp.addEventListener('click', () => inp.select());
+      });
+    })();
+
+    el('upwdOverlay')?.addEventListener('click', ev => { if (ev.target === el('upwdOverlay')) closeUpwdModal(); });
+
+    // ── Danger Zone ─────────────────────────────────────────────────────────
+    function openLogoutModal() {
+      el('logoutOverlay').classList.add('open');
+    }
+    function confirmLogout() {
+      el('logoutOverlay').classList.remove('open');
+      if (ticker) { clearInterval(ticker); ticker = null; }
+      el('signingOutTitle').textContent = 'Logging Out';
+      el('signingOutOverlay').classList.add('open');
+      setTimeout(() => {
+        localStorage.removeItem('wh_auth');
+        window.location.href = 'login.html';
+      }, 2000);
+    }
+
+    function openDeleteModal() {
+      el('delViewFeedback').style.display = '';
+      el('delViewPassword').style.display = 'none';
+      el('delChips')?.querySelectorAll('.del-chip').forEach(c => c.classList.remove('selected'));
+      const txt = el('delFeedbackText');
+      if (txt) { txt.value = ''; txt.style.height = ''; }
+      el('deleteProfileOverlay').classList.add('open');
+    }
+    function closeDeleteModal() {
+      el('deleteProfileOverlay').classList.remove('open');
+    }
+    function toggleDelChip(chip) {
+      chip.classList.toggle('selected');
+    }
+    function autoExpandTa(ta) {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    }
+    function goToDeletePwd() {
+      el('delViewFeedback').style.display = 'none';
+      el('delViewPassword').style.display = '';
+      const inp = el('deleteConfirmInput');
+      if (inp) { inp.value = ''; inp.type = 'password'; }
+      el('delEyeOpen') && (el('delEyeOpen').style.display = '');
+      el('delEyeClose') && (el('delEyeClose').style.display = 'none');
+      el('delPwdContinueBtn').disabled = true;
+      setTimeout(() => inp?.focus(), 50);
+    }
+    function backToDeleteFeedback() {
+      el('delViewPassword').style.display = 'none';
+      el('delViewFeedback').style.display = '';
+    }
+    function toggleDeletePwd() {
+      const inp = el('deleteConfirmInput');
+      const isText = inp.type === 'text';
+      inp.type = isText ? 'password' : 'text';
+      el('delEyeOpen').style.display  = isText ? '' : 'none';
+      el('delEyeClose').style.display = isText ? 'none' : '';
+    }
+    function confirmDeleteProfile() {
+      closeDeleteModal();
+      el('signingOutTitle').textContent = 'Deleting Account';
+      el('signingOutOverlay').classList.add('open');
+      setTimeout(() => {
+        localStorage.clear();
+        window.location.href = 'login.html';
+      }, 2000);
+    }
+
+    // Close modals on backdrop click
+    el('logoutOverlay')?.addEventListener('click', ev => { if (ev.target === el('logoutOverlay')) el('logoutOverlay').classList.remove('open'); });
+    el('deleteProfileOverlay')?.addEventListener('click', ev => { if (ev.target === el('deleteProfileOverlay')) closeDeleteModal(); });
 
     function obFinish() {
       localStorage.setItem(OB_DONE_KEY, '1');
@@ -5157,7 +6271,7 @@ ${sig}`
           statusEl.innerHTML = `
             <div style="background:var(--muted);border-radius:10px;padding:14px 16px;text-align:left;margin-top:4px;display:flex;flex-direction:column;gap:6px">
               <div style="font-size:12px;font-weight:700;color:var(--success);margin-bottom:2px;display:flex;align-items:center;gap:6px">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>
                 Import Successful
               </div>
               <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">File</span><span style="font-weight:500">${fileName || 'wh_log.json'}</span></div>
@@ -5198,26 +6312,25 @@ ${sig}`
         });
       }
 
-      // Drag-and-drop on import zone
+      // Drag-and-drop on import zone (counter prevents flicker from child elements)
       const importZone = el('obImportZone');
       if (importZone && !importZone._obDragBound) {
         importZone._obDragBound = true;
-        importZone.addEventListener('dragover', e => {
-          e.preventDefault();
-          importZone.classList.add('drag-over');
+        let _dragCnt = 0;
+        const _setDragActive = active => {
+          importZone.classList.toggle('drag-over', active);
           const txt = el('obImportZoneText');
-          if (txt) txt.innerHTML = '<strong>Release to import</strong><br>Drop your .json backup here';
-        });
-        importZone.addEventListener('dragleave', () => {
-          importZone.classList.remove('drag-over');
-          const txt = el('obImportZoneText');
-          if (txt) txt.innerHTML = '<strong>Choose a file or drag &amp; drop here</strong><br>Supports .json files';
-        });
+          if (txt) txt.innerHTML = active
+            ? '<strong>Release to import</strong><br>Drop your .json backup here'
+            : '<strong>Choose a file or drag &amp; drop here</strong><br>Supports .json files';
+        };
+        importZone.addEventListener('dragenter', e => { e.preventDefault(); _dragCnt++; _setDragActive(true); });
+        importZone.addEventListener('dragleave', () => { _dragCnt--; if (_dragCnt <= 0) { _dragCnt = 0; _setDragActive(false); } });
+        importZone.addEventListener('dragover', e => e.preventDefault());
         importZone.addEventListener('drop', e => {
           e.preventDefault();
-          importZone.classList.remove('drag-over');
-          const txt = el('obImportZoneText');
-          if (txt) txt.innerHTML = '<strong>Choose a file or drag &amp; drop here</strong><br>Supports .json files';
+          _dragCnt = 0;
+          _setDragActive(false);
           const file = e.dataTransfer.files?.[0];
           if (!file) return;
           const reader = new FileReader();
@@ -5265,10 +6378,7 @@ ${sig}`
         const d = new Date(); d.setHours(pts[0] || 0, pts[1] || 0, pts[2] || 0, 0);
         if (d <= new Date()) {
           loginDate = d;
-          el('calcBtn').textContent = 'Pause';
-          el('calcBtn').classList.add('pause-shift');
-          el('calcBtn').classList.remove('end-shift', 'resume-shift');
-          el('calcBtn').dataset.state = 'running';
+          setCalcBtnState('running');
           el('shiftInputRow').classList.add('active-state');
           el('shiftActiveLabel').textContent = `Started at ${short(d)}`;
           render();
@@ -5280,11 +6390,7 @@ ${sig}`
         const pts = tl.loginTime.split(':').map(Number);
         const d = new Date(); d.setHours(pts[0] || 0, pts[1] || 0, pts[2] || 0, 0);
         loginDate = d;
-        el('calcBtn').textContent = 'Resume';
-        el('calcBtn').classList.remove('end-shift', 'pause-shift');
-        el('calcBtn').classList.add('resume-shift');
-        el('calcBtn').dataset.state = 'ended';
-        el('calcBtn').disabled = false;
+        setCalcBtnState('ended');
         el('autostopBanner').classList.add('show');
         el('autostopMsg').textContent = `Auto-stopped at ${tl.checkoutDisplay || '—'} — target + buffer reached.`;
         renderEmptyState(); // show card in read mode
@@ -5324,10 +6430,10 @@ ${sig}`
 
       <!-- Step 1: Import Data -->
       <div class="ob-panel active" id="obPanel1">
-        <div class="ob-title">Say Hello to Murph.</div>
+        <div class="ob-title">Say hello to 5pm. <span style="color:var(--muted-fg);font-weight:400">— Leave on time, every time.</span></div>
         <div class="ob-desc">Your work hour tracker. Track your work hours effortlessly. Got a backup? Import it to restore your data.</div>
         <label class="ob-import-zone" for="obImportFile" id="obImportZone">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M11 4C8.37318 4 6.2324 5.99599 6.01793 8.51595C5.98608 8.89012 5.74729 9.21492 5.39963 9.35691C3.3976 10.1746 2 12.1199 2 14.3783C2 16.2952 3.00543 17.9848 4.53512 18.9537C5.00168 19.2493 5.14031 19.8671 4.84477 20.3336C4.54923 20.8002 3.93143 20.9388 3.46488 20.6433C1.38625 19.3266 0 17.0152 0 14.3783C0 11.4804 1.67256 8.9777 4.10178 7.75216C4.66997 4.47797 7.54913 2 11 2C13.8191 2 16.2533 3.65235 17.362 6.03971C19.4286 6.43792 21 8.24044 21 10.4206C21 10.7714 20.959 11.1133 20.8815 11.4415C22.7225 12.3197 24 14.186 24 16.3571C24 18.2066 23.0706 19.8374 21.6596 20.8205C21.2065 21.1362 20.5832 21.0248 20.2675 20.5717C19.9518 20.1185 20.0632 19.4952 20.5163 19.1795C21.4183 18.5511 22 17.5193 22 16.3571C22 14.7492 20.882 13.3863 19.3555 13.0085C19.056 12.9344 18.8075 12.7261 18.6821 12.4442C18.5567 12.1623 18.5684 11.8383 18.7139 11.5662C18.8965 11.2247 19 10.8359 19 10.4206C19 9.10788 17.9516 8.0197 16.6155 7.96031C16.2093 7.94225 15.8545 7.68006 15.7179 7.29708C15.0347 5.38045 13.1833 4 11 4Z" fill="currentColor"/><path d="M7.29289 16.7071C7.68342 17.0976 8.31658 17.0976 8.70711 16.7071L11 14.4142V22C11 22.5523 11.4477 23 12 23C12.5523 23 13 22.5523 13 22V14.4142L15.2929 16.7071C15.6834 17.0976 16.3166 17.0976 16.7071 16.7071C17.0976 16.3166 17.0976 15.6834 16.7071 15.2929L12.7071 11.2929C12.3166 10.9024 11.6834 10.9024 11.2929 11.2929L7.29289 15.2929C6.90237 15.6834 6.90237 16.3166 7.29289 16.7071Z" fill="currentColor"/></svg>
           <div class="ob-import-zone-text" id="obImportZoneText"><strong>Choose a file or drag &amp; drop here</strong><br>Supports .json files</div>
           <input type="file" id="obImportFile" accept=".json" style="display:none">
         </label>
@@ -5340,7 +6446,7 @@ ${sig}`
         <div class="ob-desc">These help personalise your experience. Both fields are optional.</div>
         <div class="form-field">
           <div class="ob-section-label">Your Name</div>
-          <input type="text" class="field-input" id="obName" placeholder="Nickname" maxlength="40" autocomplete="off">
+          <input type="text" class="field-input" id="obName" placeholder="Full Name" maxlength="40" autocomplete="off">
         </div>
         <div class="form-field">
           <div class="ob-section-label">Position</div>
@@ -5353,7 +6459,7 @@ ${sig}`
               <input type="text" id="obShiftStart" placeholder="From  09:00 AM" autocomplete="off"
                 style="height:40px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
               <button type="button" class="tp-icon-btn" onclick="openTpModal('obShiftStart',event)" title="Pick time">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
               </button>
             </div>
             <span style="color:var(--muted-fg);font-size:13px;flex-shrink:0">–</span>
@@ -5361,12 +6467,45 @@ ${sig}`
               <input type="text" id="obShiftEnd" placeholder="To  06:00 PM" autocomplete="off"
                 style="height:40px;padding:0 12px 0 38px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--foreground);width:100%">
               <button type="button" class="tp-icon-btn" onclick="openTpModal('obShiftEnd',event)" title="Pick time">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11H13V5.5C13 4.94772 12.5523 4.5 12 4.5C11.4477 4.5 11 4.94772 11 5.5V12C11 12.5523 11.4477 13 12 13H16.5Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" fill="currentColor"/></svg>
               </button>
             </div>
           </div>
         </div>
-        <div class="toggle-row" onclick="el('obIncludeSat').click()">
+      </div>
+
+      <!-- Step 3: Setup Routine -->
+      <div class="ob-panel" id="obPanel3">
+        <div class="ob-title">Setup Your Routine</div>
+        <div class="ob-desc">Set your daily target and whether Saturday is a work day.</div>
+        <!-- Target tabs -->
+        <div class="form-field">
+          <input type="hidden" id="obWorkDays" value="5">
+          <input type="hidden" id="obWeeklyH" value="45">
+          <input type="hidden" id="obWeeklyM" value="0">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div class="ob-section-label" id="obTargetLabel">Daily Target</div>
+            <div class="st-tabs" id="obStTabs">
+              <button type="button" class="st-tab" id="obTabDaily" onclick="obSwitchTab('daily')">Daily</button>
+              <button type="button" class="st-tab" id="obTabWeekly" onclick="obSwitchTab('weekly')">Weekly</button>
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <div style="display:flex;gap:8px">
+              <div class="input-suffix-wrap" style="flex:1">
+                <input type="number" class="field-input" id="obDailyH" min="0" max="23" step="1" value="9" placeholder="0" oninput="updateObWeeklyCalc()">
+                <span class="input-suffix-text">hrs</span>
+              </div>
+              <div class="input-suffix-wrap" style="flex:1">
+                <input type="number" class="field-input" id="obDailyM" min="0" max="59" step="5" value="0" placeholder="0" oninput="updateObWeeklyCalc()">
+                <span class="input-suffix-text">min</span>
+              </div>
+            </div>
+            <div id="obWeeklyCalcInfo" style="margin-top:8px;padding:8px 12px;background:var(--muted);border-radius:8px;font-size:12px;color:var(--muted-fg);line-height:1.5"></div>
+          </div>
+        </div>
+        <!-- Include Saturday -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('obIncludeSat').click()">
           <div>
             <div class="ob-section-label" style="text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;color:var(--foreground)">Include Saturday</div>
             <div style="font-size:12px;color:var(--muted-fg);margin-top:2px">Enable if Saturday is a working day.</div>
@@ -5376,80 +6515,15 @@ ${sig}`
             <span class="toggle-track"></span>
           </label>
         </div>
-        <input type="hidden" id="obWorkDays" value="5">
-      </div>
-
-      <!-- Step 3: Setup Routine -->
-      <div class="ob-panel" id="obPanel3">
-        <div class="ob-title">Setup Your Routine</div>
-        <div class="ob-desc">Configure your work target and leave patterns.</div>
-        <!-- Target tabs -->
-        <div class="form-field">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <div class="ob-section-label">Target Hours</div>
-            <div class="st-tabs" id="obStTabs">
-              <button type="button" class="st-tab" id="obTabDaily" onclick="obSwitchTab('daily')">Daily</button>
-              <button type="button" class="st-tab" id="obTabWeekly" onclick="obSwitchTab('weekly')">Weekly</button>
-            </div>
-          </div>
-          <div id="obPanelDaily" style="margin-top:10px">
-            <div style="display:flex;gap:8px">
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obDailyH" min="0" max="23" step="1" value="9" placeholder="0">
-                <span class="input-suffix-text">hrs</span>
-              </div>
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obDailyM" min="0" max="59" step="5" value="0" placeholder="0">
-                <span class="input-suffix-text">min</span>
-              </div>
-            </div>
-          </div>
-          <div id="obPanelWeekly" style="display:none;margin-top:10px">
-            <div class="st-panel-label">Daily (Personal)</div>
-            <div style="display:flex;gap:8px;margin-top:6px">
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obDailyHW" min="0" max="23" step="1" value="9" placeholder="0">
-                <span class="input-suffix-text">hrs</span>
-              </div>
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obDailyMW" min="0" max="59" step="5" value="0" placeholder="0">
-                <span class="input-suffix-text">min</span>
-              </div>
-            </div>
-            <div class="st-panel-label" style="margin-top:10px">Weekly</div>
-            <div style="display:flex;gap:8px;margin-top:6px">
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obWeeklyH" min="0" max="167" step="1" value="45" placeholder="0">
-                <span class="input-suffix-text">hrs</span>
-              </div>
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obWeeklyM" min="0" max="59" step="5" value="0" placeholder="0">
-                <span class="input-suffix-text">min</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Leave Early (optional) -->
+        <!-- Leave Early -->
         <div class="form-field">
           <div class="ob-section-label">Leave Early <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
-          <div class="ob-day-picker" id="obEarlyPicker">
-            <button type="button" class="plan-btn" data-oday="1">Monday</button>
-            <button type="button" class="plan-btn" data-oday="2">Tuesday</button>
-            <button type="button" class="plan-btn" data-oday="3">Wednesday</button>
-            <button type="button" class="plan-btn" data-oday="4">Thursday</button>
-            <button type="button" class="plan-btn" data-oday="5">Friday</button>
-          </div>
+          <div class="ob-day-picker" id="obEarlyPicker"></div>
         </div>
-        <!-- Stay Late (optional) -->
+        <!-- Stay Late -->
         <div class="form-field">
           <div class="ob-section-label">Stay Late <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
-          <div class="ob-day-picker" id="obLatePicker">
-            <button type="button" class="plan-btn" data-lday="1">Monday</button>
-            <button type="button" class="plan-btn" data-lday="2">Tuesday</button>
-            <button type="button" class="plan-btn" data-lday="3">Wednesday</button>
-            <button type="button" class="plan-btn" data-lday="4">Thursday</button>
-            <button type="button" class="plan-btn" data-lday="5">Friday</button>
-          </div>
+          <div class="ob-day-picker" id="obLatePicker"></div>
         </div>
       </div>
 
@@ -5458,34 +6532,28 @@ ${sig}`
         <div class="ob-title">Plan Your Week</div>
         <div class="ob-desc">Set your schedule for the week. You can update this anytime from Settings.</div>
         <div id="obWpDayRows"></div>
-        <div style="height:1px;background:var(--border);margin:2px 0 4px"></div>
-        <div class="form-field">
-          <div class="ob-section-label">Early Leave <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
-          <div class="target-day-picker" id="obWpEarly" style="margin-top:6px"></div>
-        </div>
-        <div class="form-field">
-          <div class="ob-section-label">Stay Late <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
-          <div class="target-day-picker" id="obWpLate" style="margin-top:6px"></div>
-        </div>
       </div>
 
       <!-- Step 5: All Done -->
       <div class="ob-panel" id="obPanel5">
         <div class="ob-done-card">
+          <div style="width:52px;height:52px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;margin-bottom:4px;flex-shrink:0">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.6566 5.47308C21.1068 5.88339 21.1415 6.5758 20.7312 7.02605L9.73116 19.0261C9.52896 19.2491 9.24358 19.3797 8.94191 19.387C8.64025 19.3943 8.34879 19.2776 8.13606 19.0648L3.13606 14.0648C2.71462 13.6434 2.71462 12.9617 3.13606 12.5403C3.5575 12.1189 4.23921 12.1189 4.66065 12.5403L8.87631 16.7559L19.1439 5.47395C19.5542 5.0237 20.2466 4.98278 20.6969 5.39309L20.6566 5.47308Z" fill="white"/></svg>
+          </div>
           <div style="font-size:18px;font-weight:700;color:var(--foreground)">You're all set!</div>
           <div style="font-size:13px;color:var(--muted-fg);line-height:1.6">Your workspace is configured and ready.<br>Start tracking your hours.</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted-fg)">
           <div style="display:flex;align-items:center;gap:8px">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>
             Log your daily work hours
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>
             Track weekly progress on the Dashboard
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>
             Adjust settings anytime in Settings
           </div>
         </div>
