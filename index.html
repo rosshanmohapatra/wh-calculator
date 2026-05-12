@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <!-- saved from url=(0053)file:///C:/Users/rosha/Downloads/WH%20Calculator.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Auth gate — block render entirely if not authenticated -->
+  <script>if(!localStorage.getItem('wh_auth')){document.documentElement.style.visibility='hidden';window.location.replace('login.html');}else{document.documentElement.style.visibility='';}</script>
   <!-- Apply theme before first paint to avoid flash -->
   <script>(function(){var s=localStorage.getItem('wh_theme');var p=window.matchMedia('(prefers-color-scheme:dark)').matches;if(s?s==='dark':p)document.documentElement.classList.add('dark');})()</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
