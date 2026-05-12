@@ -918,16 +918,34 @@
     .ob-panel input[type="text"]:focus { border-color: var(--ring) !important; box-shadow: 0 0 0 3px rgba(9,9,11,.08); }
     .dark .ob-panel input[type="text"]:focus { box-shadow: 0 0 0 3px rgba(250,250,250,.08); }
     .ob-import-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 28px 20px;
-      text-align: center; cursor: pointer; transition: border-color .15s, background .15s; display: flex;
+      text-align: center; cursor: pointer;
+      transition: border-color .22s ease, background .22s ease, box-shadow .22s ease; display: flex;
       flex-direction: column; align-items: center; gap: 8px; }
-    .ob-import-zone:hover { border-color: var(--foreground); }
-    .ob-import-zone.drag-over { border-color: var(--foreground); background: var(--muted); }
+    .ob-import-zone:hover { border-color: var(--muted-fg); }
+    .ob-import-zone.drag-over { border-color: var(--foreground); background: var(--muted);
+      box-shadow: 0 0 0 4px rgba(9,9,11,.06); }
+    .dark .ob-import-zone.drag-over { box-shadow: 0 0 0 4px rgba(250,250,250,.06); }
     .ob-import-zone svg { color: var(--muted-fg); }
     .ob-import-zone-text { font-size: 13px; color: var(--muted-fg); }
     .ob-import-zone-text strong { color: var(--foreground); }
     .ob-day-picker { display: flex; gap: 6px; flex-wrap: wrap; }
     .ob-done-card { background: var(--muted); border-radius: 12px; padding: 20px; text-align: center;
       display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    /* Leaving / deleting loader modal */
+    .leaving-spinner { width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--foreground);
+      border-radius:50%;animation:leaveSpin .7s linear infinite;flex-shrink:0; }
+    @keyframes leaveSpin { to { transform:rotate(360deg); } }
+    /* Delete feedback chips */
+    .del-chips { display:flex;flex-wrap:wrap;gap:6px; }
+    .del-chip { padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-size:12px;
+      font-weight:500;color:var(--muted-fg);background:var(--input-bg);cursor:pointer;
+      font-family:var(--font);transition:border-color .15s,color .15s,background .15s; }
+    .del-chip:hover { border-color:var(--muted-fg); }
+    .del-chip.selected { border-color:var(--destructive);color:var(--destructive);background:var(--destructive-bg); }
+    /* Sliding Saturday row in onboarding routine step */
+    .ob-sat-row { overflow:hidden; max-height:0; opacity:0;
+      transition:max-height .32s cubic-bezier(0.4,0,0.2,1), opacity .25s ease; }
+    .ob-sat-row.show { max-height:80px; opacity:1; }
 
     /* ── Instagram Stories–style onboarding stepper ── */
     .ob-stories-wrap { display: flex; align-items: center; gap: 5px; margin-bottom: 24px; }
@@ -1586,31 +1604,75 @@
     </div>
   </div>
 
-  <!-- ── Delete Account Confirmation Modal ── -->
+  <!-- ── Delete Account – Feedback Modal ── -->
   <div class="overlay" id="deleteProfileOverlay">
-    <div class="dialog" style="max-width:380px">
-      <div class="dialog-head">
-        <div class="dialog-title">Delete account?</div>
-        <div class="dialog-desc">We'll still have your data for 48 hours. After that it'll be permanently deleted from our database.</div>
-      </div>
-      <div class="dialog-body" style="padding-top:0">
-        <div>
-          <div class="form-label" style="margin-bottom:6px">Enter Password</div>
-          <div style="position:relative">
-            <input class="field-input" id="deleteConfirmInput" type="password" placeholder="••••••••" autocomplete="current-password"
-              style="width:100%;padding-right:44px"
-              oninput="el('deleteConfirmBtn').disabled = this.value.length < 1">
-            <button type="button" onclick="toggleDeletePwd()" title="Show / hide"
-              style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted-fg);padding:4px;display:flex;align-items:center">
-              <svg id="delEyeOpen" width="15" height="15" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 7.5C9.51472 7.5 7.5 9.51472 7.5 12C7.5 14.4853 9.51472 16.5 12 16.5C14.4853 16.5 16.5 14.4853 16.5 12C16.5 9.51472 14.4853 7.5 12 7.5ZM9.5 12C9.5 10.6193 10.6193 9.5 12 9.5C13.3807 9.5 14.5 10.6193 14.5 12C14.5 13.3807 13.3807 14.5 12 14.5C10.6193 14.5 9.5 13.3807 9.5 12Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 4.5C7.80929 4.5 4.80639 6.84327 2.90291 9.0685C1.94666 10.1864 1.24437 11.2998 0.780976 12.1325C0.548666 12.55 0.374765 12.8998 0.257664 13.1484C0.199077 13.2727 0.154596 13.372 0.124031 13.4419C0.108745 13.4769 0.096929 13.5046 0.08856 13.5245L0.07858 13.5483L0.07553 13.5557L0.07448 13.5583L0.07408 13.5593L0 11.9371L0.07408 13.5593L0 11.9371C0 11.9371 0.06469 12.291 0.06469 12.291L0.06508 12.292L0.06608 12.2947L0.06899 12.3023L0.07847 12.3266C0.08641 12.3469 0.09762 12.3751 0.11215 12.4107C0.14119 12.482 0.1835 12.583 0.23944 12.7095C0.35125 12.9623 0.5179 13.318 0.74225 13.7424C1.18972 14.5889 1.87318 15.7209 2.81783 16.8577C4.70146 19.1243 7.70693 21.5 12 21.5C16.293 21.5 19.2985 19.1243 21.1821 16.8577C22.1267 15.7209 22.8102 14.5889 23.2577 13.7424C23.482 13.318 23.6487 12.9623 23.7605 12.7095C23.8164 12.583 23.8587 12.482 23.8878 12.4107C23.9023 12.3751 23.9135 12.3469 23.9215 12.3266L23.9309 12.3023L23.9338 12.2947L23.9348 12.292L23.9352 12.291C23.9352 12.291 24.074 11.9233 24 11.9371L23.9352 12.291L24.074 11.9233L23.9258 11.5593C23.903 11.5046 23.8912 11.4769 23.8759 11.4419C23.8453 11.372 23.8008 11.2727 23.7423 11.1484C23.6252 10.8998 23.4513 10.55 23.2189 10.1325C22.7556 9.29981 22.0533 8.18638 21.097 7.0685C19.1935 4.84327 16.1906 2.5 12 2.5C7.80929 2.5 4.80639 4.84327 2.90291 7.0685ZM2.5104 12.8077C2.32531 12.4576 2.18603 12.1632 2.09077 11.9504C2.1909 11.7404 2.33654 11.4501 2.52859 11.105C2.94555 10.3558 3.57468 9.35995 4.42272 8.36857C6.12781 6.37527 8.62491 4.5 12 4.5C15.375 4.5 17.8721 6.37527 19.5772 8.36857C20.4252 9.35995 21.0544 10.3558 21.4713 11.105C21.6634 11.4501 21.809 11.7404 21.9092 11.9504C21.8139 12.1632 21.6746 12.4576 21.4895 12.8077C21.0883 13.5667 20.4782 14.5754 19.6439 15.5794C17.9696 17.5942 15.475 19.5 12 19.5C8.52489 19.5 6.03035 17.5942 4.35602 15.5794C3.52168 14.5754 2.91166 13.5667 2.5104 12.8077Z" fill="currentColor"/></svg>
-              <svg id="delEyeClose" width="15" height="15" viewBox="0 0 24 24" fill="none" style="display:none"><path fill-rule="evenodd" clip-rule="evenodd" d="M23.7071 0.292893C24.0976 0.683417 24.0976 1.31658 23.7071 1.70711L1.70711 23.7071C1.31658 24.0976 0.683417 24.0976 0.292893 23.7071C-0.0976311 23.3166 -0.0976311 22.6834 0.292893 22.2929L4.23434 18.3514C2.9164 17.1406 1.94176 15.7855 1.2732 14.6799C0.867646 14.0092 0.5691 13.421 0.370612 12.9971C0.271255 12.785 0.196646 12.6133 0.145961 12.4922C0.12061 12.4317 0.101217 12.3838 0.0876805 12.3497L0.0717465 12.3091L0.067044 12.2969L0.0655043 12.2928L0.0649367 12.2913C0.0645038 12.2902 1.00008 11.9371 0.074198 11.5593C0.0746014 11.5583 0.0756485 11.5557 0.0787059 11.5483L0.0886819 11.5245C0.0970512 11.5046 0.108867 11.4769 0.124153 11.4419C0.154718 11.372 0.199199 11.2727 0.257786 11.1484C0.374887 10.8998 0.548788 10.55 0.781098 10.1325C1.24449 9.29981 1.94679 8.18638 2.90303 7.0685C4.80651 4.84327 7.80941 2.5 12.0001 2.5C14.4526 2.5 16.5053 3.30553 18.165 4.42081L22.2929 0.292893C22.6834 -0.0976311 23.3166 -0.0976311 23.7071 0.292893ZM9.67199 12.9138L12.9138 9.67199C12.6308 9.56087 12.3227 9.5 12 9.5C10.6193 9.5 9.5 10.6193 9.5 12C9.5 12.3227 9.56087 12.6308 9.67199 12.9138ZM14.3956 8.19018C13.702 7.75332 12.8801 7.5 12 7.5C9.51472 7.5 7.5 9.51472 7.5 12C7.5 12.8801 7.75332 13.702 8.19018 14.3956L5.65003 16.9358C4.48386 15.8793 3.60174 14.6655 2.98463 13.645C2.62146 13.0444 2.35559 12.5199 2.18184 12.1489C2.19102 11.7404 2.33667 11.4501 2.52871 11.105C2.94567 10.3558 3.57481 9.35995 4.42285 8.36856C6.12793 6.37527 8.62503 4.5 12.0001 4.5C13.8295 4.5 15.395 5.04849 16.7186 5.8672L14.3956 8.19018Z" fill="currentColor"/><path d="M20.6071 7.99677C21.0547 7.6733 21.6798 7.77395 22.0033 8.22159C22.6476 9.11312 23.1239 9.93792 23.4403 10.542C23.5987 10.8445 23.7178 11.0931 23.7984 11.2688C23.8387 11.3567 23.8694 11.4264 23.8907 11.4757C23.9013 11.5004 23.9096 11.5199 23.9155 11.5341L23.9227 11.5512L23.9249 11.5567L23.9257 11.5586L23.9262 11.5598L23.0001 11.9371L23.9354 12.291L23.935 12.292L23.934 12.2947L23.9311 12.3023L23.9216 12.3266C23.9136 12.3469 23.9024 12.3751 23.8879 12.4107C23.8589 12.482 23.8165 12.583 23.7606 12.7095C23.6488 12.9623 23.4821 13.318 23.2578 13.7424C22.8103 14.5889 22.1269 15.7209 21.1822 16.8577C19.2986 19.1243 16.2931 21.5 12.0001 21.5C11.1273 21.5 10.3032 21.4013 9.5276 21.2228C8.98937 21.099 8.65343 20.5623 8.77726 20.0241C8.90108 19.4859 9.43778 19.1499 9.97601 19.2737C10.6058 19.4186 11.2795 19.5 12.0001 19.5C15.4752 19.5 17.9697 17.5942 19.644 15.5794C20.4784 14.5754 21.0884 13.5667 21.4896 12.8077C21.6747 12.4576 21.814 12.1632 21.9093 11.9504C21.8469 11.8195 21.7667 11.6573 21.6686 11.4699C21.3866 10.9316 20.9593 10.1915 20.3823 9.393C20.0588 8.94536 20.1594 8.32025 20.6071 7.99677Z" fill="currentColor"/></svg>
-            </button>
+    <div class="dialog" style="max-width:400px">
+
+      <!-- View 1: Feedback -->
+      <div id="delViewFeedback">
+        <div class="dialog-head">
+          <div class="dialog-title">What made you delete your account?</div>
+          <div class="dialog-desc">Your feedback helps improve 5pm for everyone.</div>
+        </div>
+        <div class="dialog-body" style="padding-top:0">
+          <div class="del-chips" id="delChips">
+            <button class="del-chip" onclick="toggleDelChip(this)">Missing Features</button>
+            <button class="del-chip" onclick="toggleDelChip(this)">Too Buggy</button>
+            <button class="del-chip" onclick="toggleDelChip(this)">Didn't Need It</button>
+            <button class="del-chip" onclick="toggleDelChip(this)">Hard To Use</button>
+            <button class="del-chip" onclick="toggleDelChip(this)">Other</button>
+          </div>
+          <div>
+            <div class="form-label" style="margin-bottom:6px">Tell us more. <span style="font-weight:400;color:var(--muted-fg)">(optional)</span></div>
+            <textarea class="field-input" id="delFeedbackText" rows="3" placeholder="Tell us more. (optional)"
+              style="width:100%;resize:none;padding:10px 12px;font-family:var(--font);font-size:13px;line-height:1.5"></textarea>
           </div>
         </div>
+        <div style="padding:0 20px 20px;display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+          <button class="btn-ghost-destructive" onclick="goToDeletePwd()">Delete Forever</button>
+        </div>
       </div>
-      <div style="padding:0 20px 20px;display:flex;justify-content:flex-end;gap:8px">
-        <button class="btn-secondary" onclick="closeDeleteModal()">Keep Account</button>
-        <button class="btn-ghost-destructive" id="deleteConfirmBtn" onclick="confirmDeleteProfile()" disabled>Delete Forever</button>
+
+      <!-- View 2: Password Verification -->
+      <div id="delViewPassword" style="display:none">
+        <div class="dialog-head">
+          <div class="dialog-title">Verify Your Identity</div>
+          <div class="dialog-desc">Enter your password to confirm account deletion.</div>
+        </div>
+        <div class="dialog-body" style="padding-top:0">
+          <div>
+            <div class="form-label" style="margin-bottom:6px">Password</div>
+            <div style="position:relative">
+              <input class="field-input" id="deleteConfirmInput" type="password" placeholder="••••••••" autocomplete="current-password"
+                style="width:100%;padding-right:44px"
+                oninput="el('delPwdContinueBtn').disabled = this.value.length < 1">
+              <button type="button" onclick="toggleDeletePwd()" title="Show / hide"
+                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted-fg);padding:4px;display:flex;align-items:center">
+                <svg id="delEyeOpen" width="15" height="15" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 7.5C9.51472 7.5 7.5 9.51472 7.5 12C7.5 14.4853 9.51472 16.5 12 16.5C14.4853 16.5 16.5 14.4853 16.5 12C16.5 9.51472 14.4853 7.5 12 7.5ZM9.5 12C9.5 10.6193 10.6193 9.5 12 9.5C13.3807 9.5 14.5 10.6193 14.5 12C14.5 13.3807 13.3807 14.5 12 14.5C10.6193 14.5 9.5 13.3807 9.5 12Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 4.5C7.80929 4.5 4.80639 6.84327 2.90291 9.0685C1.94666 10.1864 1.24437 11.2998 0.780976 12.1325C0.548666 12.55 0.374765 12.8998 0.257664 13.1484C0.199077 13.2727 0.154596 13.372 0.124031 13.4419C0.108745 13.4769 0.096929 13.5046 0.08856 13.5245L0.07858 13.5483L0.07553 13.5557L0.07448 13.5583L0.07408 13.5593L0 11.9371L0.07408 13.5593L0 11.9371C0 11.9371 0.06469 12.291 0.06469 12.291L0.06508 12.292L0.06608 12.2947L0.06899 12.3023L0.07847 12.3266C0.08641 12.3469 0.09762 12.3751 0.11215 12.4107C0.14119 12.482 0.1835 12.583 0.23944 12.7095C0.35125 12.9623 0.5179 13.318 0.74225 13.7424C1.18972 14.5889 1.87318 15.7209 2.81783 16.8577C4.70146 19.1243 7.70693 21.5 12 21.5C16.293 21.5 19.2985 19.1243 21.1821 16.8577C22.1267 15.7209 22.8102 14.5889 23.2577 13.7424C23.482 13.318 23.6487 12.9623 23.7605 12.7095C23.8164 12.583 23.8587 12.482 23.8878 12.4107C23.9023 12.3751 23.9135 12.3469 23.9215 12.3266L23.9309 12.3023L23.9338 12.2947L23.9348 12.292L23.9352 12.291C23.9352 12.291 24.074 11.9233 24 11.9371L23.9352 12.291L24.074 11.9233L23.9258 11.5593C23.903 11.5046 23.8912 11.4769 23.8759 11.4419C23.8453 11.372 23.8008 11.2727 23.7423 11.1484C23.6252 10.8998 23.4513 10.55 23.2189 10.1325C22.7556 9.29981 22.0533 8.18638 21.097 7.0685C19.1935 4.84327 16.1906 2.5 12 2.5C7.80929 2.5 4.80639 4.84327 2.90291 7.0685ZM2.5104 12.8077C2.32531 12.4576 2.18603 12.1632 2.09077 11.9504C2.1909 11.7404 2.33654 11.4501 2.52859 11.105C2.94555 10.3558 3.57468 9.35995 4.42272 8.36857C6.12781 6.37527 8.62491 4.5 12 4.5C15.375 4.5 17.8721 6.37527 19.5772 8.36857C20.4252 9.35995 21.0544 10.3558 21.4713 11.105C21.6634 11.4501 21.809 11.7404 21.9092 11.9504C21.8139 12.1632 21.6746 12.4576 21.4895 12.8077C21.0883 13.5667 20.4782 14.5754 19.6439 15.5794C17.9696 17.5942 15.475 19.5 12 19.5C8.52489 19.5 6.03035 17.5942 4.35602 15.5794C3.52168 14.5754 2.91166 13.5667 2.5104 12.8077Z" fill="currentColor"/></svg>
+                <svg id="delEyeClose" width="15" height="15" viewBox="0 0 24 24" fill="none" style="display:none"><path fill-rule="evenodd" clip-rule="evenodd" d="M23.7071 0.292893C24.0976 0.683417 24.0976 1.31658 23.7071 1.70711L1.70711 23.7071C1.31658 24.0976 0.683417 24.0976 0.292893 23.7071C-0.0976311 23.3166 -0.0976311 22.6834 0.292893 22.2929L4.23434 18.3514C2.9164 17.1406 1.94176 15.7855 1.2732 14.6799C0.867646 14.0092 0.5691 13.421 0.370612 12.9971C0.271255 12.785 0.196646 12.6133 0.145961 12.4922C0.12061 12.4317 0.101217 12.3838 0.0876805 12.3497L0.0717465 12.3091L0.067044 12.2969L0.0655043 12.2928L0.0649367 12.2913C0.0645038 12.2902 1.00008 11.9371 0.074198 11.5593C0.0746014 11.5583 0.0756485 11.5557 0.0787059 11.5483L0.0886819 11.5245C0.0970512 11.5046 0.108867 11.4769 0.124153 11.4419C0.154718 11.372 0.199199 11.2727 0.257786 11.1484C0.374887 10.8998 0.548788 10.55 0.781098 10.1325C1.24449 9.29981 1.94679 8.18638 2.90303 7.0685C4.80651 4.84327 7.80941 2.5 12.0001 2.5C14.4526 2.5 16.5053 3.30553 18.165 4.42081L22.2929 0.292893C22.6834 -0.0976311 23.3166 -0.0976311 23.7071 0.292893Z" fill="currentColor"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div style="padding:0 20px 20px;display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn-secondary" onclick="backToDeleteFeedback()">Back</button>
+          <button class="btn-ghost-destructive" id="delPwdContinueBtn" onclick="confirmDeleteProfile()" disabled>Continue</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Signing Out / Deleting Loader Modal ── -->
+  <div class="overlay" id="signingOutOverlay" style="z-index:2500">
+    <div class="dialog" style="max-width:320px;text-align:center">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:36px 24px">
+        <div class="leaving-spinner"></div>
+        <div>
+          <div class="dialog-title" id="signingOutTitle">Sorry to let you go.</div>
+          <div class="dialog-desc" id="signingOutDesc" style="margin-top:4px">Deleting you from the database.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1918,10 +1980,15 @@
   </div>
 
   <script>
+    // Auth gate — redirect to login if not authenticated
+    if (!localStorage.getItem('wh_auth')) {
+      window.location.replace('login.html');
+    }
+
     // Test release — wipe all previous data on version change
     const APP_VERSION = '0.9.0';
     if (localStorage.getItem('wh_ver') !== APP_VERSION) {
-      Object.keys(localStorage).filter(k => k.startsWith('wh_') && k !== 'wh_theme').forEach(k => localStorage.removeItem(k));
+      Object.keys(localStorage).filter(k => k.startsWith('wh_') && k !== 'wh_theme' && k !== 'wh_auth').forEach(k => localStorage.removeItem(k));
       localStorage.setItem('wh_ver', APP_VERSION);
     }
 
@@ -3708,6 +3775,22 @@
     function obToggleIncludeSaturday(checked) {
       const n = checked ? 6 : 5;
       const inp = el('obWorkDays'); if (inp) inp.value = n;
+      // Smooth dialog height animation while the calc info text changes
+      const dialog = document.querySelector('.ob-dialog');
+      const curH = dialog ? dialog.offsetHeight : 0;
+      updateObWeeklyCalc();
+      if (dialog && curH > 0) {
+        const newH = dialog.offsetHeight;
+        if (newH !== curH) {
+          dialog.style.height = curH + 'px';
+          dialog.style.overflow = 'hidden';
+          dialog.style.transition = 'height .3s cubic-bezier(0.4,0,0.2,1)';
+          requestAnimationFrame(() => {
+            dialog.style.height = newH + 'px';
+            setTimeout(() => { dialog.style.height = ''; dialog.style.overflow = ''; dialog.style.transition = ''; }, 320);
+          });
+        }
+      }
     }
 
     function switchPenaltyMode(mode) {
@@ -5132,8 +5215,28 @@ ${sig}`
       _obIsWeekly = tab === 'weekly';
       el('obTabDaily').classList.toggle('active', !_obIsWeekly);
       el('obTabWeekly').classList.toggle('active', _obIsWeekly);
-      el('obPanelDaily').style.display = _obIsWeekly ? 'none' : '';
-      el('obPanelWeekly').style.display = _obIsWeekly ? '' : 'none';
+      const lbl = el('obTargetLabel');
+      if (lbl) lbl.textContent = _obIsWeekly ? 'Weekly Target' : 'Daily Target';
+      updateObWeeklyCalc();
+    }
+
+    function updateObWeeklyCalc() {
+      const info = el('obWeeklyCalcInfo'); if (!info) return;
+      const dh = parseFloat(el('obDailyH')?.value) || 0;
+      const dm = parseFloat(el('obDailyM')?.value) || 0;
+      const days = parseInt(el('obWorkDays')?.value || '5', 10) || 5;
+      const isWeekly = _obIsWeekly;
+      const totalMins = (dh * 60 + dm) * days;
+      const wh = Math.floor(totalMins / 60);
+      const wm = totalMins % 60;
+      if (isWeekly) {
+        info.textContent = `Based on ${dh}h${dm ? ' ' + dm + 'm' : ''} daily × ${days} days, that's ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly.`;
+      } else {
+        info.textContent = `That's ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly (${days} working days).`;
+      }
+      // Sync hidden weekly fields so obSaveStep3 can read them
+      const whi = el('obWeeklyH'); if (whi) whi.value = wh;
+      const wmi = el('obWeeklyM'); if (wmi) wmi.value = wm;
     }
 
     function obAnimateTo(step, dir) {
@@ -5195,57 +5298,30 @@ ${sig}`
       const shiftStart = (el('obShiftStart')?.value || '09:00 AM').trim();
       const shiftEnd = (el('obShiftEnd')?.value || '06:00 PM').trim();
       const shiftType = deriveShiftType(shiftStart);
-      const workDays = parseInt(el('obWorkDays')?.value || '5', 10) || 5;
       const c = cfg();
-      saveCfg({ ...c, name, position, shiftStart, shiftEnd, shiftType, workDays });
+      saveCfg({ ...c, name, position, shiftStart, shiftEnd, shiftType });
     }
 
     function obPopulateStep3Days() {
-      const wdays = workDayNames();
-      const earlyPicker = el('obEarlyPicker');
-      if (earlyPicker) {
-        earlyPicker.innerHTML = wdays.map((n, i) =>
-          `<button type="button" class="plan-btn" data-oday="${i+1}">${n}</button>`
-        ).join('');
-        earlyPicker.querySelectorAll('[data-oday]').forEach(b => b.addEventListener('click', () => b.classList.toggle('selected')));
-      }
-      const latePicker = el('obLatePicker');
-      if (latePicker) {
-        latePicker.innerHTML = wdays.map((n, i) =>
-          `<button type="button" class="plan-btn" data-lday="${i+1}">${n}</button>`
-        ).join('');
-        latePicker.querySelectorAll('[data-lday]').forEach(b => b.addEventListener('click', () => b.classList.toggle('selected')));
-      }
+      // No day pickers in step 3 anymore — just ensure calc is updated
+      updateObWeeklyCalc();
     }
 
     function obSaveStep3() {
       const c = cfg();
-      let dailyH, weeklyH, weeklyOn;
-      if (_obIsWeekly) {
-        const dh = parseInt(el('obDailyHW')?.value, 10) || 9;
-        const dm = parseInt(el('obDailyMW')?.value, 10) || 0;
-        const wh = parseInt(el('obWeeklyH')?.value, 10) || 45;
-        const wm = parseInt(el('obWeeklyM')?.value, 10) || 0;
-        dailyH = dh + dm / 60;
-        weeklyH = wh + wm / 60;
-        weeklyOn = true;
-      } else {
-        const dh = parseInt(el('obDailyH')?.value, 10) || 9;
-        const dm = parseInt(el('obDailyM')?.value, 10) || 0;
-        dailyH = dh + dm / 60;
-        weeklyH = c.weeklyH || 45;
-        weeklyOn = false;
-      }
-      const earlyLeaveDays = [...document.querySelectorAll('#obEarlyPicker .plan-btn.selected')].map(b => +b.dataset.oday);
-      const lateDays = [...document.querySelectorAll('#obLatePicker .plan-btn.selected')].map(b => +b.dataset.lday);
-      const targetDay = earlyLeaveDays.length ? earlyLeaveDays[0] : null;
-      saveCfg({ ...c, dailyH, weeklyH, weeklyOn, earlyLeaveDays, lateDays, targetDay });
+      const dh = parseInt(el('obDailyH')?.value, 10) || 9;
+      const dm = parseInt(el('obDailyM')?.value, 10) || 0;
+      const dailyH = dh + dm / 60;
+      const wh = parseInt(el('obWeeklyH')?.value, 10) || 45;
+      const wm = parseInt(el('obWeeklyM')?.value, 10) || 0;
+      const weeklyH = wh + wm / 60;
+      const weeklyOn = _obIsWeekly;
+      const workDays = parseInt(el('obWorkDays')?.value || '5', 10) || 5;
+      saveCfg({ ...c, dailyH, weeklyH, weeklyOn, workDays });
     }
 
     function obPopulateWeekPanel() {
-      const c = cfg(), wk = week(0), tk = todayKey();
-
-      // Day override rows
+      const wk = week(0), tk = todayKey();
       const rows = el('obWpDayRows');
       if (rows) {
         rows.innerHTML = wk.map(day => {
@@ -5263,40 +5339,10 @@ ${sig}`
           </div>`;
         }).join('');
       }
-
-      // Early leave picker (1-indexed: Mon=1)
-      const earlyPicker = el('obWpEarly');
-      if (earlyPicker) {
-        earlyPicker.innerHTML = FULL_DAY_NAMES.map((n, i) =>
-          `<button class="plan-btn${(c.targetDay === i+1)?' selected':''}" data-obwp-tday="${i+1}">${n}</button>`
-        ).join('');
-        earlyPicker.querySelectorAll('[data-obwp-tday]').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const isSelected = btn.classList.contains('selected');
-            earlyPicker.querySelectorAll('[data-obwp-tday]').forEach(b => b.classList.remove('selected'));
-            if (!isSelected) btn.classList.add('selected');
-          });
-        });
-      }
-
-      // Stay late picker (0-indexed: Mon=0 to match saveWeekPlan)
-      const latePicker = el('obWpLate');
-      if (latePicker) {
-        latePicker.innerHTML = FULL_DAY_NAMES.map((n, i) =>
-          `<button class="plan-btn${(c.lateDays||[]).includes(i)?' selected':''}" data-obwp-sday="${i}">${n}</button>`
-        ).join('');
-        latePicker.querySelectorAll('[data-obwp-sday]').forEach(btn => {
-          btn.addEventListener('click', () => btn.classList.toggle('selected'));
-        });
-      }
     }
 
     function obSaveWeekPanel() {
-      const c = cfg();
-      const selTday = el('obWpEarly')?.querySelector('[data-obwp-tday].selected');
-      const targetDay = selTday ? +selTday.dataset.obwpTday : (c.targetDay || null);
-      const lateDays = [...(el('obWpLate')?.querySelectorAll('[data-obwp-sday].selected') || [])].map(b => +b.dataset.obwpSday);
-      saveCfg({ ...c, targetDay, lateDays });
+      // Day overrides are saved live via wpSetOverride; nothing extra to save here
     }
 
     function obStep(dir) {
@@ -5446,24 +5492,44 @@ ${sig}`
     }
     function confirmLogout() {
       el('logoutOverlay').classList.remove('open');
-      // Clear session state (keep stored data intact — just signs out)
       if (ticker) { clearInterval(ticker); ticker = null; }
-      showToast('Signed out', 'success', 'See you next time.');
-      setTimeout(() => { window.location.href = 'login.html'; }, 1000);
+      // Show leaving modal then redirect
+      el('signingOutTitle').textContent = 'Sorry to let you go.';
+      el('signingOutDesc').textContent = 'Signing you out securely…';
+      el('signingOutOverlay').classList.add('open');
+      setTimeout(() => {
+        localStorage.removeItem('wh_auth');
+        window.location.href = 'login.html';
+      }, 2000);
     }
 
     function openDeleteModal() {
-      const inp = el('deleteConfirmInput');
-      if (inp) { inp.value = ''; inp.type = 'password'; }
-      el('delEyeOpen') && (el('delEyeOpen').style.display = '');
-      el('delEyeClose') && (el('delEyeClose').style.display = 'none');
-      el('deleteConfirmBtn').disabled = true;
+      // Reset to feedback view
+      el('delViewFeedback').style.display = '';
+      el('delViewPassword').style.display = 'none';
+      el('delChips')?.querySelectorAll('.del-chip').forEach(c => c.classList.remove('selected'));
+      const txt = el('delFeedbackText'); if (txt) txt.value = '';
       el('deleteProfileOverlay').classList.add('open');
     }
     function closeDeleteModal() {
       el('deleteProfileOverlay').classList.remove('open');
+    }
+    function toggleDelChip(chip) {
+      chip.classList.toggle('selected');
+    }
+    function goToDeletePwd() {
+      el('delViewFeedback').style.display = 'none';
+      el('delViewPassword').style.display = '';
       const inp = el('deleteConfirmInput');
       if (inp) { inp.value = ''; inp.type = 'password'; }
+      el('delEyeOpen') && (el('delEyeOpen').style.display = '');
+      el('delEyeClose') && (el('delEyeClose').style.display = 'none');
+      el('delPwdContinueBtn').disabled = true;
+      setTimeout(() => inp?.focus(), 50);
+    }
+    function backToDeleteFeedback() {
+      el('delViewPassword').style.display = 'none';
+      el('delViewFeedback').style.display = '';
     }
     function toggleDeletePwd() {
       const inp = el('deleteConfirmInput');
@@ -5474,10 +5540,14 @@ ${sig}`
     }
     function confirmDeleteProfile() {
       closeDeleteModal();
-      // Wipe all local data
-      localStorage.clear();
-      showToast('Account scheduled for deletion', 'success', 'Your data will be removed in 48 hours.');
-      setTimeout(() => { window.location.href = 'login.html'; }, 1600);
+      // Show leaving/deleting modal
+      el('signingOutTitle').textContent = 'Sorry to let you go.';
+      el('signingOutDesc').textContent = 'Deleting you from the database.';
+      el('signingOutOverlay').classList.add('open');
+      setTimeout(() => {
+        localStorage.clear();
+        window.location.href = 'login.html';
+      }, 2000);
     }
 
     // Close modals on backdrop click
@@ -5564,26 +5634,25 @@ ${sig}`
         });
       }
 
-      // Drag-and-drop on import zone
+      // Drag-and-drop on import zone (counter prevents flicker from child elements)
       const importZone = el('obImportZone');
       if (importZone && !importZone._obDragBound) {
         importZone._obDragBound = true;
-        importZone.addEventListener('dragover', e => {
-          e.preventDefault();
-          importZone.classList.add('drag-over');
+        let _dragCnt = 0;
+        const _setDragActive = active => {
+          importZone.classList.toggle('drag-over', active);
           const txt = el('obImportZoneText');
-          if (txt) txt.innerHTML = '<strong>Release to import</strong><br>Drop your .json backup here';
-        });
-        importZone.addEventListener('dragleave', () => {
-          importZone.classList.remove('drag-over');
-          const txt = el('obImportZoneText');
-          if (txt) txt.innerHTML = '<strong>Choose a file or drag &amp; drop here</strong><br>Supports .json files';
-        });
+          if (txt) txt.innerHTML = active
+            ? '<strong>Release to import</strong><br>Drop your .json backup here'
+            : '<strong>Choose a file or drag &amp; drop here</strong><br>Supports .json files';
+        };
+        importZone.addEventListener('dragenter', e => { e.preventDefault(); _dragCnt++; _setDragActive(true); });
+        importZone.addEventListener('dragleave', () => { _dragCnt--; if (_dragCnt <= 0) { _dragCnt = 0; _setDragActive(false); } });
+        importZone.addEventListener('dragover', e => e.preventDefault());
         importZone.addEventListener('drop', e => {
           e.preventDefault();
-          importZone.classList.remove('drag-over');
-          const txt = el('obImportZoneText');
-          if (txt) txt.innerHTML = '<strong>Choose a file or drag &amp; drop here</strong><br>Supports .json files';
+          _dragCnt = 0;
+          _setDragActive(false);
           const file = e.dataTransfer.files?.[0];
           if (!file) return;
           const reader = new FileReader();
@@ -5698,9 +5767,6 @@ ${sig}`
           <input type="file" id="obImportFile" accept=".json" style="display:none">
         </label>
         <div id="obImportStatus" style="font-size:12px;color:var(--muted-fg);text-align:center;display:none"></div>
-        <div style="text-align:center;margin-top:12px">
-          <button class="ob-btn-link" style="font-size:12px;color:var(--muted-fg);border:none;background:none;padding:0;height:auto;cursor:pointer" onclick="openFpModal()">Forgot Password?</button>
-        </div>
       </div>
 
       <!-- Step 2: Personal Details -->
@@ -5735,7 +5801,40 @@ ${sig}`
             </div>
           </div>
         </div>
-        <div class="toggle-row" onclick="el('obIncludeSat').click()">
+      </div>
+
+      <!-- Step 3: Setup Routine -->
+      <div class="ob-panel" id="obPanel3">
+        <div class="ob-title">Setup Your Routine</div>
+        <div class="ob-desc">Set your daily target and whether Saturday is a work day.</div>
+        <!-- Target tabs -->
+        <div class="form-field">
+          <input type="hidden" id="obWorkDays" value="5">
+          <input type="hidden" id="obWeeklyH" value="45">
+          <input type="hidden" id="obWeeklyM" value="0">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div class="ob-section-label" id="obTargetLabel">Daily Target</div>
+            <div class="st-tabs" id="obStTabs">
+              <button type="button" class="st-tab" id="obTabDaily" onclick="obSwitchTab('daily')">Daily</button>
+              <button type="button" class="st-tab" id="obTabWeekly" onclick="obSwitchTab('weekly')">Weekly</button>
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <div style="display:flex;gap:8px">
+              <div class="input-suffix-wrap" style="flex:1">
+                <input type="number" class="field-input" id="obDailyH" min="0" max="23" step="1" value="9" placeholder="0" oninput="updateObWeeklyCalc()">
+                <span class="input-suffix-text">hrs</span>
+              </div>
+              <div class="input-suffix-wrap" style="flex:1">
+                <input type="number" class="field-input" id="obDailyM" min="0" max="59" step="5" value="0" placeholder="0" oninput="updateObWeeklyCalc()">
+                <span class="input-suffix-text">min</span>
+              </div>
+            </div>
+            <div id="obWeeklyCalcInfo" style="margin-top:8px;padding:8px 12px;background:var(--muted);border-radius:8px;font-size:12px;color:var(--muted-fg);line-height:1.5"></div>
+          </div>
+        </div>
+        <!-- Include Saturday -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('obIncludeSat').click()">
           <div>
             <div class="ob-section-label" style="text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;color:var(--foreground)">Include Saturday</div>
             <div style="font-size:12px;color:var(--muted-fg);margin-top:2px">Enable if Saturday is a working day.</div>
@@ -5745,81 +5844,6 @@ ${sig}`
             <span class="toggle-track"></span>
           </label>
         </div>
-        <input type="hidden" id="obWorkDays" value="5">
-      </div>
-
-      <!-- Step 3: Setup Routine -->
-      <div class="ob-panel" id="obPanel3">
-        <div class="ob-title">Setup Your Routine</div>
-        <div class="ob-desc">Configure your work target and leave patterns.</div>
-        <!-- Target tabs -->
-        <div class="form-field">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <div class="ob-section-label">Target Hours</div>
-            <div class="st-tabs" id="obStTabs">
-              <button type="button" class="st-tab" id="obTabDaily" onclick="obSwitchTab('daily')">Daily</button>
-              <button type="button" class="st-tab" id="obTabWeekly" onclick="obSwitchTab('weekly')">Weekly</button>
-            </div>
-          </div>
-          <div id="obPanelDaily" style="margin-top:10px">
-            <div style="display:flex;gap:8px">
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obDailyH" min="0" max="23" step="1" value="9" placeholder="0">
-                <span class="input-suffix-text">hrs</span>
-              </div>
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obDailyM" min="0" max="59" step="5" value="0" placeholder="0">
-                <span class="input-suffix-text">min</span>
-              </div>
-            </div>
-          </div>
-          <div id="obPanelWeekly" style="display:none;margin-top:10px">
-            <div class="st-panel-label">Daily (Personal)</div>
-            <div style="display:flex;gap:8px;margin-top:6px">
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obDailyHW" min="0" max="23" step="1" value="9" placeholder="0">
-                <span class="input-suffix-text">hrs</span>
-              </div>
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obDailyMW" min="0" max="59" step="5" value="0" placeholder="0">
-                <span class="input-suffix-text">min</span>
-              </div>
-            </div>
-            <div class="st-panel-label" style="margin-top:10px">Weekly</div>
-            <div style="display:flex;gap:8px;margin-top:6px">
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obWeeklyH" min="0" max="167" step="1" value="45" placeholder="0">
-                <span class="input-suffix-text">hrs</span>
-              </div>
-              <div class="input-suffix-wrap" style="flex:1">
-                <input type="number" class="field-input" id="obWeeklyM" min="0" max="59" step="5" value="0" placeholder="0">
-                <span class="input-suffix-text">min</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Leave Early (optional) -->
-        <div class="form-field">
-          <div class="ob-section-label">Leave Early <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
-          <div class="ob-day-picker" id="obEarlyPicker">
-            <button type="button" class="plan-btn" data-oday="1">Monday</button>
-            <button type="button" class="plan-btn" data-oday="2">Tuesday</button>
-            <button type="button" class="plan-btn" data-oday="3">Wednesday</button>
-            <button type="button" class="plan-btn" data-oday="4">Thursday</button>
-            <button type="button" class="plan-btn" data-oday="5">Friday</button>
-          </div>
-        </div>
-        <!-- Stay Late (optional) -->
-        <div class="form-field">
-          <div class="ob-section-label">Stay Late <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
-          <div class="ob-day-picker" id="obLatePicker">
-            <button type="button" class="plan-btn" data-lday="1">Monday</button>
-            <button type="button" class="plan-btn" data-lday="2">Tuesday</button>
-            <button type="button" class="plan-btn" data-lday="3">Wednesday</button>
-            <button type="button" class="plan-btn" data-lday="4">Thursday</button>
-            <button type="button" class="plan-btn" data-lday="5">Friday</button>
-          </div>
-        </div>
       </div>
 
       <!-- Step 4: Plan Your Week -->
@@ -5827,20 +5851,14 @@ ${sig}`
         <div class="ob-title">Plan Your Week</div>
         <div class="ob-desc">Set your schedule for the week. You can update this anytime from Settings.</div>
         <div id="obWpDayRows"></div>
-        <div style="height:1px;background:var(--border);margin:2px 0 4px"></div>
-        <div class="form-field">
-          <div class="ob-section-label">Early Leave <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
-          <div class="target-day-picker" id="obWpEarly" style="margin-top:6px"></div>
-        </div>
-        <div class="form-field">
-          <div class="ob-section-label">Stay Late <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
-          <div class="target-day-picker" id="obWpLate" style="margin-top:6px"></div>
-        </div>
       </div>
 
       <!-- Step 5: All Done -->
       <div class="ob-panel" id="obPanel5">
         <div class="ob-done-card">
+          <div style="width:52px;height:52px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;margin-bottom:4px;flex-shrink:0">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.6566 5.47308C21.1068 5.88339 21.1415 6.5758 20.7312 7.02605L9.73116 19.0261C9.52896 19.2491 9.24358 19.3797 8.94191 19.387C8.64025 19.3943 8.34879 19.2776 8.13606 19.0648L3.13606 14.0648C2.71462 13.6434 2.71462 12.9617 3.13606 12.5403C3.5575 12.1189 4.23921 12.1189 4.66065 12.5403L8.87631 16.7559L19.1439 5.47395C19.5542 5.0237 20.2466 4.98278 20.6969 5.39309L20.6566 5.47308Z" fill="white"/></svg>
+          </div>
           <div style="font-size:18px;font-weight:700;color:var(--foreground)">You're all set!</div>
           <div style="font-size:13px;color:var(--muted-fg);line-height:1.6">Your workspace is configured and ready.<br>Start tracking your hours.</div>
         </div>
