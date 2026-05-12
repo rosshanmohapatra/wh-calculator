@@ -1387,6 +1387,60 @@
               </div>
             </div>
 
+            <div class="sep-inner"></div>
+
+            <!-- Allow Notifications (moved here from System card) -->
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifOn').click()">
+              <div>
+                <div class="form-label">Allow Notifications</div>
+                <div class="form-sub">Native push alerts for your shift milestones.</div>
+              </div>
+              <label class="toggle" onclick="event.stopPropagation()">
+                <input type="checkbox" id="inpNotifOn" onchange="onNotifToggleChange()">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+
+            <!-- Sub-toggles (expand smoothly when notifications enabled) -->
+            <div id="notifSubGroup" style="overflow:hidden;max-height:0;transition:max-height .3s cubic-bezier(.4,0,.2,1),opacity .22s;opacity:0;pointer-events:none">
+              <div style="padding-top:12px;display:flex;flex-direction:column;gap:14px;padding-left:12px;border-left:2px solid var(--border)">
+
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifTarget').click()">
+                  <div>
+                    <div class="form-label" style="font-size:13px">Daily Target</div>
+                    <div class="form-sub">When your daily target is complete.</div>
+                  </div>
+                  <label class="toggle" style="flex-shrink:0;margin-top:2px" onclick="event.stopPropagation()">
+                    <input type="checkbox" id="inpNotifTarget" onchange="autoSaveSettings()">
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifKickstart').click()">
+                  <div>
+                    <div class="form-label" style="font-size:13px">Kickstart</div>
+                    <div class="form-sub">5 minutes before — time to start wrapping up.</div>
+                  </div>
+                  <label class="toggle" style="flex-shrink:0;margin-top:2px" onclick="event.stopPropagation()">
+                    <input type="checkbox" id="inpNotifKickstart" onchange="autoSaveSettings()">
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifOvertime').click()">
+                  <div>
+                    <div class="form-label" style="font-size:13px">Overtime</div>
+                    <div class="form-sub">5 minutes after — a nudge to actually leave.</div>
+                  </div>
+                  <label class="toggle" style="flex-shrink:0;margin-top:2px" onclick="event.stopPropagation()">
+                    <input type="checkbox" id="inpNotifOvertime" onchange="autoSaveSettings()">
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+
           </div>
           </div><!-- /settings-card-body -->
         </div><!-- /General Card -->
@@ -1496,20 +1550,6 @@
           </div>
           <div class="settings-card-body">
           <div class="settings-group">
-
-            <!-- Allow Notifications -->
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifOn').click()">
-              <div>
-                <div class="form-label">Allow Notifications</div>
-                <div class="form-sub">We'll notify you when your working hours are elapsed.</div>
-              </div>
-              <label class="toggle" onclick="event.stopPropagation()">
-                <input type="checkbox" id="inpNotifOn">
-                <span class="toggle-track"></span>
-              </label>
-            </div>
-
-            <div class="sep-inner"></div>
 
             <!-- Update Password -->
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
@@ -2127,8 +2167,12 @@
     }
 
     // ── CONFIG ─────────────────────────────────────────
-    const CFG_DEF = { dailyH:9, weeklyH:45, weeklyOn:true, lateDays:[], earlyLeaveEntries:[], lateEntries:[], notifOn:false, name:'', position:'', targetDay:null, autoStopBuf:0.5, tzOffset:330, shiftType:'morning', workDays:5 };
+    const CFG_DEF = { dailyH:9, weeklyH:45, weeklyOn:true, lateDays:[], earlyLeaveEntries:[], lateEntries:[], notifOn:false, notifTarget:true, notifKickstart:true, notifOvertime:true, name:'', position:'', targetDay:null, autoStopBuf:0.5, tzOffset:330, shiftType:'morning', workDays:5 };
     function cfg() { const r=Store.getCfg(); return r?{...CFG_DEF,...r}:{...CFG_DEF}; }
+
+    // ── ANON USER ID (persists across sessions, used as push subscription key) ──
+    if (!localStorage.getItem('wh_uid')) localStorage.setItem('wh_uid', crypto.randomUUID());
+    const WH_UID = localStorage.getItem('wh_uid');
     // saveCfg defined in persistence layer
 
     function nowTz() {
@@ -2258,14 +2302,116 @@
       const d = new Date(); d.setHours(h, m, s, 0); return d;
     }
 
-    // ── NOTIFY ─────────────────────────────────────────
+    // ── NOTIFY (in-tab fallback) ────────────────────────
     function notify(s) {
       if (!cfg().notifOn) return;
+      // Web Push handles the real notification via service worker.
+      // This fallback fires only if the tab is open and SW isn't active.
       if ('Notification' in window && Notification.permission === 'granted' && !notifSent) {
         const n = new Notification('Time to go! 🎉', { body: `${dur(s)} logged. Click to check out.` });
         n.onclick = () => { window.focus(); if (loginDate) checkout(); };
         notifSent = true;
       }
+    }
+
+    // ── WEB PUSH ENGINE ────────────────────────────────
+    let _swReg = null;
+    let _scheduledIds = JSON.parse(localStorage.getItem('wh_sched_ids') || '[]');
+
+    async function initServiceWorker() {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+      try {
+        _swReg = await navigator.serviceWorker.register('/sw.js');
+      } catch (e) { console.warn('[5pm] SW register failed:', e); }
+    }
+
+    async function requestPushPermission() {
+      if (!('Notification' in window)) return false;
+      if (Notification.permission === 'denied') return false;
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') return false;
+      await subscribeToPush();
+      return true;
+    }
+
+    async function subscribeToPush() {
+      if (!_swReg) return;
+      try {
+        const keyRes = await fetch('/api/vapid-key');
+        if (!keyRes.ok) return;
+        const { publicKey } = await keyRes.json();
+        const sub = await _swReg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: _urlB64ToUint8(publicKey),
+        });
+        await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: WH_UID, subscription: sub.toJSON() }),
+        });
+      } catch (e) { console.warn('[5pm] Push subscribe failed:', e); }
+    }
+
+    async function scheduleNotifications(loginTimestamp) {
+      const c = cfg();
+      if (!c.notifOn || Notification.permission !== 'granted') return;
+      await cancelScheduledNotifications(); // clear old ones first
+      try {
+        const res = await fetch('/api/schedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId:          WH_UID,
+            loginTimestamp,
+            dailyTargetSecs: effSecs(),
+            notifPrefs: {
+              target:    c.notifTarget    !== false,
+              kickstart: c.notifKickstart !== false,
+              overtime:  c.notifOvertime  !== false,
+            },
+          }),
+        });
+        const data = await res.json();
+        _scheduledIds = data.messageIds || [];
+        localStorage.setItem('wh_sched_ids', JSON.stringify(_scheduledIds));
+      } catch (e) { console.warn('[5pm] Schedule failed:', e); }
+    }
+
+    async function cancelScheduledNotifications() {
+      if (!_scheduledIds.length) return;
+      try {
+        await fetch('/api/cancel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messageIds: _scheduledIds }),
+        });
+      } catch (_) {}
+      _scheduledIds = [];
+      localStorage.removeItem('wh_sched_ids');
+    }
+
+    function _urlB64ToUint8(b64) {
+      const pad  = '='.repeat((4 - b64.length % 4) % 4);
+      const raw  = atob((b64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
+      return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+    }
+
+    async function onNotifToggleChange() {
+      autoSaveSettings();
+      const sub = el('notifSubGroup');
+      const isOn = el('inpNotifOn').checked;
+      if (sub) {
+        if (isOn) {
+          sub.style.pointerEvents = '';
+          sub.style.maxHeight = sub.scrollHeight + 200 + 'px';
+          sub.style.opacity   = '1';
+        } else {
+          sub.style.pointerEvents = 'none';
+          sub.style.maxHeight = '0';
+          sub.style.opacity   = '0';
+        }
+      }
+      if (isOn) await requestPushPermission();
     }
 
     // ── CHECKOUT ───────────────────────────────────────
@@ -2332,6 +2478,7 @@
     // ── END SHIFT: finalises the day, shows insights modal ──────────────────
     function checkout() {
       if (!loginDate) return;
+      cancelScheduledNotifications(); // cancel pending push notifications
       if (ticker) { clearInterval(ticker); ticker = null; }
       const now = new Date();
       const tk = todayKey(), ex = dayLog(tk) || {};
@@ -3738,9 +3885,11 @@
       render();
       if (ticker) clearInterval(ticker);
       ticker = setInterval(render, 1000);
+      scheduleNotifications(loginDate.toISOString()); // schedule Web Push for this shift
     }
 
     function clearLogin() {
+      cancelScheduledNotifications(); // cancel any pending push notifications
       loginDate = null; wasDone = false; notifSent = false; autoStopped = false;
       _sessionAccSecs = 0; _sessionCheckoutTime = null;
       Store.clearSession();
@@ -3778,6 +3927,12 @@
       el('inpWeeklyM').value    = _wm;
       el('inpWeeklyOn').checked = c.weeklyOn;
       el('inpNotifOn').checked  = c.notifOn;
+      if (el('inpNotifTarget'))    el('inpNotifTarget').checked    = c.notifTarget    !== false;
+      if (el('inpNotifKickstart')) el('inpNotifKickstart').checked = c.notifKickstart !== false;
+      if (el('inpNotifOvertime'))  el('inpNotifOvertime').checked  = c.notifOvertime  !== false;
+      // Restore sub-toggle visibility if notifications are already on
+      const _nsg = el('notifSubGroup');
+      if (_nsg && c.notifOn) { _nsg.style.maxHeight = '400px'; _nsg.style.opacity = '1'; _nsg.style.pointerEvents = ''; }
       const satToggle = el('inpIncludeSat'); if (satToggle) satToggle.checked = (c.workDays === 6);
       el('pcTabDaily')?.classList.toggle('active', !c.weeklyOn);
       el('pcTabWeekly')?.classList.toggle('active', !!c.weeklyOn);
@@ -3916,7 +4071,10 @@
       const lateDays       = [...document.querySelectorAll('.plan-btn[data-sday].selected')].map(b => +b.dataset.sday);
       const earlyLeaveDays = [...document.querySelectorAll('.plan-btn[data-tday].selected')].map(b => +b.dataset.tday);
       const targetDay      = earlyLeaveDays.length > 0 ? earlyLeaveDays[0] : null;
-      const notifOn    = el('inpNotifOn').checked;
+      const notifOn        = el('inpNotifOn').checked;
+      const notifTarget    = el('inpNotifTarget')?.checked ?? true;
+      const notifKickstart = el('inpNotifKickstart')?.checked ?? true;
+      const notifOvertime  = el('inpNotifOvertime')?.checked ?? true;
       const name       = el('inpName').value.trim();
       const position   = el('inpPosition')?.value.trim() || '';
       const weeklyH    = (_wHVal > 0 || _wMVal > 0) ? _wHVal + _wMVal / 60 : cfg().weeklyH;
@@ -3925,7 +4083,7 @@
       const shiftType  = deriveShiftType(shiftStart);
       const now = nowTz();
       const workDays = parseInt(el('inpWorkDays')?.value || '5', 10) || 5;
-      saveCfg({ dailyH: daily, weeklyH, weeklyOn: on, lateDays, earlyLeaveDays, notifOn, name, position,
+      saveCfg({ dailyH: daily, weeklyH, weeklyOn: on, lateDays, earlyLeaveDays, notifOn, notifTarget, notifKickstart, notifOvertime, name, position,
                 targetDay, shiftType, shiftStart, shiftEnd, tzOffset, workDays,
                 autoStopBuf: cfg().autoStopBuf || 0.5 });
       renderDaySelector(); // refresh strip in case work-days changed
@@ -5134,6 +5292,7 @@ ${sig}`
     const _savedTheme = localStorage.getItem('wh_theme');
     applyTheme(_savedTheme ? _savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme:dark)').matches);
     el('themeBtn').addEventListener('click', () => applyTheme(!dark));
+    initServiceWorker(); // register service worker for Web Push
 
     // ── EVENTS ─────────────────────────────────────────
     document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -5158,7 +5317,7 @@ ${sig}`
       el(id)?.addEventListener('input', autoSaveSettings);
     });
     /* inpWeeklyOn is a hidden checkbox now toggled via switchStTab — no direct listener needed */
-    el('inpNotifOn').addEventListener('change', autoSaveSettings);
+    // inpNotifOn change handled by onNotifToggleChange() inline
     document.querySelectorAll('.plan-btn[data-sday]').forEach(btn => {
       btn.addEventListener('click', () => { btn.classList.toggle('selected'); autoSaveSettings(); });
     });

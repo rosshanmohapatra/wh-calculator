@@ -1,0 +1,15 @@
+{
+  "name": "5pm-work-tracker",
+  "version": "1.0.0",
+  "description": "Work hour tracker with Web Push notifications",
+  "private": true,
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "vapid": "node -e \"const wp=require('web-push');const k=wp.generateVAPIDKeys();console.log('VAPID_PUBLIC_KEY='+k.publicKey);console.log('VAPID_PRIVATE_KEY='+k.privateKey);\""
+  },
+  "dependencies": {
+    "web-push": "^3.6.7",
+    "@vercel/kv": "^2.0.0",
+    "@upstash/qstash": "^2.7.0"
+  }
+}
