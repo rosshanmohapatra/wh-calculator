@@ -270,7 +270,7 @@
     .shift-cta { display: flex; flex-direction: column; gap: 10px; }
     .shift-combo { display: flex; align-items: center; background: var(--card);
       border: 1.5px solid var(--border); border-radius: 12px; height: 52px;
-      padding: 0 6px; gap: 8px; transition: border-color .15s; position: relative; }
+      padding: 0 6px; gap: 8px; transition: border-color .15s; }
     .shift-combo:focus-within { border-color: var(--muted-fg); }
     .shift-combo-input.err { color: var(--destructive); }
     .shift-combo-clock { color: var(--muted-fg); flex-shrink: 0; }
@@ -290,26 +290,11 @@
     .shift-combo-btn.resume-shift { background: var(--foreground); color: var(--background); border: none; }
     .shift-combo-btn.resume-shift:hover { opacity: .85; }
     .shift-combo-btn:disabled { opacity: .4; cursor: default; }
-    /* Split button (Pause / Resume + chevron + End Session dropdown) */
-    .split-btn-wrap { display: flex; align-items: stretch; }
-    .split-btn-wrap .shift-combo-btn { border-radius: 8px 0 0 8px; flex: 1; }
-    .split-chevron-btn { height: 38px; width: 34px; flex-shrink: 0; border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; border-radius: 0 8px 8px 0;
-      transition: opacity .12s; }
-    .split-chevron-btn:hover { opacity: .85; }
-    .split-chevron-btn.pause-shift-chev { background: var(--muted); color: var(--foreground);
-      border: 1.5px solid var(--border); border-left: none; }
-    .split-chevron-btn.resume-shift-chev { background: var(--foreground); color: var(--background);
-      border-left: 1px solid rgba(255,255,255,.15); }
-    .split-dropdown { position: absolute; right: 0; top: calc(100% + 6px);
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.06);
-      overflow: hidden; z-index: 200; min-width: 150px; }
-    .split-dropdown-item { display: flex; align-items: center; gap: 8px;
-      width: 100%; padding: 10px 14px; border: none; background: none; text-align: left;
-      font-size: 13px; font-weight: 500; color: var(--destructive); cursor: pointer;
-      font-family: var(--font); transition: background .1s; }
-    .split-dropdown-item:hover { background: var(--destructive-bg); }
+    /* End Session button — appears alongside Pause/Resume when session is active */
+    .shift-combo-btn.end-session-btn { background: transparent; color: var(--muted-fg);
+      border: 1.5px solid var(--border); font-size: 12px; padding: 0 10px; flex-shrink: 0; }
+    .shift-combo-btn.end-session-btn:hover { background: var(--destructive-bg);
+      color: var(--destructive); border-color: var(--destructive-border); opacity: 1; }
     /* Custom target chip in Log Out box */
     .custom-target-chip { font-size: 10px; font-weight: 600; letter-spacing: .04em;
       background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border);
@@ -507,7 +492,24 @@
       transform: scale(.96) translateY(8px);
       transition: transform .22s cubic-bezier(.34,1.35,.64,1); }
     .overlay.open .dialog { transform: scale(1) translateY(0); }
-    .dialog-head { padding: 20px 20px 16px; }
+    .dialog-head { padding: 20px 20px 16px; position: relative; }
+    /* Toast */
+    #appToast.toast-show { opacity: 1 !important; pointer-events: all !important; transform: translateX(-50%) translateY(0) !important; }
+    /* About Project card */
+    .about-dev-pic { width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--border); flex-shrink: 0; }
+    .about-social-btn { display:inline-flex;align-items:center;justify-content:center;
+      width:34px;height:34px;border-radius:8px;border:1px solid var(--border);
+      background:transparent;color:var(--muted-fg);text-decoration:none;
+      transition:color .15s,border-color .15s;cursor:pointer; }
+    .about-social-btn:hover { color:var(--foreground);border-color:var(--foreground); }
+    .sponsor-btn { display:inline-flex;align-items:center;gap:7px;padding:7px 14px;
+      border-radius:8px;border:1.5px solid var(--border);background:transparent;
+      color:var(--foreground);font-size:13px;font-weight:500;font-family:var(--font);
+      cursor:pointer;text-decoration:none;transition:background .12s,border-color .12s; }
+    .sponsor-btn:hover { background:var(--muted); }
+    .about-version-badge { font-size:11px;font-weight:600;letter-spacing:.06em;
+      background:var(--muted);color:var(--muted-fg);padding:2px 8px;border-radius:6px; }
     .dialog-title { font-size: 15px; font-weight: 600; color: var(--foreground); }
     .dialog-desc  { font-size: 12px; color: var(--muted-fg); margin-top: 3px; }
     .dialog-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
@@ -1234,18 +1236,8 @@
           </button>
           <input class="shift-combo-input" id="loginInput" type="text" placeholder="Enter Time" autocomplete="off" spellcheck="false">
           <span class="shift-combo-active-label" id="shiftActiveLabel">—</span>
-          <div class="split-btn-wrap" id="calcBtnWrap">
-            <button class="shift-combo-btn" id="calcBtn">Quick Start</button>
-            <button class="split-chevron-btn" id="calcBtnChevron" style="display:none" title="More options">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-          <div class="split-dropdown" id="calcBtnDropdown" style="display:none">
-            <button class="split-dropdown-item" id="endSessionBtn">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              End Session
-            </button>
-          </div>
+          <button class="shift-combo-btn end-session-btn" id="endSessionShiftBtn" style="display:none">End Session</button>
+          <button class="shift-combo-btn" id="calcBtn">Quick Start</button>
         </div>
         <!-- Resume row (after End Session or auto-stop) -->
         <div class="shift-resume-row" id="resumeRow" style="display:none">
@@ -1456,7 +1448,7 @@
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifKickstart').click()">
                   <div>
                     <div class="form-label" style="font-size:13px">Kickstart</div>
-                    <div class="form-sub">5 minutes before — time to start wrapping up.</div>
+                    <div class="form-sub">5 minutes before your target. Time to wrap up.</div>
                   </div>
                   <label class="toggle" style="flex-shrink:0;margin-top:2px" onclick="event.stopPropagation()">
                     <input type="checkbox" id="inpNotifKickstart" onchange="autoSaveSettings()">
@@ -1467,7 +1459,7 @@
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpNotifOvertime').click()">
                   <div>
                     <div class="form-label" style="font-size:13px">Overtime</div>
-                    <div class="form-sub">5 minutes after — a nudge to actually leave.</div>
+                    <div class="form-sub">5 minutes past your target. A nudge to leave.</div>
                   </div>
                   <label class="toggle" style="flex-shrink:0;margin-top:2px" onclick="event.stopPropagation()">
                     <input type="checkbox" id="inpNotifOvertime" onchange="autoSaveSettings()">
@@ -1647,25 +1639,68 @@
           </div><!-- /settings-card-body -->
         </div><!-- /Other Settings Card -->
 
-        <!-- About Developer -->
+        <!-- About Project -->
         <div class="settings-card">
           <div class="settings-card-head" style="cursor:default">
-            <div class="section-label">About Developer</div>
+            <div class="section-label">About Project</div>
           </div>
-          <div class="settings-card-body" style="padding-top:0">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-              <div style="display:flex;flex-direction:column;gap:2px">
-                <div style="font-size:13px;font-weight:600;color:var(--foreground)">Roshan Mohapatra</div>
+          <div class="settings-card-body" style="padding-top:0;display:flex;flex-direction:column;gap:20px">
+
+            <!-- Versioning -->
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <div>
+                <div class="form-label">5pm — Work Hour Tracker</div>
+                <div class="form-sub">Open source. Built for people who actually want to leave on time.</div>
               </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <a href="https://github.com/rosshanmohapatra/wh-calculator" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted-fg);text-decoration:none;transition:color .15s,border-color .15s" onmouseover="this.style.color='var(--foreground)';this.style.borderColor='var(--foreground)'" onmouseout="this.style.color='var(--muted-fg)';this.style.borderColor='var(--border)'" title="GitHub">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              <span class="about-version-badge">v0.9.0</span>
+            </div>
+
+            <div style="height:1px;background:var(--border)"></div>
+
+            <!-- Developer -->
+            <div>
+              <div class="section-label" style="margin-bottom:10px">Developer</div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <img class="about-dev-pic" src="https://framerusercontent.com/images/u88DE05m7bwVdrx5jcyopewNaE.jpg?width=200&height=200" alt="Roshan Mohapatra">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:600;color:var(--foreground);line-height:1.2">Roshan Mohapatra</div>
+                  <div class="form-sub" style="margin-top:1px">Product Designer & Developer</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <!-- GitHub -->
+                  <a href="https://github.com/rosshanmohapatra/wh-calculator" target="_blank" rel="noopener" class="about-social-btn" title="GitHub">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                  </a>
+                  <!-- Framer -->
+                  <a href="https://roshan.framer.wiki/" target="_blank" rel="noopener" class="about-social-btn" title="Portfolio">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 0h16v8h-8zM4 8h8l8 8H4zM4 16h8v8z"/></svg>
+                  </a>
+                  <!-- Threads -->
+                  <a href="https://www.threads.com/@rosshan_1" target="_blank" rel="noopener" class="about-social-btn" title="Threads">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.781 3.63 2.695 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.371-.888h-.048c-.832 0-1.979.228-2.721 1.332l-1.7-1.159c.951-1.395 2.444-2.166 4.421-2.177h.06c3.738 0 5.95 2.247 6.1 6.162.38.208.733.437 1.051.683 1.225.929 2.023 2.168 2.312 3.578.433 2.118-.04 4.832-2.234 6.996-1.929 1.919-4.265 2.825-7.498 2.847zm1.586-8.965c-.348 0-.7.012-1.05.035-1.357.081-2.243.474-2.629.786-.287.247-.42.541-.396.876.058 1.073 1.395 1.568 2.587 1.503 1.018-.055 1.958-.48 2.504-1.158.24-.297.462-.765.567-1.509a10.237 10.237 0 0 0-1.583-.533z"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:1px;background:var(--border)"></div>
+
+            <!-- Sponsorship -->
+            <div>
+              <div class="section-label" style="margin-bottom:10px">Support the Project</div>
+              <div class="form-sub" style="margin-bottom:12px">If 5pm saves you an hour a day, consider buying me a coffee.</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <a href="#" class="sponsor-btn" title="PayPal (coming soon)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.144 19.532l1.049-5.751c.11-.606.691-1.041 1.296-.962 2.89.368 5.998.145 7.852-1.961 1.09-1.242 1.494-2.894 1.416-4.44C19.473 2.873 16.762 2 13.64 2H4.97a1.282 1.282 0 0 0-1.27 1.085L1.012 18.903c-.09.55.328 1.05.882 1.05h4.13a1.282 1.282 0 0 0 1.12-.421zm9.575-12.365c.187 3.37-2.33 5.584-6.387 5.584H8.956l-1.04 5.716H4.12L6.015 3.5h7.625c1.994 0 2.983.695 3.079 3.667z"/></svg>
+                  PayPal
                 </a>
-                <a href="https://roshan.framer.wiki/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted-fg);text-decoration:none;transition:color .15s,border-color .15s" onmouseover="this.style.color='var(--foreground)';this.style.borderColor='var(--foreground)'" onmouseout="this.style.color='var(--muted-fg)';this.style.borderColor='var(--border)'" title="Framer">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 0h16v8h-8zM4 8h8l8 8H4zM4 16h8v8z"/></svg>
+                <a href="#" class="sponsor-btn" title="Buy Me a Coffee (coming soon)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.216 6.415l-.132-.666c-.119-.598-.388-1.163-1.001-1.379-.197-.069-.42-.098-.57-.241-.152-.143-.196-.366-.231-.572-.065-.378-.125-.756-.192-1.133-.057-.325-.102-.69-.25-.987-.195-.4-.597-.634-.996-.788a5.723 5.723 0 0 0-.626-.194c-1-.263-2.05-.36-3.077-.416a25.834 25.834 0 0 0-3.7.062c-.915.083-1.88.184-2.75.5-.318.116-.646.256-.382.668.145.228.37.responsible.402.428.142.155.224.373.15.567-.089.234-.367.263-.581.284a1.44 1.44 0 0 0-.66.255c-.246.197-.395.502-.493.78-.13.362-.103.773.044 1.126.15.362.437.629.762.838.313.2.668.304 1.015.399.617.171 1.275.26 1.897.418.626.159 1.298.4 1.634 1.002.278.495.188 1.094-.07 1.565-.248.45-.6.824-.982 1.147-.754.638-1.64 1.096-2.568 1.415-.919.315-1.869.48-2.846.592-.993.114-2.004.173-3 .097-.47-.036-.972-.093-1.369-.362-.398-.27-.58-.74-.483-1.186.08-.376.34-.682.637-.912.31-.243.678-.403 1.046-.56.36-.152.748-.277 1.064-.517.387-.294.56-.795.3-1.22-.165-.269-.445-.412-.729-.518-.248-.092-.518-.15-.785-.181a14.69 14.69 0 0 0-1.804-.07c-.397.018-.8.06-1.19.149-.781.178-1.583.519-2.06 1.175-.298.407-.42.916-.3 1.402.116.471.42.866.78 1.163.334.28.72.477 1.11.643.764.32 1.576.495 2.39.614.813.119 1.638.172 2.459.177.84.006 1.695-.048 2.516-.206 1.638-.315 3.23-.937 4.558-1.942 1.364-1.032 2.397-2.503 2.397-4.24 0-1.273-.59-2.491-1.512-3.373-.37-.35-.782-.647-1.203-.917.18-.118.37-.225.55-.346.375-.249.74-.511 1.09-.788.352-.277.682-.574 1.007-.876.35-.326.69-.666.95-1.065.256-.395.424-.846.378-1.32zm-9.956 7.785c.004 0-.002 0 0 0zm.185-4.937h.002c.107.001.214.003.32.01l-.322-.01z"/></svg>
+                  Buy Me a Coffee
                 </a>
               </div>
             </div>
+
           </div>
         </div>
 
@@ -1675,6 +1710,37 @@
   </div>
 
   <!-- App footer removed -->
+
+  <!-- ── End Session Confirmation Modal ── -->
+  <div class="overlay" id="endSessionOverlay">
+    <div class="dialog" style="max-width:360px">
+      <div class="dialog-head">
+        <div class="dialog-title">End Session?</div>
+        <div class="dialog-desc" id="endSessionDesc">You still have time remaining until your daily target.</div>
+      </div>
+      <div id="endSessionHalfDayNote" style="display:none;margin:0 20px 4px;padding:10px 12px;background:var(--warning-bg);border:1px solid var(--warning-border);border-radius:8px;font-size:12px;color:var(--warning);font-weight:500;line-height:1.4">
+        Since you're leaving before the halfway mark, today will be logged as a Half Day.
+      </div>
+      <div style="padding:16px 20px 20px;display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn-secondary" id="endSessionCancelBtn">Keep Going</button>
+        <button class="btn-ghost-destructive" id="endSessionConfirmBtn">End Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast Notification ── -->
+  <div id="appToast" style="
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--foreground);color:var(--card);border-radius:10px;
+    padding:10px 14px;display:flex;align-items:center;gap:12px;
+    font-size:13px;font-weight:500;white-space:nowrap;
+    box-shadow:0 4px 20px rgba(0,0,0,.22);z-index:9999;
+    opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;font-family:var(--font)">
+    <span id="appToastMsg">Entry deleted.</span>
+    <button id="appToastUndo" style="background:none;border:none;cursor:pointer;font-family:inherit;
+      font-size:13px;font-weight:700;color:var(--card);opacity:.8;padding:0;letter-spacing:.03em"
+      onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.8">UNDO</button>
+  </div>
 
   <!-- ── Logout Confirmation Modal ── -->
   <div class="overlay" id="logoutOverlay">
@@ -2047,9 +2113,17 @@
   <!-- Day Edit Modal -->
   <div class="overlay" id="dayEditOverlay">
     <div class="dialog">
-      <div class="dialog-head">
+      <div class="dialog-head" style="position:relative">
         <div class="dialog-title" id="dayEditTitle">Edit Day</div>
         <div class="dialog-desc" id="dayEditDesc">Update times or mark a special day</div>
+        <button id="dayEditDeleteBtn" title="Delete entry" onclick="deleteDayEntry()"
+          style="position:absolute;top:0;right:0;background:none;border:none;cursor:pointer;
+            padding:4px;border-radius:6px;color:var(--muted-fg);transition:color .15s;display:flex;align-items:center;justify-content:center"
+          onmouseover="this.style.color='var(--destructive)'" onmouseout="this.style.color='var(--muted-fg)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+        </button>
       </div>
       <div class="dialog-body">
         <div class="modal-override-row">
@@ -3900,26 +3974,22 @@
       renderEmptyState();
     }
 
-    // ── SPLIT BUTTON STATE ────────────────────────────
+    // ── BUTTON STATE ──────────────────────────────────
     function setCalcBtnState(state) {
-      const btn = el('calcBtn'), chev = el('calcBtnChevron'), dd = el('calcBtnDropdown');
+      const btn = el('calcBtn'), esBt = el('endSessionShiftBtn');
       if (!btn) return;
       btn.classList.remove('end-shift', 'pause-shift', 'resume-shift');
       btn.disabled = false;
       btn.dataset.state = state;
-      if (dd) dd.style.display = 'none'; // always close dropdown on state change
       if (state === 'running') {
         btn.textContent = 'Pause'; btn.classList.add('pause-shift');
-        btn.style.borderRadius = ''; // CSS split rule applies
-        if (chev) { chev.style.display = ''; chev.className = 'split-chevron-btn pause-shift-chev'; }
+        if (esBt) esBt.style.display = '';
       } else if (state === 'ended') {
         btn.textContent = 'Resume'; btn.classList.add('resume-shift');
-        btn.style.borderRadius = ''; // CSS split rule applies
-        if (chev) { chev.style.display = ''; chev.className = 'split-chevron-btn resume-shift-chev'; }
+        if (esBt) esBt.style.display = '';
       } else { // 'start'
         btn.textContent = 'Quick Start';
-        btn.style.borderRadius = '8px'; // full rounded — no chevron visible
-        if (chev) chev.style.display = 'none';
+        if (esBt) esBt.style.display = 'none';
       }
     }
 
@@ -4614,6 +4684,92 @@ ${sig}`
       else                       { ap = h>=12?'PM':'AM'; }
       const display = `${p2(h > 12 ? h - 12 : h || 12)}:${p2(m)} ${ap}`;
       input.value = display;
+    }
+
+    // ── END SESSION MODAL ─────────────────────────────
+    function openEndSessionModal() {
+      const c = cfg();
+      const dailySecs = c.dailyH * 3600;
+      const halfSecs  = dailySecs / 2;
+      // Compute how much has been worked so far
+      let workedSecs = _sessionAccSecs;
+      if (loginDate) workedSecs += Math.max(0, Math.floor((new Date() - loginDate) / 1000));
+      const remSecs = Math.max(0, dailySecs - workedSecs);
+      const isHalfDay = workedSecs <= halfSecs;
+      const desc = el('endSessionDesc');
+      const note = el('endSessionHalfDayNote');
+      const confirmBtn = el('endSessionConfirmBtn');
+      if (remSecs > 0) {
+        desc.textContent = `You still have ${dur(remSecs)} remaining until your daily target.`;
+      } else {
+        desc.textContent = "You've hit your daily target. Great work today!";
+      }
+      if (isHalfDay && workedSecs > 0) {
+        note.style.display = '';
+        confirmBtn.textContent = 'End & Mark Half Day';
+      } else {
+        note.style.display = 'none';
+        confirmBtn.textContent = 'End Session';
+      }
+      el('endSessionOverlay').classList.add('open');
+    }
+
+    function confirmEndSession() {
+      const c = cfg();
+      const dailySecs = c.dailyH * 3600;
+      const halfSecs  = dailySecs / 2;
+      let workedSecs = _sessionAccSecs;
+      if (loginDate) workedSecs += Math.max(0, Math.floor((new Date() - loginDate) / 1000));
+      const isHalfDay = workedSecs > 0 && workedSecs <= halfSecs;
+      el('endSessionOverlay').classList.remove('open');
+      // Mark half day in log before checkout
+      if (isHalfDay) {
+        const tk = todayKey(), ex = dayLog(tk) || {};
+        saveDayLog(tk, { ...ex, override: 'halfday' });
+      }
+      checkout();
+    }
+
+    // ── TOAST SYSTEM ──────────────────────────────────
+    let _toastTimer = null, _toastUndoFn = null;
+    function showToast(msg, undoFn, durationMs = 4000) {
+      const toast = el('appToast');
+      const msgEl = el('appToastMsg');
+      const undoBtn = el('appToastUndo');
+      if (!toast) return;
+      if (_toastTimer) { clearTimeout(_toastTimer); toast.classList.remove('toast-show'); }
+      msgEl.textContent = msg;
+      _toastUndoFn = undoFn || null;
+      undoBtn.style.display = undoFn ? '' : 'none';
+      requestAnimationFrame(() => {
+        toast.classList.add('toast-show');
+        _toastTimer = setTimeout(() => {
+          toast.classList.remove('toast-show');
+          _toastTimer = null; _toastUndoFn = null;
+        }, durationMs);
+      });
+    }
+
+    // ── DELETE DAY ENTRY ───────────────────────────────
+    let _deletedEntryKey = null, _deletedEntryData = null;
+    function deleteDayEntry() {
+      if (!_dayEditKey) return;
+      const key = _dayEditKey;
+      const backup = dayLog(key);
+      _deletedEntryKey = key; _deletedEntryData = backup || null;
+      // Remove from Store
+      Store.remove(KEY.day + key);
+      closeDayEditModal();
+      renderDaySelector();
+      if (key === todayKey()) renderEmptyState();
+      showToast('Entry deleted.', () => {
+        if (_deletedEntryKey && _deletedEntryData) {
+          saveDayLog(_deletedEntryKey, _deletedEntryData);
+          renderDaySelector();
+          if (_deletedEntryKey === todayKey() && loginDate) render();
+        }
+        _deletedEntryKey = null; _deletedEntryData = null;
+      });
     }
 
     function openDayEditModal(key) {
@@ -5387,38 +5543,8 @@ ${sig}`
       else calculate();
     });
 
-    // Split button: chevron opens/closes the End Session dropdown
-    el('calcBtnChevron').addEventListener('click', e => {
-      e.stopPropagation();
-      const dd = el('calcBtnDropdown');
-      if (!dd) return;
-      const isOpen = dd.style.display !== 'none';
-      dd.style.display = isOpen ? 'none' : '';
-      if (!isOpen) {
-        // Position dropdown above/below the split btn
-        const wrapRect = el('calcBtnWrap').getBoundingClientRect();
-        const ddH = dd.offsetHeight || 52;
-        const spaceBelow = window.innerHeight - wrapRect.bottom;
-        if (spaceBelow < ddH + 12) {
-          dd.style.top = 'auto'; dd.style.bottom = 'calc(100% + 6px)';
-        } else {
-          dd.style.top = 'calc(100% + 6px)'; dd.style.bottom = 'auto';
-        }
-      }
-    });
-
-    // Close dropdown on outside click
-    document.addEventListener('click', () => {
-      const dd = el('calcBtnDropdown');
-      if (dd) dd.style.display = 'none';
-    });
-
-    // End Session button in dropdown
-    el('endSessionBtn').addEventListener('click', e => {
-      e.stopPropagation();
-      const dd = el('calcBtnDropdown'); if (dd) dd.style.display = 'none';
-      checkout();
-    });
+    // End Session button — opens confirmation modal
+    el('endSessionShiftBtn').addEventListener('click', () => openEndSessionModal());
     el('coDone').addEventListener('click', closeCheckoutModal);
     el('checkoutOverlay').addEventListener('click', e => { if (e.target === el('checkoutOverlay')) closeCheckoutModal(); });
     // Week nav (Analytics)
@@ -5464,6 +5590,18 @@ ${sig}`
     el('dayEditSave').addEventListener('click', saveDayEditModal);
     el('dayEditCancel').addEventListener('click', closeDayEditModal);
     el('dayEditOverlay').addEventListener('click', e => { if (e.target === el('dayEditOverlay')) closeDayEditModal(); });
+
+    // End Session modal
+    el('endSessionCancelBtn').addEventListener('click', () => el('endSessionOverlay').classList.remove('open'));
+    el('endSessionConfirmBtn').addEventListener('click', confirmEndSession);
+    el('endSessionOverlay').addEventListener('click', e => { if (e.target === el('endSessionOverlay')) el('endSessionOverlay').classList.remove('open'); });
+
+    // Toast undo button
+    el('appToastUndo').addEventListener('click', () => {
+      if (_toastUndoFn) { const fn = _toastUndoFn; _toastUndoFn = null; fn(); }
+      if (_toastTimer) { clearTimeout(_toastTimer); _toastTimer = null; }
+      el('appToast').classList.remove('toast-show');
+    });
 
     // Week plan modal
     el('weekPlanSave').addEventListener('click', saveWeekPlan);
