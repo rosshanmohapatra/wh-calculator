@@ -2314,12 +2314,36 @@
       }
     }
 
-    // ── WEB PUSH ENGINE ────────────────────────────────
-    let _swReg = null;
-    let _scheduledIds = JSON.parse(localStorage.getItem('wh_sched_ids') || '[]');
+    // ── NOTIFICATION ENGINE (browser-native, no external scheduler) ───
+    // Scheduling uses client-side setTimeout + SW showNotification().
+    // Works globally — no QStash/region dependency.
+    // Notifications fire as long as the browser is open (which it must
+    // be anyway for tracking). SW keeps them native even when tab is hidden.
+
+    let _swReg        = null;
+    let _notifTimers  = [];   // active setTimeout IDs
+
+    const _NOTIF_MSGS = {
+      kickstart: {
+        title: 'Almost there 👀',
+        body:  '5 minutes left in your shift. Time to start wrapping up.',
+        tag:   'kickstart',
+      },
+      target: {
+        title: 'Time to go! 🎉',
+        body:  "You've hit your daily target. Head out — you've earned it.",
+        tag:   'target',
+      },
+      overtime: {
+        title: 'You should leave now ⏰',
+        body:  "It's been 5 minutes past your target. Close the laptop and go.",
+        tag:   'overtime',
+        requireInteraction: true,
+      },
+    };
 
     async function initServiceWorker() {
-      if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+      if (!('serviceWorker' in navigator)) return;
       try {
         _swReg = await navigator.serviceWorker.register('/sw.js');
       } catch (e) { console.warn('[5pm] SW register failed:', e); }
@@ -2329,71 +2353,54 @@
       if (!('Notification' in window)) return false;
       if (Notification.permission === 'denied') return false;
       const perm = await Notification.requestPermission();
-      if (perm !== 'granted') return false;
-      await subscribeToPush();
-      return true;
+      return perm === 'granted';
     }
 
-    async function subscribeToPush() {
-      if (!_swReg) return;
+    async function _fireNotif(type) {
+      const msg = _NOTIF_MSGS[type]; if (!msg) return;
       try {
-        const keyRes = await fetch('/api/vapid-key');
-        if (!keyRes.ok) return;
-        const { publicKey } = await keyRes.json();
-        const sub = await _swReg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: _urlB64ToUint8(publicKey),
+        // Prefer SW showNotification — works when tab is backgrounded
+        const reg = _swReg || await navigator.serviceWorker.ready;
+        await reg.showNotification(msg.title, {
+          body:               msg.body,
+          tag:                msg.tag,
+          icon:               '/icon-192.png',
+          badge:              '/icon-72.png',
+          renotify:           true,
+          requireInteraction: !!msg.requireInteraction,
         });
-        await fetch('/api/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: WH_UID, subscription: sub.toJSON() }),
-        });
-      } catch (e) { console.warn('[5pm] Push subscribe failed:', e); }
+      } catch (_) {
+        // Fallback to basic Notification API
+        if (Notification.permission === 'granted') new Notification(msg.title, { body: msg.body, tag: msg.tag });
+      }
     }
 
-    async function scheduleNotifications(loginTimestamp) {
+    function scheduleNotifications(loginTimestamp) {
       const c = cfg();
+      cancelScheduledNotifications(); // clear any previous timers
       if (!c.notifOn || Notification.permission !== 'granted') return;
-      await cancelScheduledNotifications(); // clear old ones first
-      try {
-        const res = await fetch('/api/schedule', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId:          WH_UID,
-            loginTimestamp,
-            dailyTargetSecs: effSecs(),
-            notifPrefs: {
-              target:    c.notifTarget    !== false,
-              kickstart: c.notifKickstart !== false,
-              overtime:  c.notifOvertime  !== false,
-            },
-          }),
-        });
-        const data = await res.json();
-        _scheduledIds = data.messageIds || [];
-        localStorage.setItem('wh_sched_ids', JSON.stringify(_scheduledIds));
-      } catch (e) { console.warn('[5pm] Schedule failed:', e); }
+
+      const targetSecs = effSecs();
+      const baseMs     = new Date(loginTimestamp).getTime();
+      const now        = Date.now();
+
+      const jobs = [
+        { type: 'kickstart', offsetSecs: targetSecs - 300, enabled: c.notifKickstart !== false },
+        { type: 'target',    offsetSecs: targetSecs,       enabled: c.notifTarget    !== false },
+        { type: 'overtime',  offsetSecs: targetSecs + 300, enabled: c.notifOvertime  !== false },
+      ];
+
+      for (const job of jobs) {
+        if (!job.enabled) continue;
+        const delay = baseMs + job.offsetSecs * 1000 - now;
+        if (delay < 0) continue; // already passed
+        _notifTimers.push(setTimeout(() => _fireNotif(job.type), delay));
+      }
     }
 
-    async function cancelScheduledNotifications() {
-      if (!_scheduledIds.length) return;
-      try {
-        await fetch('/api/cancel', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messageIds: _scheduledIds }),
-        });
-      } catch (_) {}
-      _scheduledIds = [];
-      localStorage.removeItem('wh_sched_ids');
-    }
-
-    function _urlB64ToUint8(b64) {
-      const pad  = '='.repeat((4 - b64.length % 4) % 4);
-      const raw  = atob((b64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
-      return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+    function cancelScheduledNotifications() {
+      _notifTimers.forEach(id => clearTimeout(id));
+      _notifTimers = [];
     }
 
     async function onNotifToggleChange() {

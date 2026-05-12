@@ -10,7 +10,6 @@
     "vapid": "node -e \"const wp=require('web-push');const k=wp.generateVAPIDKeys();console.log('VAPID_PUBLIC_KEY='+k.publicKey);console.log('VAPID_PRIVATE_KEY='+k.privateKey);\""
   },
   "dependencies": {
-    "@upstash/qstash": "^2.7.0",
     "@vercel/kv": "^2.0.0",
     "web-push": "^3.6.7"
   }
