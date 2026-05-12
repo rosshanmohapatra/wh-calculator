@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "Work hour tracker with Web Push notifications",
   "private": true,
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "vapid": "node -e \"const wp=require('web-push');const k=wp.generateVAPIDKeys();console.log('VAPID_PUBLIC_KEY='+k.publicKey);console.log('VAPID_PRIVATE_KEY='+k.privateKey);\""
   },
   "dependencies": {
-    "web-push": "^3.6.7",
+    "@upstash/qstash": "^2.7.0",
     "@vercel/kv": "^2.0.0",
-    "@upstash/qstash": "^2.7.0"
+    "web-push": "^3.6.7"
   }
 }
