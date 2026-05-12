@@ -937,11 +937,18 @@
     @keyframes leaveSpin { to { transform:rotate(360deg); } }
     /* Delete feedback chips */
     .del-chips { display:flex;flex-wrap:wrap;gap:6px; }
-    .del-chip { padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-size:12px;
+    .del-chip { display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+      border:1px solid var(--border);border-radius:20px;font-size:12px;
       font-weight:500;color:var(--muted-fg);background:var(--input-bg);cursor:pointer;
       font-family:var(--font);transition:border-color .15s,color .15s,background .15s; }
     .del-chip:hover { border-color:var(--muted-fg); }
-    .del-chip.selected { border-color:var(--destructive);color:var(--destructive);background:var(--destructive-bg); }
+    .del-chip.selected { border-color:var(--foreground);color:var(--foreground);background:var(--muted); }
+    .del-chip .chip-check { display:none;width:13px;height:13px;flex-shrink:0; }
+    .del-chip.selected .chip-check { display:block; }
+    /* Auto-expanding feedback textarea */
+    .del-feedback-ta { width:100%;resize:none;overflow:hidden;padding:10px 12px;
+      font-family:var(--font);font-size:13px;line-height:1.5;min-height:72px;
+      transition:height .2s cubic-bezier(0.4,0,0.2,1); }
     /* Sliding Saturday row in onboarding routine step */
     .ob-sat-row { overflow:hidden; max-height:0; opacity:0;
       transition:max-height .32s cubic-bezier(0.4,0,0.2,1), opacity .25s ease; }
@@ -1418,19 +1425,6 @@
               </div>
             </div>
 
-            <!-- Include Saturday Toggle -->
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpIncludeSat').click()">
-              <div>
-                <div class="form-label">Include Saturday</div>
-                <div class="form-sub">Enable if Saturday is a working day for you.</div>
-              </div>
-              <label class="toggle" onclick="event.stopPropagation()">
-                <input type="checkbox" id="inpIncludeSat" onchange="toggleIncludeSaturday(this.checked)">
-                <span class="toggle-track"></span>
-              </label>
-            </div>
-            <input type="hidden" id="inpWorkDays" value="5">
-
             <!-- Penalty Calculation -->
             <div class="form-field">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
@@ -1444,6 +1438,19 @@
                 </div>
               </div>
             </div>
+
+            <!-- Include Saturday Toggle -->
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="el('inpIncludeSat').click()">
+              <div>
+                <div class="form-label">Include Saturday</div>
+                <div class="form-sub">Enable if Saturday is a working day for you.</div>
+              </div>
+              <label class="toggle" onclick="event.stopPropagation()">
+                <input type="checkbox" id="inpIncludeSat" onchange="toggleIncludeSaturday(this.checked)">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <input type="hidden" id="inpWorkDays" value="5">
 
             <!-- Leave Early Plan (multi-select) -->
             <div class="target-day-block">
@@ -1506,9 +1513,9 @@
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
               <div>
                 <div class="form-label">Update Password</div>
-                <div class="form-sub">Change your account password. Supabase integration coming soon.</div>
+                <div class="form-sub">Verify your identity to set a new password.</div>
               </div>
-              <button class="btn-secondary" onclick="showToast('Coming soon','info','Password update requires Supabase auth.')">Update</button>
+              <button class="btn-secondary" onclick="openUpwdModal()">Update</button>
             </div>
 
             <div class="sep-inner"></div>
@@ -1616,21 +1623,21 @@
         </div>
         <div class="dialog-body" style="padding-top:0">
           <div class="del-chips" id="delChips">
-            <button class="del-chip" onclick="toggleDelChip(this)">Missing Features</button>
-            <button class="del-chip" onclick="toggleDelChip(this)">Too Buggy</button>
-            <button class="del-chip" onclick="toggleDelChip(this)">Didn't Need It</button>
-            <button class="del-chip" onclick="toggleDelChip(this)">Hard To Use</button>
-            <button class="del-chip" onclick="toggleDelChip(this)">Other</button>
+            <button class="del-chip" onclick="toggleDelChip(this)"><svg class="chip-check" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.707 5.293a1 1 0 010 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 15.586 19.293 5.293a1 1 0 011.414 0z" fill="currentColor"/></svg>Missing Features</button>
+            <button class="del-chip" onclick="toggleDelChip(this)"><svg class="chip-check" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.707 5.293a1 1 0 010 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 15.586 19.293 5.293a1 1 0 011.414 0z" fill="currentColor"/></svg>Too Buggy</button>
+            <button class="del-chip" onclick="toggleDelChip(this)"><svg class="chip-check" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.707 5.293a1 1 0 010 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 15.586 19.293 5.293a1 1 0 011.414 0z" fill="currentColor"/></svg>Didn't Need It</button>
+            <button class="del-chip" onclick="toggleDelChip(this)"><svg class="chip-check" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.707 5.293a1 1 0 010 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 15.586 19.293 5.293a1 1 0 011.414 0z" fill="currentColor"/></svg>Hard To Use</button>
+            <button class="del-chip" onclick="toggleDelChip(this)"><svg class="chip-check" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.707 5.293a1 1 0 010 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 15.586 19.293 5.293a1 1 0 011.414 0z" fill="currentColor"/></svg>Other</button>
           </div>
           <div>
             <div class="form-label" style="margin-bottom:6px">Tell us more. <span style="font-weight:400;color:var(--muted-fg)">(optional)</span></div>
-            <textarea class="field-input" id="delFeedbackText" rows="3" placeholder="Tell us more. (optional)"
-              style="width:100%;resize:none;padding:10px 12px;font-family:var(--font);font-size:13px;line-height:1.5"></textarea>
+            <textarea class="field-input del-feedback-ta" id="delFeedbackText" rows="3" placeholder="Tell us more. (optional)"
+              oninput="autoExpandTa(this)"></textarea>
           </div>
         </div>
         <div style="padding:0 20px 20px;display:flex;justify-content:flex-end;gap:8px">
           <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
-          <button class="btn-ghost-destructive" onclick="goToDeletePwd()">Delete Forever</button>
+          <button class="btn-secondary" style="background:var(--foreground);color:var(--card);border-color:var(--foreground)" onclick="goToDeletePwd()">Continue</button>
         </div>
       </div>
 
@@ -1657,7 +1664,7 @@
         </div>
         <div style="padding:0 20px 20px;display:flex;justify-content:flex-end;gap:8px">
           <button class="btn-secondary" onclick="backToDeleteFeedback()">Back</button>
-          <button class="btn-ghost-destructive" id="delPwdContinueBtn" onclick="confirmDeleteProfile()" disabled>Continue</button>
+          <button class="btn-ghost-destructive" id="delPwdContinueBtn" onclick="confirmDeleteProfile()" disabled>Delete Forever</button>
         </div>
       </div>
 
@@ -1666,13 +1673,10 @@
 
   <!-- ── Signing Out / Deleting Loader Modal ── -->
   <div class="overlay" id="signingOutOverlay" style="z-index:2500">
-    <div class="dialog" style="max-width:320px;text-align:center">
+    <div class="dialog" style="max-width:300px;text-align:center">
       <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:36px 24px">
         <div class="leaving-spinner"></div>
-        <div>
-          <div class="dialog-title" id="signingOutTitle">Sorry to let you go.</div>
-          <div class="dialog-desc" id="signingOutDesc" style="margin-top:4px">Deleting you from the database.</div>
-        </div>
+        <div class="dialog-title" id="signingOutTitle">Logging Out</div>
       </div>
     </div>
   </div>
@@ -1753,6 +1757,99 @@
           <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="fpBackToEmail()">Use a different email</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ── Update Password Modal ── -->
+  <div class="overlay" id="upwdOverlay" style="z-index:2100">
+    <div class="dialog" style="max-width:360px">
+
+      <!-- View 1: Method selection -->
+      <div id="upwdViewMethod">
+        <div class="dialog-head">
+          <div class="dialog-title">Update Password</div>
+          <div class="dialog-desc">Choose how you'd like to verify your identity.</div>
+        </div>
+        <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:8px">
+          <button class="fp-oauth-btn" onclick="upwdShowEmail()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.5"/></svg>
+            Send an Email
+          </button>
+          <div class="fp-divider">or</div>
+          <button class="fp-oauth-btn" onclick="upwdShowAuth()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 2C3.79086 2 2 3.79086 2 6V18C2 20.2091 3.79086 22 6 22H18C20.2091 22 22 20.2091 22 18V6C22 3.79086 20.2091 2 18 2H6ZM7 7H9V9H7V7ZM9 11H7V13H9V11ZM7 15H9V17H7V15ZM11 7H13V9H11V7ZM13 11H11V13H13V11ZM11 15H13V17H11V15ZM17 7H15V9H17V7ZM15 11H17V13H15V11ZM17 15H15V17H17V15Z" fill="currentColor"/></svg>
+            Use Authenticator
+          </button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="closeUpwdModal()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- View 2a: Email OTP -->
+      <div id="upwdViewEmail" style="display:none">
+        <div class="dialog-head">
+          <div class="dialog-title">Verify via Email</div>
+          <div class="dialog-desc">Enter your email — we'll send a 6-digit code.</div>
+        </div>
+        <div class="dialog-body" style="padding-top:0">
+          <input class="field-input" id="upwdEmailInput" type="email" placeholder="you@example.com" autocomplete="email">
+          <div class="err-msg" id="upwdEmailErr" style="margin-top:6px">Enter a valid email address.</div>
+        </div>
+        <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:8px">
+          <button id="upwdSendBtn" class="ob-btn-primary" style="height:40px;font-size:13px;width:100%;border-radius:8px" onclick="upwdSendEmail()">Send Code</button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="upwdShowMethod()">← Back</button>
+        </div>
+      </div>
+
+      <!-- View 2b: Email OTP code entry -->
+      <div id="upwdViewOTP" style="display:none">
+        <div class="dialog-head">
+          <div class="dialog-title">Enter Code</div>
+          <div class="dialog-desc">A 6-digit code was sent to <strong id="upwdEmailDisplay"></strong>. It expires in 1 minute.</div>
+        </div>
+        <div class="dialog-body" style="padding-top:0">
+          <input class="field-input fp-code-input" id="upwdOtpInput" type="text" inputmode="numeric" maxlength="6" placeholder="000000"
+            oninput="el('upwdVerifyBtn').disabled=this.value.length<6||upwdExpired">
+          <div class="fp-timer" id="upwdTimerWrap">Code expires in <span id="upwdTimerDisplay">1:00</span></div>
+          <div id="upwdExpiredMsg" style="display:none;font-size:12px;color:var(--destructive);text-align:center;margin-top:10px">
+            Code expired. <button style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer;font-family:var(--font);padding:0" onclick="upwdResend()">Resend</button>
+          </div>
+        </div>
+        <div style="padding:0 20px 12px">
+          <button class="ob-btn-primary" id="upwdVerifyBtn" style="height:40px;font-size:13px;width:100%;border-radius:8px" onclick="upwdVerify()" disabled>Verify &amp; Update</button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="upwdShowEmail()">Use a different email</button>
+        </div>
+      </div>
+
+      <!-- View 3: Authenticator -->
+      <div id="upwdViewAuth" style="display:none">
+        <div class="dialog-head">
+          <div class="dialog-title">Authenticator Code</div>
+          <div class="dialog-desc">Enter the 6-digit code from your authenticator app.</div>
+        </div>
+        <div class="dialog-body" style="padding-top:0">
+          <div style="display:flex;gap:6px;justify-content:center">
+            <input class="auth-digit" id="upwdD0" type="text" inputmode="numeric" maxlength="1">
+            <input class="auth-digit" id="upwdD1" type="text" inputmode="numeric" maxlength="1">
+            <input class="auth-digit" id="upwdD2" type="text" inputmode="numeric" maxlength="1">
+            <input class="auth-digit" id="upwdD3" type="text" inputmode="numeric" maxlength="1">
+            <input class="auth-digit" id="upwdD4" type="text" inputmode="numeric" maxlength="1">
+            <input class="auth-digit" id="upwdD5" type="text" inputmode="numeric" maxlength="1">
+          </div>
+        </div>
+        <div style="padding:0 20px 12px">
+          <button class="ob-btn-primary" id="upwdAuthVerifyBtn" style="height:40px;font-size:13px;width:100%;border-radius:8px" onclick="upwdAuthVerify()" disabled>Verify &amp; Update</button>
+        </div>
+        <div style="padding:0 20px 20px;text-align:center">
+          <button style="background:none;border:none;font-size:12px;color:var(--muted-fg);cursor:pointer;font-family:var(--font)" onclick="upwdShowMethod()">← Back</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -3738,13 +3835,13 @@
 
     function switchStTab(tab) {
       const isWeekly = tab === 'weekly';
-      el('inpWeeklyOn').checked = isWeekly;
+      // NOTE: do NOT touch inpWeeklyOn here — that's owned by Penalty Calculation
       el('stTabDaily').classList.toggle('active', !isWeekly);
       el('stTabWeekly').classList.toggle('active', isWeekly);
       const lbl = el('stTargetLabel');
       if (lbl) lbl.textContent = isWeekly ? 'Weekly Target' : 'Daily Target';
       updateWeeklyCalc();
-      autoSaveSettings();
+      // don't call autoSaveSettings — tab is display-only, no save needed
     }
 
     function updateWeeklyCalc() {
@@ -3755,11 +3852,12 @@
       const days = (cfg().workDays || 5);
       const weekly = daily * days;
       const wh = Math.floor(weekly), wm = Math.round((weekly - wh) * 60);
-      const isWeekly = el('inpWeeklyOn')?.checked;
+      // Read from the tab state, NOT from inpWeeklyOn (penalty calc)
+      const isWeekly = el('stTabWeekly')?.classList.contains('active');
       if (isWeekly) {
-        info.textContent = `Based on ${dh}h${dm ? ' ' + dm + 'm' : ''} daily x ${days} days, that would be ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly.`;
+        info.textContent = `Based on ${dh}h${dm ? ' ' + dm + 'm' : ''} daily × ${days} days, that's ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly.`;
       } else {
-        info.textContent = `That would be ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly (${days} working days).`;
+        info.textContent = `That's ${wh}h${wm ? ' ' + wm + 'm' : ''} weekly (${days} working days).`;
       }
       // Sync hidden weekly inputs so calculations still work
       el('inpWeeklyH').value = wh;
@@ -3775,21 +3873,23 @@
     function obToggleIncludeSaturday(checked) {
       const n = checked ? 6 : 5;
       const inp = el('obWorkDays'); if (inp) inp.value = n;
-      // Smooth dialog height animation while the calc info text changes
       const dialog = document.querySelector('.ob-dialog');
       const curH = dialog ? dialog.offsetHeight : 0;
       updateObWeeklyCalc();
+      obBuildStep3Pickers(); // rebuild pickers so Saturday appears/disappears
       if (dialog && curH > 0) {
-        const newH = dialog.offsetHeight;
-        if (newH !== curH) {
-          dialog.style.height = curH + 'px';
-          dialog.style.overflow = 'hidden';
-          dialog.style.transition = 'height .3s cubic-bezier(0.4,0,0.2,1)';
-          requestAnimationFrame(() => {
-            dialog.style.height = newH + 'px';
-            setTimeout(() => { dialog.style.height = ''; dialog.style.overflow = ''; dialog.style.transition = ''; }, 320);
-          });
-        }
+        requestAnimationFrame(() => {
+          const newH = dialog.scrollHeight;
+          if (Math.abs(newH - curH) > 2) {
+            dialog.style.height = curH + 'px';
+            dialog.style.overflow = 'hidden';
+            dialog.style.transition = 'height .3s cubic-bezier(0.4,0,0.2,1)';
+            requestAnimationFrame(() => {
+              dialog.style.height = newH + 'px';
+              setTimeout(() => { dialog.style.height = ''; dialog.style.overflow = ''; dialog.style.transition = ''; }, 320);
+            });
+          }
+        });
       }
     }
 
@@ -5302,9 +5402,30 @@ ${sig}`
       saveCfg({ ...c, name, position, shiftStart, shiftEnd, shiftType });
     }
 
+    function obBuildStep3Pickers() {
+      const days = parseInt(el('obWorkDays')?.value || '5', 10) || 5;
+      const names = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].slice(0, days);
+      const earlyPicker = el('obEarlyPicker');
+      if (earlyPicker) {
+        const prev = [...earlyPicker.querySelectorAll('.plan-btn.selected')].map(b => +b.dataset.oday);
+        earlyPicker.innerHTML = names.map((n,i) =>
+          `<button type="button" class="plan-btn${prev.includes(i+1)?' selected':''}" data-oday="${i+1}">${n}</button>`
+        ).join('');
+        earlyPicker.querySelectorAll('[data-oday]').forEach(b => b.addEventListener('click', () => b.classList.toggle('selected')));
+      }
+      const latePicker = el('obLatePicker');
+      if (latePicker) {
+        const prev = [...latePicker.querySelectorAll('.plan-btn.selected')].map(b => +b.dataset.lday);
+        latePicker.innerHTML = names.map((n,i) =>
+          `<button type="button" class="plan-btn${prev.includes(i+1)?' selected':''}" data-lday="${i+1}">${n}</button>`
+        ).join('');
+        latePicker.querySelectorAll('[data-lday]').forEach(b => b.addEventListener('click', () => b.classList.toggle('selected')));
+      }
+    }
+
     function obPopulateStep3Days() {
-      // No day pickers in step 3 anymore — just ensure calc is updated
       updateObWeeklyCalc();
+      obBuildStep3Pickers();
     }
 
     function obSaveStep3() {
@@ -5317,7 +5438,10 @@ ${sig}`
       const weeklyH = wh + wm / 60;
       const weeklyOn = _obIsWeekly;
       const workDays = parseInt(el('obWorkDays')?.value || '5', 10) || 5;
-      saveCfg({ ...c, dailyH, weeklyH, weeklyOn, workDays });
+      const earlyLeaveDays = [...document.querySelectorAll('#obEarlyPicker .plan-btn.selected')].map(b => +b.dataset.oday);
+      const lateDays = [...document.querySelectorAll('#obLatePicker .plan-btn.selected')].map(b => +b.dataset.lday);
+      const targetDay = earlyLeaveDays.length ? earlyLeaveDays[0] : null;
+      saveCfg({ ...c, dailyH, weeklyH, weeklyOn, workDays, earlyLeaveDays, lateDays, targetDay });
     }
 
     function obPopulateWeekPanel() {
@@ -5486,6 +5610,133 @@ ${sig}`
     }
     _initAuthDigits();
 
+    // ── Update Password ──────────────────────────────────────────────────────
+    let _upwdTimer = null, upwdExpired = false;
+
+    function openUpwdModal() {
+      upwdShowMethod();
+      el('upwdOverlay').classList.add('open');
+    }
+    function closeUpwdModal() {
+      el('upwdOverlay').classList.remove('open');
+      if (_upwdTimer) { clearInterval(_upwdTimer); _upwdTimer = null; }
+    }
+    function upwdShowMethod() {
+      el('upwdViewMethod').style.display = '';
+      el('upwdViewEmail').style.display = 'none';
+      el('upwdViewOTP').style.display = 'none';
+      el('upwdViewAuth').style.display = 'none';
+      if (_upwdTimer) { clearInterval(_upwdTimer); _upwdTimer = null; }
+    }
+    function upwdShowEmail() {
+      el('upwdViewMethod').style.display = 'none';
+      el('upwdViewEmail').style.display = '';
+      el('upwdViewOTP').style.display = 'none';
+      el('upwdViewAuth').style.display = 'none';
+      el('upwdEmailInput').value = '';
+      el('upwdEmailErr').classList.remove('show');
+      setTimeout(() => el('upwdEmailInput').focus(), 50);
+    }
+    function upwdSendEmail() {
+      const email = el('upwdEmailInput').value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        el('upwdEmailErr').classList.add('show'); return;
+      }
+      el('upwdEmailErr').classList.remove('show');
+      const btn = el('upwdSendBtn');
+      btn.disabled = true; btn.textContent = 'Sending…'; btn.style.opacity = '.7';
+      setTimeout(() => {
+        btn.disabled = false; btn.textContent = 'Send Code'; btn.style.opacity = '';
+        el('upwdEmailDisplay').textContent = email;
+        el('upwdViewEmail').style.display = 'none';
+        el('upwdViewOTP').style.display = '';
+        el('upwdOtpInput').value = '';
+        el('upwdOtpInput').disabled = false;
+        el('upwdVerifyBtn').disabled = true;
+        el('upwdExpiredMsg').style.display = 'none';
+        el('upwdTimerWrap').style.display = '';
+        upwdExpired = false;
+        _upwdStartTimer(60);
+      }, 800);
+    }
+    function _upwdStartTimer(secs) {
+      if (_upwdTimer) clearInterval(_upwdTimer);
+      let rem = secs;
+      const fmt = s => Math.floor(s/60)+':'+(String(s%60).padStart(2,'0'));
+      el('upwdTimerDisplay').textContent = fmt(rem);
+      _upwdTimer = setInterval(() => {
+        rem--;
+        if (rem <= 0) {
+          clearInterval(_upwdTimer); _upwdTimer = null;
+          upwdExpired = true;
+          el('upwdTimerWrap').style.display = 'none';
+          el('upwdExpiredMsg').style.display = '';
+          el('upwdVerifyBtn').disabled = true;
+          el('upwdOtpInput').disabled = true;
+        } else {
+          el('upwdTimerDisplay').textContent = fmt(rem);
+        }
+      }, 1000);
+    }
+    function upwdResend() {
+      upwdExpired = false;
+      el('upwdOtpInput').disabled = false;
+      el('upwdOtpInput').value = '';
+      el('upwdVerifyBtn').disabled = true;
+      el('upwdExpiredMsg').style.display = 'none';
+      el('upwdTimerWrap').style.display = '';
+      _upwdStartTimer(60);
+    }
+    function upwdVerify() {
+      closeUpwdModal();
+      showToast('Password updated', 'success', 'Supabase integration coming soon.');
+    }
+    function upwdShowAuth() {
+      el('upwdViewMethod').style.display = 'none';
+      el('upwdViewEmail').style.display = 'none';
+      el('upwdViewOTP').style.display = 'none';
+      el('upwdViewAuth').style.display = '';
+      const digits = ['upwdD0','upwdD1','upwdD2','upwdD3','upwdD4','upwdD5'].map(id => el(id));
+      digits.forEach(d => { d.value = ''; d.disabled = false; });
+      el('upwdAuthVerifyBtn').disabled = true;
+      setTimeout(() => digits[0].focus(), 50);
+    }
+    function upwdAuthVerify() {
+      closeUpwdModal();
+      showToast('Password updated', 'success', 'Supabase integration coming soon.');
+    }
+    // Wire up upwd auth digits (paste + keyboard)
+    (function _initUpwdDigits() {
+      const ids = ['upwdD0','upwdD1','upwdD2','upwdD3','upwdD4','upwdD5'];
+      const digits = ids.map(id => el(id));
+      const update = () => { el('upwdAuthVerifyBtn').disabled = !digits.every(d => /^\d$/.test(d.value)); };
+      digits.forEach((inp, i) => {
+        inp.addEventListener('input', () => {
+          inp.value = inp.value.replace(/\D/g,'').slice(-1);
+          if (inp.value && i < 5) digits[i+1].focus();
+          update();
+        });
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Backspace') {
+            if (!inp.value && i > 0) { digits[i-1].focus(); digits[i-1].value = ''; e.preventDefault(); }
+            else if (inp.value) { inp.value = ''; e.preventDefault(); }
+            update();
+          } else if (e.key === 'ArrowLeft' && i > 0) digits[i-1].focus();
+          else if (e.key === 'ArrowRight' && i < 5) digits[i+1].focus();
+        });
+        inp.addEventListener('paste', e => {
+          e.preventDefault();
+          const txt = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+          digits.forEach((d, j) => { d.value = txt[j] || ''; });
+          digits[Math.min(txt.length - 1, 5)].focus();
+          update();
+        });
+        inp.addEventListener('click', () => inp.select());
+      });
+    })();
+
+    el('upwdOverlay')?.addEventListener('click', ev => { if (ev.target === el('upwdOverlay')) closeUpwdModal(); });
+
     // ── Danger Zone ─────────────────────────────────────────────────────────
     function openLogoutModal() {
       el('logoutOverlay').classList.add('open');
@@ -5493,9 +5744,7 @@ ${sig}`
     function confirmLogout() {
       el('logoutOverlay').classList.remove('open');
       if (ticker) { clearInterval(ticker); ticker = null; }
-      // Show leaving modal then redirect
-      el('signingOutTitle').textContent = 'Sorry to let you go.';
-      el('signingOutDesc').textContent = 'Signing you out securely…';
+      el('signingOutTitle').textContent = 'Logging Out';
       el('signingOutOverlay').classList.add('open');
       setTimeout(() => {
         localStorage.removeItem('wh_auth');
@@ -5504,11 +5753,11 @@ ${sig}`
     }
 
     function openDeleteModal() {
-      // Reset to feedback view
       el('delViewFeedback').style.display = '';
       el('delViewPassword').style.display = 'none';
       el('delChips')?.querySelectorAll('.del-chip').forEach(c => c.classList.remove('selected'));
-      const txt = el('delFeedbackText'); if (txt) txt.value = '';
+      const txt = el('delFeedbackText');
+      if (txt) { txt.value = ''; txt.style.height = ''; }
       el('deleteProfileOverlay').classList.add('open');
     }
     function closeDeleteModal() {
@@ -5516,6 +5765,10 @@ ${sig}`
     }
     function toggleDelChip(chip) {
       chip.classList.toggle('selected');
+    }
+    function autoExpandTa(ta) {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
     }
     function goToDeletePwd() {
       el('delViewFeedback').style.display = 'none';
@@ -5540,9 +5793,7 @@ ${sig}`
     }
     function confirmDeleteProfile() {
       closeDeleteModal();
-      // Show leaving/deleting modal
-      el('signingOutTitle').textContent = 'Sorry to let you go.';
-      el('signingOutDesc').textContent = 'Deleting you from the database.';
+      el('signingOutTitle').textContent = 'Deleting Account';
       el('signingOutOverlay').classList.add('open');
       setTimeout(() => {
         localStorage.clear();
@@ -5843,6 +6094,16 @@ ${sig}`
             <input type="checkbox" id="obIncludeSat" onchange="obToggleIncludeSaturday(this.checked)">
             <span class="toggle-track"></span>
           </label>
+        </div>
+        <!-- Leave Early -->
+        <div class="form-field">
+          <div class="ob-section-label">Leave Early <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
+          <div class="ob-day-picker" id="obEarlyPicker"></div>
+        </div>
+        <!-- Stay Late -->
+        <div class="form-field">
+          <div class="ob-section-label">Stay Late <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-fg);font-size:11px">(Optional)</span></div>
+          <div class="ob-day-picker" id="obLatePicker"></div>
         </div>
       </div>
 
