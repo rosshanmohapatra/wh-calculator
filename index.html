@@ -2261,7 +2261,7 @@
     }
 
     // Test release — wipe all previous data on version change
-    const APP_VERSION = '0.9.0';
+    const APP_VERSION = '0.9.1';
     if (localStorage.getItem('wh_ver') !== APP_VERSION) {
       Object.keys(localStorage).filter(k => k.startsWith('wh_') && k !== 'wh_theme' && k !== 'wh_auth').forEach(k => localStorage.removeItem(k));
       localStorage.setItem('wh_ver', APP_VERSION);
