@@ -270,7 +270,7 @@
     .shift-cta { display: flex; flex-direction: column; gap: 10px; }
     .shift-combo { display: flex; align-items: center; background: var(--card);
       border: 1.5px solid var(--border); border-radius: 12px; height: 52px;
-      padding: 0 6px; gap: 8px; transition: border-color .15s; }
+      padding: 0 6px; gap: 8px; transition: border-color .15s; position: relative; }
     .shift-combo:focus-within { border-color: var(--muted-fg); }
     .shift-combo-input.err { color: var(--destructive); }
     .shift-combo-clock { color: var(--muted-fg); flex-shrink: 0; }
@@ -290,6 +290,31 @@
     .shift-combo-btn.resume-shift { background: var(--foreground); color: var(--background); border: none; }
     .shift-combo-btn.resume-shift:hover { opacity: .85; }
     .shift-combo-btn:disabled { opacity: .4; cursor: default; }
+    /* Split button (Pause / Resume + chevron + End Session dropdown) */
+    .split-btn-wrap { display: flex; align-items: stretch; }
+    .split-btn-wrap .shift-combo-btn { border-radius: 8px 0 0 8px; flex: 1; }
+    .split-chevron-btn { height: 38px; width: 34px; flex-shrink: 0; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; border-radius: 0 8px 8px 0;
+      transition: opacity .12s; }
+    .split-chevron-btn:hover { opacity: .85; }
+    .split-chevron-btn.pause-shift-chev { background: var(--muted); color: var(--foreground);
+      border: 1.5px solid var(--border); border-left: none; }
+    .split-chevron-btn.resume-shift-chev { background: var(--foreground); color: var(--background);
+      border-left: 1px solid rgba(255,255,255,.15); }
+    .split-dropdown { position: absolute; right: 0; top: calc(100% + 6px);
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.06);
+      overflow: hidden; z-index: 200; min-width: 150px; }
+    .split-dropdown-item { display: flex; align-items: center; gap: 8px;
+      width: 100%; padding: 10px 14px; border: none; background: none; text-align: left;
+      font-size: 13px; font-weight: 500; color: var(--destructive); cursor: pointer;
+      font-family: var(--font); transition: background .1s; }
+    .split-dropdown-item:hover { background: var(--destructive-bg); }
+    /* Custom target chip in Log Out box */
+    .custom-target-chip { font-size: 10px; font-weight: 600; letter-spacing: .04em;
+      background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border);
+      border-radius: 4px; padding: 1px 5px; text-transform: uppercase; line-height: 1.4;
+      flex-shrink: 0; }
     .shift-combo-active-label { flex: 1; font-size: 13px; font-weight: 500;
       color: var(--muted-fg); display: none; }
     .shift-combo.active-state .shift-combo-input { display: none; }
@@ -320,13 +345,13 @@
     .rc-body .rc-numbers { margin-bottom: -4px; }
     .rc-numbers { display: flex; align-items: baseline; gap: 12px; }
     .rc-left-col { display: flex; flex-direction: column; gap: 2px; }
-    .rc-right-col { display: flex; flex-direction: column; gap: 2px; margin-left: auto; text-align: right; }
+    .rc-elapsed-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: 2px; }
+    .rc-rem-sep { font-size: 11px; color: var(--muted-fg); opacity: 0.45; font-weight: 700; line-height: 1; }
+    .rc-rem-inline { font-size: 11px; font-weight: 600; letter-spacing: .04em; line-height: 1; }
+    .rc-rem-text { font-size: 11px; font-weight: 600; color: var(--muted-fg); letter-spacing: .06em; text-transform: uppercase; line-height: 1; }
     .rc-worked { font-size: 36px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
     .rc-elapsed-label { font-size: 11px; font-weight: 600; letter-spacing: .08em;
       text-transform: uppercase; color: var(--success); margin-top: 2px; }
-    .rc-remaining { font-size: 36px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
-    .rc-rem-label { font-size: 11px; font-weight: 600; letter-spacing: .08em;
-      text-transform: uppercase; color: var(--muted-fg); margin-top: 2px; }
     .progress-wrap { display: flex; flex-direction: column; gap: 6px; }
     .progress-track { height: 4px; background: var(--muted); border-radius: 99px; overflow: hidden; }
     .progress-fill { height: 100%; background: var(--foreground); border-radius: 99px;
@@ -800,7 +825,7 @@
       .day-date { font-size: 14px; }
       .login-row { flex-wrap: wrap; }
       #loginInput { min-width: 0; }
-      .rc-worked, .rc-remaining { font-size: 30px; }
+      .rc-worked { font-size: 30px; }
       .target-day-picker { flex-wrap: wrap; }
     }
 
@@ -970,7 +995,7 @@
     .day-selector.wk-back { animation: ds-slide-back .22s ease both; }
 
     /* ── Animated number ticker ── */
-    .rc-worked, .rc-remaining { will-change: contents; }
+    .rc-worked, .rc-rem-inline { will-change: contents; }
 
     /* ── Saturday pill entrance animation ── */
     @keyframes plan-btn-in { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: scale(1); } }
@@ -1159,11 +1184,12 @@
           <div class="rc-numbers">
             <div class="rc-left-col">
               <div class="rc-worked" id="rcWorked" style="color:var(--muted-fg)">—</div>
-              <div class="rc-elapsed-label" id="rcElapsedLabel">Not Started</div>
-            </div>
-            <div class="rc-right-col" id="rcRightCol" style="display:block">
-              <div class="rc-remaining" id="rcRemaining" style="color:var(--muted-fg)">10h 00m</div>
-              <div class="rc-rem-label">remaining</div>
+              <div class="rc-elapsed-row">
+                <div class="rc-elapsed-label" id="rcElapsedLabel">Not Started</div>
+                <span class="rc-rem-sep" id="rcRemSep" style="display:none">·</span>
+                <span class="rc-rem-inline" id="rcRemaining" style="color:var(--muted-fg);display:none">10h 00m</span>
+                <span class="rc-rem-text" id="rcRemText" style="display:none">remaining</span>
+              </div>
             </div>
           </div>
           <div class="progress-wrap">
@@ -1208,7 +1234,18 @@
           </button>
           <input class="shift-combo-input" id="loginInput" type="text" placeholder="Enter Time" autocomplete="off" spellcheck="false">
           <span class="shift-combo-active-label" id="shiftActiveLabel">—</span>
-          <button class="shift-combo-btn" id="calcBtn">Quick Start</button>
+          <div class="split-btn-wrap" id="calcBtnWrap">
+            <button class="shift-combo-btn" id="calcBtn">Quick Start</button>
+            <button class="split-chevron-btn" id="calcBtnChevron" style="display:none" title="More options">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="split-dropdown" id="calcBtnDropdown" style="display:none">
+            <button class="split-dropdown-item" id="endSessionBtn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              End Session
+            </button>
+          </div>
         </div>
         <!-- Resume row (after End Session or auto-stop) -->
         <div class="shift-resume-row" id="resumeRow" style="display:none">
@@ -1921,7 +1958,7 @@
       <div class="tp-fade-bot"></div>
     </div>
     <div class="tp-footer">
-      <button class="tp-cancel-btn" onclick="closeTpModal()">Cancel</button>
+      <button class="tp-cancel-btn" id="tpCancelBtn" onclick="cancelOrClearTpModal()">Cancel</button>
       <button class="tp-set-btn" onclick="confirmTpModal()">Set</button>
     </div>
   </div>
@@ -2403,6 +2440,12 @@
       _notifTimers = [];
     }
 
+    // Toggle visibility of the inline remaining time display (next to elapsed label)
+    function showRem(show) {
+      const d = show ? '' : 'none';
+      ['rcRemSep','rcRemaining','rcRemText'].forEach(id => { const e = el(id); if (e) e.style.display = d; });
+    }
+
     async function onNotifToggleChange() {
       autoSaveSettings();
       const sub = el('notifSubGroup');
@@ -2418,7 +2461,12 @@
           sub.style.opacity   = '0';
         }
       }
-      if (isOn) await requestPushPermission();
+      if (isOn) {
+        const granted = await requestPushPermission();
+        if (granted && loginDate) scheduleNotifications(loginDate.toISOString());
+      } else {
+        cancelScheduledNotifications();
+      }
     }
 
     // ── CHECKOUT ───────────────────────────────────────
@@ -2508,10 +2556,7 @@
       // Reset state — clearLogin() is called inside closeCheckoutModal
       _sessionAccSecs = 0; _sessionCheckoutTime = null;
       loginDate = null; autoStopped = false;
-      el('calcBtn').textContent = 'Quick Start';
-      el('calcBtn').classList.remove('end-shift', 'pause-shift', 'resume-shift');
-      el('calcBtn').dataset.state = 'start';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('start');
       el('shiftInputRow').classList.remove('active-state', 'hidden');
     }
 
@@ -2535,11 +2580,7 @@
       });
       Store.clearSession();
       loginDate = null; autoStopped = false;
-      el('calcBtn').textContent = 'Resume';
-      el('calcBtn').classList.remove('end-shift', 'pause-shift');
-      el('calcBtn').classList.add('resume-shift');
-      el('calcBtn').dataset.state = 'ended';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('ended');
       el('shiftInputRow').classList.remove('active-state', 'hidden');
       el('shiftActiveLabel').textContent = '—';
       el('autostopBanner').classList.remove('show');
@@ -2692,7 +2733,7 @@
       const inVal  = loginDate ? short(loginDate) : '—';
       // Log Out: show personal target if set, otherwise projected leave
       const outVal   = earlyTarget ? earlyTarget : (leaveDate ? short(leaveDate) : '—');
-      const outLabel = earlyTarget ? 'Target Out' : 'Log Out';
+      const outLabel = 'Log Out';
 
       // Early leave target status
       let eltStatusHtml = '';
@@ -2724,10 +2765,11 @@
           </div>
           <input type="hidden" id="inTimeEditInput" value="${inVal}">
         </div>
-        <div class="rc-io-box editable" id="outTimeBox" onclick="openTpModal('outTargetEditInput',event,'${outLabel}',()=>saveOutTargetEdit())">
-          <div class="rc-io-label">${outLabel}</div>
+        <div class="rc-io-box editable" id="outTimeBox" onclick="openTpModal('outTargetEditInput',event,'Log Out',()=>saveOutTargetEdit(),${earlyTarget ? '()=>clearOutTarget()' : 'null'})">
+          <div class="rc-io-label">Log Out</div>
           <div class="rc-io-val-row">
-            <div class="rc-io-val" id="metaTarget" style="${earlyTarget ? 'color:var(--blue)' : ''}">${outVal}</div>
+            <div class="rc-io-val" id="metaTarget">${outVal}</div>
+            ${earlyTarget ? `<span class="custom-target-chip">Custom</span>` : ''}
             ${earlyTarget ? `<button class="rc-io-edit-btn" title="Clear target" onclick="event.stopPropagation();clearOutTarget()" style="color:var(--muted-fg)">✕</button>` : ''}
           </div>
           <input type="hidden" id="outTargetEditInput" value="${earlyTarget||''}">
@@ -2760,7 +2802,7 @@
     }
 
     // ── WHEEL TIME PICKER ────────────────────────────────
-    let _tpTargetId = null, _tpCallback = null;
+    let _tpTargetId = null, _tpCallback = null, _tpClearFn = null;
     let _tpHIdx = 11, _tpMIdx = 0, _tpApIdx = 0;
     const TP_HOURS = ['01','02','03','04','05','06','07','08','09','10','11','12'];
     const TP_MINS  = Array.from({length:60}, (_, i) => String(i).padStart(2, '0'));
@@ -2852,10 +2894,13 @@
       });
     }
 
-    function openTpModal(targetInputId, event, title, onConfirm) {
+    function openTpModal(targetInputId, event, title, onConfirm, onClear) {
       if (event) { event.stopPropagation(); event.preventDefault(); }
       _tpTargetId = targetInputId;
       _tpCallback = onConfirm || null;
+      _tpClearFn  = onClear  || null;
+      const cancelBtn = el('tpCancelBtn');
+      if (cancelBtn) cancelBtn.textContent = onClear ? 'Clear' : 'Cancel';
       const modal = el('tpModal');
       if (!modal) return;
 
@@ -2910,7 +2955,14 @@
     function closeTpModal() {
       el('tpModal')?.classList.remove('open');
       document.removeEventListener('mousedown', _tpOutsideClick);
-      _tpTargetId = null; _tpCallback = null;
+      _tpTargetId = null; _tpCallback = null; _tpClearFn = null;
+      const cancelBtn = el('tpCancelBtn');
+      if (cancelBtn) cancelBtn.textContent = 'Cancel';
+    }
+
+    function cancelOrClearTpModal() {
+      if (_tpClearFn) { const fn = _tpClearFn; closeTpModal(); fn(); }
+      else closeTpModal();
     }
 
     function confirmTpModal() {
@@ -3107,9 +3159,9 @@
       el('rcElapsedLabel').textContent = 'Not Started';
       el('rcElapsedLabel').style.color = 'var(--muted-fg)';
       _setTodayDateChip();
-      el('rcRightCol').style.display = 'block';
       el('rcRemaining').textContent = dur(eff);
       el('rcRemaining').style.color = 'var(--muted-fg)';
+      showRem(eff > 0);
       el('progFill').style.width = '0%';
       el('progFill').classList.remove('done');
       el('progLabel').textContent = '';
@@ -3138,11 +3190,7 @@
         lastUpdated:  now.toISOString(),
         sessionTag:   'autostopped'
       });
-      el('calcBtn').textContent = 'Resume';
-      el('calcBtn').classList.remove('end-shift', 'pause-shift');
-      el('calcBtn').classList.add('resume-shift');
-      el('calcBtn').dataset.state = 'ended';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('ended');
       el('shiftInputRow').classList.remove('active-state');
       el('autostopBanner').classList.add('show');
       el('autostopMsg').textContent = `Auto-stopped at ${short(now)} — target + buffer reached.`;
@@ -3237,16 +3285,16 @@
         const rem = eff - worked;
         const remText = rem < 60 ? `${Math.max(0, rem)}s` : dur(rem);
         animateDuration('rcRemaining', remText);
-        el('rcRightCol').style.display = 'block';
+        showRem(true);
         el('otBanner').classList.remove('show');
       } else if (isDone) {
-        el('rcRightCol').style.display = 'none';
+        showRem(false);
         const otMins = Math.floor((worked - eff) / 60);
         el('otMsg').textContent = `+${dur(worked - eff)} overtime`;
         el('otQuip').textContent = OT_QUIPS[Math.floor(otMins / 15) % OT_QUIPS.length];
         el('otBanner').classList.add('show');
       } else {
-        el('rcRightCol').style.display = 'none';
+        showRem(false);
         el('otBanner').classList.remove('show');
       }
 
@@ -3276,19 +3324,7 @@
         el('doneBanner').classList.remove('show');
       }
 
-      if (isDone) {
-        if (el('calcBtn').dataset.state !== 'ending') {
-          el('calcBtn').textContent = 'End Shift';
-          el('calcBtn').classList.remove('pause-shift');
-          el('calcBtn').classList.add('end-shift');
-          el('calcBtn').dataset.state = 'ending';
-        }
-      } else if (el('calcBtn').dataset.state === 'ending') {
-        el('calcBtn').textContent = 'Pause';
-        el('calcBtn').classList.remove('end-shift');
-        el('calcBtn').classList.add('pause-shift');
-        el('calcBtn').dataset.state = 'running';
-      }
+      // Split button stays in its current running/ended state — End Session is in the dropdown
       if (isDone && !wasDone) wasDone = true;
       else if (!isDone) wasDone = false;
 
@@ -3573,7 +3609,7 @@
       function _clearCardState() {
         el('rcElapsedLabel').textContent = '';
         el('rcElapsedLabel').style.color = '';
-        el('rcRightCol').style.display = 'none';
+        showRem(false);
         el('progFill').style.width = '0%';
         el('progFill').classList.remove('done');
         el('stayHint').style.display = 'none';
@@ -3608,8 +3644,8 @@
       if (!log || log.hoursWorked == null) {
         el('rcWorked').textContent = '—'; el('rcWorked').style.color = 'var(--muted-fg)';
         _setTodayDateChip();
-        el('rcRightCol').style.display = isFutureDay ? 'block' : 'none';
         el('rcRemaining').textContent = dur(target); el('rcRemaining').style.color = 'var(--muted-fg)';
+        showRem(isFutureDay);
         el('progFill').style.width = '0%'; el('progFill').classList.remove('done');
         el('progLabel').textContent = isFutureDay ? '' : 'No data logged for this day';
         el('rcToday').innerHTML = targetRow + `<div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">—</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">—</div></div></div>`;
@@ -3622,16 +3658,16 @@
       el('rcWorked').textContent = dur(worked); el('rcWorked').style.color = '';
       el('rcRemaining').style.color = '';
       if (isDone) {
-        el('rcRightCol').style.display = 'none';
+        showRem(false);
         const ot = worked - target;
         if (ot > 120) { el('otMsg').textContent = `+${dur(ot)} overtime`; el('otQuip').textContent = ''; el('otBanner').classList.add('show'); }
         else { el('otBanner').classList.remove('show'); }
         el('doneMsg').textContent = `${dur(worked)} logged`;
         el('doneBanner').classList.add('show');
       } else {
-        el('rcRightCol').style.display = 'block';
         el('rcRemaining').textContent = dur(target - worked);
         el('rcRemaining').style.color = 'var(--warning)';
+        showRem(true);
         el('otBanner').classList.remove('show'); el('doneBanner').classList.remove('show');
       }
       const pct = Math.min((worked / target) * 100, 100);
@@ -3864,6 +3900,29 @@
       renderEmptyState();
     }
 
+    // ── SPLIT BUTTON STATE ────────────────────────────
+    function setCalcBtnState(state) {
+      const btn = el('calcBtn'), chev = el('calcBtnChevron'), dd = el('calcBtnDropdown');
+      if (!btn) return;
+      btn.classList.remove('end-shift', 'pause-shift', 'resume-shift');
+      btn.disabled = false;
+      btn.dataset.state = state;
+      if (dd) dd.style.display = 'none'; // always close dropdown on state change
+      if (state === 'running') {
+        btn.textContent = 'Pause'; btn.classList.add('pause-shift');
+        btn.style.borderRadius = ''; // CSS split rule applies
+        if (chev) { chev.style.display = ''; chev.className = 'split-chevron-btn pause-shift-chev'; }
+      } else if (state === 'ended') {
+        btn.textContent = 'Resume'; btn.classList.add('resume-shift');
+        btn.style.borderRadius = ''; // CSS split rule applies
+        if (chev) { chev.style.display = ''; chev.className = 'split-chevron-btn resume-shift-chev'; }
+      } else { // 'start'
+        btn.textContent = 'Quick Start';
+        btn.style.borderRadius = '8px'; // full rounded — no chevron visible
+        if (chev) chev.style.display = 'none';
+      }
+    }
+
     function calculate() {
       const raw = el('loginInput').value.trim();
       let p;
@@ -3879,11 +3938,7 @@
       loginDate = p; wasDone = false; notifSent = false; autoStopped = false;
       if (el('metaLogin')) el('metaLogin').textContent = short(p);
       // Switch CTA to "Pause" combo active state
-      el('calcBtn').textContent = 'Pause';
-      el('calcBtn').classList.add('pause-shift');
-      el('calcBtn').classList.remove('end-shift', 'resume-shift');
-      el('calcBtn').dataset.state = 'running';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('running');
       el('shiftInputRow').classList.add('active-state');
       el('shiftActiveLabel').textContent = `Started at ${short(p)}`;
       el('autostopBanner').classList.remove('show');
@@ -3905,10 +3960,7 @@
       el('loginInput').classList.remove('err');
       el('errMsg').classList.remove('show');
       // Restore CTA to Quick Start
-      el('calcBtn').textContent = 'Quick Start';
-      el('calcBtn').classList.remove('end-shift', 'pause-shift', 'resume-shift');
-      el('calcBtn').dataset.state = 'start';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('start');
       el('shiftInputRow').classList.remove('active-state', 'hidden');
       el('autostopBanner').classList.remove('show');
       selectedDayKey = todayKey();
@@ -4096,7 +4148,15 @@
       renderDaySelector(); // refresh strip in case work-days changed
       updateWeeklyCalc();
       el('settingsLastSaved').textContent = `Last updated just now`;
-      if (notifOn && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+      if (notifOn && 'Notification' in window) {
+        if (Notification.permission === 'default') {
+          Notification.requestPermission().then(p => {
+            if (p === 'granted' && loginDate) scheduleNotifications(loginDate.toISOString());
+          });
+        } else if (Notification.permission === 'granted' && loginDate) {
+          scheduleNotifications(loginDate.toISOString());
+        }
+      }
       if (loginDate) render(); else renderEmptyState();
     }
 
@@ -4902,22 +4962,14 @@ ${sig}`
         const d=new Date(s.loginISO);
         if (isNaN(d.getTime())||d>new Date()) { Store.clearSession(); return; }
         loginDate=d;
-        el('calcBtn').textContent='Pause';
-        el('calcBtn').classList.add('pause-shift');
-        el('calcBtn').classList.remove('end-shift','resume-shift');
-        el('calcBtn').dataset.state='running';
-        el('calcBtn').disabled=false;
+        setCalcBtnState('running');
         el('shiftInputRow').classList.add('active-state');
         el('shiftActiveLabel').textContent=`Started at ${short(loginDate)}`;
         el('autostopBanner').classList.remove('show');
         if (ticker) clearInterval(ticker);
         ticker=setInterval(render,1000);
       } else if (_sessionAccSecs>0) {
-        el('calcBtn').textContent='Resume';
-        el('calcBtn').classList.remove('end-shift','pause-shift');
-        el('calcBtn').classList.add('resume-shift');
-        el('calcBtn').dataset.state='ended';
-        el('calcBtn').disabled=false;
+        setCalcBtnState('ended');
       }
     }
 
@@ -5075,11 +5127,7 @@ ${sig}`
         } else {
           // No active session — start one from the given time
           loginDate = s; wasDone = false; notifSent = false; autoStopped = false;
-          el('calcBtn').textContent = 'Pause';
-          el('calcBtn').classList.add('pause-shift');
-          el('calcBtn').classList.remove('end-shift', 'resume-shift');
-          el('calcBtn').dataset.state = 'running';
-          el('calcBtn').disabled = false;
+          setCalcBtnState('running');
           el('shiftInputRow').classList.add('active-state');
           el('shiftActiveLabel').textContent = `Started at ${short(s)}`;
           persistSession();
@@ -5269,16 +5317,13 @@ ${sig}`
         _sessionAccSecs = Math.round(prevLog.hoursWorked * 3600);
       }
       loginDate = now; wasDone = false; notifSent = false; autoStopped = false;
-      el('calcBtn').textContent = 'Pause';
-      el('calcBtn').classList.add('pause-shift');
-      el('calcBtn').classList.remove('end-shift', 'resume-shift');
-      el('calcBtn').dataset.state = 'running';
-      el('calcBtn').disabled = false;
+      setCalcBtnState('running');
       el('shiftInputRow').classList.add('active-state');
       el('shiftActiveLabel').textContent = `Resumed · ${dur(_sessionAccSecs)} prior`;
       el('autostopBanner').classList.remove('show');
       saveDayLog(tk, { ...prevLog, sessionTag: 'realtime', autostopped: false });
       persistSession();
+      scheduleNotifications(loginDate.toISOString()); // reschedule on resume
       selectDay(tk); render();
       if (ticker) clearInterval(ticker);
       ticker = setInterval(render, 1000);
@@ -5337,10 +5382,42 @@ ${sig}`
     // Shift presets handled by renderShiftPresets() / applyShiftPreset()
     el('calcBtn').addEventListener('click', () => {
       const state = el('calcBtn').dataset.state || 'start';
-      if (state === 'ending') checkout();
-      else if (state === 'running') endSession();
+      if (state === 'running') endSession();
       else if (state === 'ended') resumeShift();
       else calculate();
+    });
+
+    // Split button: chevron opens/closes the End Session dropdown
+    el('calcBtnChevron').addEventListener('click', e => {
+      e.stopPropagation();
+      const dd = el('calcBtnDropdown');
+      if (!dd) return;
+      const isOpen = dd.style.display !== 'none';
+      dd.style.display = isOpen ? 'none' : '';
+      if (!isOpen) {
+        // Position dropdown above/below the split btn
+        const wrapRect = el('calcBtnWrap').getBoundingClientRect();
+        const ddH = dd.offsetHeight || 52;
+        const spaceBelow = window.innerHeight - wrapRect.bottom;
+        if (spaceBelow < ddH + 12) {
+          dd.style.top = 'auto'; dd.style.bottom = 'calc(100% + 6px)';
+        } else {
+          dd.style.top = 'calc(100% + 6px)'; dd.style.bottom = 'auto';
+        }
+      }
+    });
+
+    // Close dropdown on outside click
+    document.addEventListener('click', () => {
+      const dd = el('calcBtnDropdown');
+      if (dd) dd.style.display = 'none';
+    });
+
+    // End Session button in dropdown
+    el('endSessionBtn').addEventListener('click', e => {
+      e.stopPropagation();
+      const dd = el('calcBtnDropdown'); if (dd) dd.style.display = 'none';
+      checkout();
     });
     el('coDone').addEventListener('click', closeCheckoutModal);
     el('checkoutOverlay').addEventListener('click', e => { if (e.target === el('checkoutOverlay')) closeCheckoutModal(); });
@@ -6119,10 +6196,7 @@ ${sig}`
         const d = new Date(); d.setHours(pts[0] || 0, pts[1] || 0, pts[2] || 0, 0);
         if (d <= new Date()) {
           loginDate = d;
-          el('calcBtn').textContent = 'Pause';
-          el('calcBtn').classList.add('pause-shift');
-          el('calcBtn').classList.remove('end-shift', 'resume-shift');
-          el('calcBtn').dataset.state = 'running';
+          setCalcBtnState('running');
           el('shiftInputRow').classList.add('active-state');
           el('shiftActiveLabel').textContent = `Started at ${short(d)}`;
           render();
@@ -6134,11 +6208,7 @@ ${sig}`
         const pts = tl.loginTime.split(':').map(Number);
         const d = new Date(); d.setHours(pts[0] || 0, pts[1] || 0, pts[2] || 0, 0);
         loginDate = d;
-        el('calcBtn').textContent = 'Resume';
-        el('calcBtn').classList.remove('end-shift', 'pause-shift');
-        el('calcBtn').classList.add('resume-shift');
-        el('calcBtn').dataset.state = 'ended';
-        el('calcBtn').disabled = false;
+        setCalcBtnState('ended');
         el('autostopBanner').classList.add('show');
         el('autostopMsg').textContent = `Auto-stopped at ${tl.checkoutDisplay || '—'} — target + buffer reached.`;
         renderEmptyState(); // show card in read mode
