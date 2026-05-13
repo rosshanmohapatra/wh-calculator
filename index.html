@@ -3169,7 +3169,7 @@
     }
 
     // ── TOAST ─────────────────────────────────────────
-    let _toastTimer = null;
+    let _toastTimer = null, _toastUndoFn = null;
     const _toastIcons = {
       success: '<polyline points="20 6 9 17 4 12"/>',
       error:   '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
@@ -4755,9 +4755,8 @@ ${sig}`
       checkout();
     }
 
-    // ── TOAST SYSTEM ──────────────────────────────────
-    let _toastTimer = null, _toastUndoFn = null;
-    function showToast(msg, undoFn, durationMs = 4000) {
+    // ── UNDO TOAST SYSTEM ─────────────────────────────
+    function showUndoToast(msg, undoFn, durationMs = 4000) {
       const toast = el('appToast');
       const msgEl = el('appToastMsg');
       const undoBtn = el('appToastUndo');
@@ -4787,7 +4786,7 @@ ${sig}`
       closeDayEditModal();
       renderDaySelector();
       if (key === todayKey()) renderEmptyState();
-      showToast('Entry deleted.', () => {
+      showUndoToast('Entry deleted.', () => {
         if (_deletedEntryKey && _deletedEntryData) {
           saveDayLog(_deletedEntryKey, _deletedEntryData);
           renderDaySelector();
