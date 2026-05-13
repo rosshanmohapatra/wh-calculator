@@ -2146,7 +2146,7 @@
       <div class="dialog-head" style="position:relative">
         <div class="dialog-title" id="dayEditTitle">Edit Day</div>
         <div class="dialog-desc" id="dayEditDesc">Update times or mark a special day</div>
-        <button id="dayEditDeleteBtn" title="Delete entry" onclick="deleteDayEntry()"
+        <button id="dayEditDeleteBtn" title="Delete entry"
           style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;
             padding:6px;border-radius:8px;color:var(--muted-fg);transition:color .15s,background .15s;display:flex;align-items:center;justify-content:center"
           onmouseover="this.style.color='var(--destructive)';this.style.background='var(--destructive-bg)'" onmouseout="this.style.color='var(--muted-fg)';this.style.background='none'">
@@ -5634,6 +5634,7 @@ ${sig}`
     el('dayEditSave').addEventListener('click', saveDayEditModal);
     el('dayEditCancel').addEventListener('click', closeDayEditModal);
     el('dayEditOverlay').addEventListener('click', e => { if (e.target === el('dayEditOverlay')) closeDayEditModal(); });
+    el('dayEditDeleteBtn').addEventListener('click', deleteDayEntry);
 
     // End Session modal
     el('endSessionCancelBtn').addEventListener('click', () => el('endSessionOverlay').classList.remove('open'));
