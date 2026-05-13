@@ -6262,6 +6262,10 @@ ${sig}`
         const dayCount = Object.keys(snap.days || {}).length;
         const userName = c.name || '';
         const position = c.position || '';
+        const escHtml = s => String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        const safeFileName = escHtml(fileName || 'wh_log.json');
+        const safeUserName = escHtml(userName);
+        const safePosition = escHtml(position);
 
         // Show summary card
         const statusEl = el('obImportStatus');
@@ -6274,9 +6278,9 @@ ${sig}`
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M21.2285 6.60358C21.619 6.9941 21.619 7.62726 21.2285 8.01779L10.2557 18.9906C9.86764 19.3786 9.23938 19.3815 8.84786 18.997L2.66233 12.9219C2.2683 12.5349 2.2626 11.9017 2.64959 11.5077L3.3503 10.7943C3.73729 10.4002 4.37043 10.3945 4.76445 10.7815L9.53589 15.4678L19.1072 5.89647C19.4977 5.50595 20.1309 5.50595 20.5214 5.89647L21.2285 6.60358Z" fill="currentColor"/></svg>
                 Import Successful
               </div>
-              <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">File</span><span style="font-weight:500">${fileName || 'wh_log.json'}</span></div>
-              ${userName ? `<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">Name</span><span style="font-weight:500">${userName}</span></div>` : ''}
-              ${position ? `<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">Position</span><span style="font-weight:500">${position}</span></div>` : ''}
+              <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">File</span><span style="font-weight:500">${safeFileName}</span></div>
+              ${userName ? `<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">Name</span><span style="font-weight:500">${safeUserName}</span></div>` : ''}
+              ${position ? `<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">Position</span><span style="font-weight:500">${safePosition}</span></div>` : ''}
               <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted-fg)">Login Activities</span><span style="font-weight:500">${dayCount} day${dayCount !== 1 ? 's' : ''}</span></div>
             </div>`;
         }
