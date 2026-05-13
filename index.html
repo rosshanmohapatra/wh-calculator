@@ -1663,23 +1663,12 @@
           </div><!-- /settings-card-body -->
         </div><!-- /Other Settings Card -->
 
-        <!-- About Project -->
+        <!-- About Developer -->
         <div class="settings-card">
           <div class="settings-card-head" style="cursor:default">
-            <div class="section-label">About Project</div>
+            <div class="section-label">About Developer</div>
           </div>
           <div class="settings-card-body" style="padding-top:0;display:flex;flex-direction:column;gap:20px">
-
-            <!-- Versioning -->
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-              <div>
-                <div class="form-label">5pm - Work Hour Tracker</div>
-                <div class="form-sub">Open source. Built for people who actually want to leave on time.</div>
-              </div>
-              <span class="about-version-badge">v0.9.0</span>
-            </div>
-
-            <div style="height:1px;background:var(--border)"></div>
 
             <!-- Developer -->
             <div>
@@ -1733,7 +1722,16 @@
     </main>
   </div>
 
-  <!-- App footer removed -->
+  <!-- Version pill -->
+  <div style="position:fixed;bottom:8px;left:50%;transform:translateX(-50%);
+    display:inline-flex;align-items:center;gap:7px;
+    padding:4px 10px 4px 12px;border-radius:100px;
+    background:var(--background);border:1px solid var(--border);
+    font-family:var(--font);pointer-events:none;z-index:10">
+    <span style="font-size:11px;font-weight:600;color:var(--muted-fg);letter-spacing:.01em">5pm</span>
+    <span style="font-size:10px;font-weight:600;letter-spacing:.05em;
+      background:var(--muted);color:var(--muted-fg);padding:1px 7px;border-radius:100px">v0.9.2</span>
+  </div>
 
   <!-- ── End Session Confirmation Modal ── -->
   <div class="overlay" id="endSessionOverlay">
@@ -2259,7 +2257,7 @@
       window.location.replace('login.html');
     }
 
-    const APP_VERSION = '0.9.1';
+    const APP_VERSION = '0.9.2';
     localStorage.setItem('wh_ver', APP_VERSION);
 
     // ── HELPERS ─────────────────────────────────────────
