@@ -527,8 +527,7 @@
     .version-pill { position:fixed;bottom:8px;left:50%;transform:translateX(-50%);
       display:inline-flex;align-items:center;gap:7px;padding:4px 4px 4px 12px;
       border-radius:100px;background:var(--background);border:1px solid var(--border);
-      font-family:var(--font);z-index:10;text-decoration:none;transition:border-color .15s; }
-    .version-pill:hover { border-color:var(--muted-fg); }
+      font-family:var(--font);z-index:10;text-decoration:none; }
     .dialog-title { font-size: 15px; font-weight: 600; color: var(--foreground); }
     .dialog-desc  { font-size: 12px; color: var(--muted-fg); margin-top: 3px; }
     .dialog-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
@@ -4796,9 +4795,9 @@ ${sig}`
     }
 
     function openDayEditModal(key) {
-      _dayEditKey = key;
+      _dayEditKey = key || todayKey(); // null means today throughout the app
       const wk = week(0), allWk = week(analyticsWeekOffset);
-      const dayInfo = [...wk, ...allWk].find(d => d.key === key);
+      const dayInfo = [...wk, ...allWk].find(d => d.key === (key || todayKey()));
       const log = dayLog(key);
       const d = new Date(key + 'T12:00');
       el('dayEditTitle').textContent = 'Update Entry';
