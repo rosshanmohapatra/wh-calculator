@@ -80,42 +80,6 @@
       width: 100%;
       max-width: 380px;
     }
-    .brand-icon {
-      width: 64px; height: 64px;
-      background: #09090b;
-      border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      position: relative;
-      box-shadow: 0 4px 20px rgba(0,0,0,.22), 0 0 0 1px rgba(255,255,255,.05);
-      flex-shrink: 0;
-      transition: background .2s, box-shadow .2s;
-    }
-    .dark .brand-icon {
-      background: #ffffff;
-      box-shadow: 0 4px 20px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.06);
-    }
-    .brand-five {
-      font-family: var(--font);
-      font-size: 32px;
-      font-weight: 800;
-      color: #ffffff;
-      line-height: 1;
-      letter-spacing: -2px;
-      margin-top: 1px;
-      transition: color .2s;
-    }
-    .dark .brand-five { color: #09090b; }
-    .brand-pm {
-      position: absolute;
-      top: 10px;
-      right: 9px;
-      font-family: var(--font);
-      font-size: 8px;
-      font-weight: 700;
-      color: #a855f7;
-      line-height: 1;
-      letter-spacing: .5px;
-    }
     .brand-text {
       display: flex;
       flex-direction: column;
@@ -343,15 +307,19 @@
 
   <!-- Branding -->
   <div class="branding">
-    <div class="brand-icon">
-      <span class="brand-five">5</span>
-      <span class="brand-pm">PM</span>
-    </div>
+    <img id="loginLogo" src="brand-light.svg" alt="5pm" height="64" style="border-radius:16px;display:block">
     <div class="brand-text">
       <div class="brand-name">5pm</div>
       <div class="brand-tagline">Work Hour Tracker</div>
     </div>
   </div>
+  <script>
+    (function(){
+      var s = localStorage.getItem('wh_theme');
+      var dark = s ? s==='dark' : window.matchMedia('(prefers-color-scheme:dark)').matches;
+      if (dark) document.getElementById('loginLogo').src = 'brand-dark.svg';
+    })();
+  </script>
 
   <!-- Auth card -->
   <div class="auth-card">
