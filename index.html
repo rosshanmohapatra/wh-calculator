@@ -8,7 +8,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>5pm — Work Hour Tracker</title>
+  <title>5pm - Work Hour Tracker</title>
 
   <!-- Favicons (theme-aware; JS in applyTheme() swaps #favicon at runtime) -->
   <link id="favicon" rel="icon" type="image/svg+xml" href="favicon-light.svg">
@@ -27,14 +27,14 @@
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="https://whtracker.vercel.app/">
   <meta property="og:site_name"   content="5pm">
-  <meta property="og:title"       content="5pm — Work Hour Tracker">
+  <meta property="og:title"       content="5pm - Work Hour Tracker">
   <meta property="og:description" content="Real-time work hour tracking. Work your hours. Leave on time.">
   <meta property="og:image"       content="https://whtracker.vercel.app/social-preview.svg">
   <meta property="og:image:type"  content="image/svg+xml">
 
   <!-- Twitter / X Card -->
   <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:title"       content="5pm — Work Hour Tracker">
+  <meta name="twitter:title"       content="5pm - Work Hour Tracker">
   <meta name="twitter:description" content="Real-time work hour tracking. Work your hours. Leave on time.">
   <meta name="twitter:image"       content="https://whtracker.vercel.app/social-preview.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com/">
@@ -583,9 +583,16 @@
     .about-version-badge { font-size:11px;font-weight:600;letter-spacing:.06em;
       background:var(--muted);color:var(--muted-fg);padding:2px 8px;border-radius:6px; }
     .version-pill { position:fixed;bottom:8px;left:50%;transform:translateX(-50%);
-      display:inline-flex;align-items:center;gap:7px;padding:4px 4px 4px 12px;
+      display:inline-flex;align-items:center;gap:6px;padding:4px 4px 4px 12px;
       border-radius:100px;background:var(--background);border:1px solid var(--border);
-      font-family:var(--font);z-index:10;text-decoration:none; }
+      font-family:var(--font);z-index:10;text-decoration:none;
+      white-space:nowrap;overflow:hidden; }
+    .vp-tagline { font-size:11px;font-weight:500;color:var(--muted-fg);
+      max-width:0;overflow:hidden;opacity:0;
+      transition:max-width .35s cubic-bezier(.4,0,.2,1), opacity .25s ease; }
+    .version-pill:hover .vp-tagline { max-width:160px;opacity:1; }
+    .version-pill:hover { border-color:var(--muted-fg); }
+    @media (max-width:640px) { .version-pill { display:none !important; } }
     .dialog-title { font-size: 15px; font-weight: 600; color: var(--foreground); }
     .dialog-desc  { font-size: 12px; color: var(--muted-fg); margin-top: 3px; }
     .dialog-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
@@ -1258,7 +1265,7 @@
 
     <!-- Mobile top bar -->
     <div class="mob-topbar" id="mobTopbar">
-      <span class="mob-brand">5pm</span>
+      <img id="mobLogo" src="favicon-light.svg" alt="5pm" height="28" style="display:block">
       <div class="mob-actions">
         <button class="btn-icon" id="mobThemeBtn" title="Theme">
           <span id="mobSunIconWrap" class="theme-icon-wrap" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1ZM12 19a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1ZM24 12a1 1 0 0 1-1 1h-3a1 1 0 1 1 0-2h3a1 1 0 0 1 1 1ZM5 12a1 1 0 0 1-1 1H1a1 1 0 1 1 0-2h3a1 1 0 0 1 1 1ZM12 7a5 5 0 1 0 0 10A5 5 0 0 0 12 7ZM20.485 3.515a1 1 0 0 1 0 1.414l-2.121 2.122a1 1 0 1 1-1.415-1.415l2.122-2.121a1 1 0 0 1 1.414 0ZM7.051 16.95a1 1 0 0 1 0 1.413l-2.122 2.122a1 1 0 1 1-1.414-1.415l2.121-2.12a1 1 0 0 1 1.415 0ZM20.485 20.485a1 1 0 0 1-1.414 0l-2.122-2.121a1 1 0 1 1 1.415-1.415l2.121 2.122a1 1 0 0 1 0 1.414ZM7.051 7.05a1 1 0 0 1-1.415 0L3.515 4.93A1 1 0 0 1 4.929 3.515l2.122 2.121a1 1 0 0 1 0 1.415Z"/></svg></span>
@@ -1390,14 +1397,11 @@
               <div class="rc-worked" id="rcWorked" style="color:var(--muted-fg)">—</div>
               <div class="rc-elapsed-row">
                 <div class="rc-elapsed-label" id="rcElapsedLabel">Not Started</div>
-                <span class="rc-rem-sep" id="rcRemSep" style="display:none">·</span>
-                <span class="rc-rem-inline" id="rcRemaining" style="color:var(--muted-fg);display:none">10h 00m</span>
-                <span class="rc-rem-text" id="rcRemText" style="display:none">remaining</span>
               </div>
             </div>
             <div class="rc-right-col">
               <div class="rc-target-val" id="rcTarget" style="color:var(--muted-fg)">—</div>
-              <div class="rc-target-label">Target</div>
+              <div class="rc-target-label">Remaining</div>
             </div>
           </div>
           <div class="progress-wrap">
@@ -1917,8 +1921,9 @@
   <!-- Version pill -->
   <a href="https://github.com/rosshanmohapatra/5pm-workhour-tracker/releases" target="_blank" rel="noopener" class="version-pill">
     <span style="font-size:11px;font-weight:600;color:var(--muted-fg);letter-spacing:.01em">5pm</span>
+    <span class="vp-tagline">- Work Hour Tracker</span>
     <span style="font-size:10px;font-weight:600;letter-spacing:.05em;
-      background:var(--muted);color:var(--muted-fg);padding:4px 4px 4px 7px;border-radius:100px">v0.9.2</span>
+      background:var(--muted);color:var(--muted-fg);padding:4px 7px;border-radius:100px">(v.0.9.2)</span>
   </a>
 
   <!-- ── End Session Confirmation Modal ── -->
@@ -3478,13 +3483,10 @@
       const _tkE = todayKey(), _logE = dayLog(_tkE) || {};
       el('rcWorked').textContent = '—';
       el('rcWorked').style.color = 'var(--muted-fg)';
-      const _cE = cfg(); el('rcTarget').textContent = dur(_cE.dailyH * 3600); el('rcTarget').style.color = 'var(--muted-fg)';
+      el('rcTarget').textContent = dur(eff); el('rcTarget').style.color = 'var(--muted-fg)';
       el('rcElapsedLabel').textContent = 'Not Started';
       el('rcElapsedLabel').style.color = 'var(--muted-fg)';
       _setTodayDateChip();
-      el('rcRemaining').textContent = dur(eff);
-      el('rcRemaining').style.color = 'var(--muted-fg)';
-      showRem(eff > 0);
       el('progFill').style.width = '0%';
       el('progFill').classList.remove('done');
       el('progLabel').textContent = '';
@@ -3598,8 +3600,7 @@
       const h = Math.floor(worked / 3600), m = Math.floor((worked % 3600) / 60);
       animateDuration('rcWorked', `${h}h ${p2(m)}m`);
       el('rcWorked').style.color = '';
-      const _cT = cfg(); if (el('rcTarget')) { el('rcTarget').textContent = dur(_cT.dailyH * 3600); el('rcTarget').style.color = 'var(--muted-fg)'; }
-      el('rcRemaining').style.color = '';
+      if (el('rcTarget')) el('rcTarget').style.color = '';
       // "Leave at" badge: prefer personal Out Time target if set
       const _tkNow = todayKey(), _logNow = dayLog(_tkNow) || {};
       const _earlyTarget = _logNow.earlyLeaveTarget;
@@ -3608,17 +3609,17 @@
       if (!isDone && eff > 0) {
         const rem = eff - worked;
         const remText = rem < 60 ? `${Math.max(0, rem)}s` : dur(rem);
-        animateDuration('rcRemaining', remText);
-        showRem(true);
+        animateDuration('rcTarget', remText);
+        el('rcTarget').style.color = '';
         el('otBanner').classList.remove('show');
       } else if (isDone) {
-        showRem(false);
+        el('rcTarget').textContent = '0h 00m'; el('rcTarget').style.color = 'var(--success)';
         const otMins = Math.floor((worked - eff) / 60);
         el('otMsg').textContent = `+${dur(worked - eff)} overtime`;
         el('otQuip').textContent = OT_QUIPS[Math.floor(otMins / 15) % OT_QUIPS.length];
         el('otBanner').classList.add('show');
       } else {
-        showRem(false);
+        el('rcTarget').textContent = '—'; el('rcTarget').style.color = 'var(--muted-fg)';
         el('otBanner').classList.remove('show');
       }
 
@@ -3971,8 +3972,6 @@
         el('rcWorked').textContent = '—'; el('rcWorked').style.color = 'var(--muted-fg)';
         if (el('rcTarget')) { el('rcTarget').textContent = dur(target); el('rcTarget').style.color = 'var(--muted-fg)'; }
         _setTodayDateChip();
-        el('rcRemaining').textContent = dur(target); el('rcRemaining').style.color = 'var(--muted-fg)';
-        showRem(isFutureDay);
         el('progFill').style.width = '0%'; el('progFill').classList.remove('done');
         el('progLabel').textContent = isFutureDay ? '' : 'No data logged for this day';
         el('rcToday').innerHTML = targetRow + `<div class="rc-io-row"><div class="rc-io-box"><div class="rc-io-label">Log In</div><div class="rc-io-val" id="metaLogin">—</div></div><div class="rc-io-box"><div class="rc-io-label">Log Out</div><div class="rc-io-val" id="metaTarget">—</div></div></div>`;
@@ -3983,19 +3982,15 @@
       const worked = log.hoursWorked * 3600;
       const isDone = worked >= target;
       el('rcWorked').textContent = dur(worked); el('rcWorked').style.color = '';
-      if (el('rcTarget')) { el('rcTarget').textContent = dur(target); el('rcTarget').style.color = 'var(--muted-fg)'; }
-      el('rcRemaining').style.color = '';
       if (isDone) {
-        showRem(false);
+        if (el('rcTarget')) { el('rcTarget').textContent = '0h 00m'; el('rcTarget').style.color = 'var(--success)'; }
         const ot = worked - target;
         if (ot > 120) { el('otMsg').textContent = `+${dur(ot)} overtime`; el('otQuip').textContent = ''; el('otBanner').classList.add('show'); }
         else { el('otBanner').classList.remove('show'); }
         el('doneMsg').textContent = `${dur(worked)} logged`;
         el('doneBanner').classList.add('show');
       } else {
-        el('rcRemaining').textContent = dur(target - worked);
-        el('rcRemaining').style.color = 'var(--warning)';
-        showRem(true);
+        if (el('rcTarget')) { el('rcTarget').textContent = dur(target - worked); el('rcTarget').style.color = 'var(--warning)'; }
         el('otBanner').classList.remove('show'); el('doneBanner').classList.remove('show');
       }
       const pct = Math.min((worked / target) * 100, 100);
@@ -5758,6 +5753,11 @@ ${sig}`
       localStorage.setItem('wh_theme', d ? 'dark' : 'light');
       const fav = document.getElementById('favicon');
       if (fav) fav.href = d ? _faviconDark : _faviconLight;
+      const logoSrc = d ? _faviconDark : _faviconLight;
+      const mobLogo = document.getElementById('mobLogo');
+      if (mobLogo) mobLogo.src = logoSrc;
+      const obLogo = document.getElementById('obLogo');
+      if (obLogo) obLogo.src = logoSrc;
     }
     const _savedTheme = localStorage.getItem('wh_theme');
     applyTheme(_savedTheme ? _savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme:dark)').matches);
@@ -5980,7 +5980,7 @@ ${sig}`
     // While the tab is hidden and a session is running, show a live countdown
     // in the browser tab title so the user knows how long they have left.
     // Uses Date.now() to stay accurate even when the interval is throttled.
-    const _baseTitle = '5pm — Work Hour Tracker';
+    const _baseTitle = '5pm - Work Hour Tracker';
     let _tabTitleTimer = null;
 
     function _formatTabTitle() {
@@ -6713,6 +6713,7 @@ ${sig}`
 
       <!-- Step 1: Import Data -->
       <div class="ob-panel active" id="obPanel1">
+        <img id="obLogo" src="favicon-light.svg" alt="5pm" height="48" style="display:block;margin-bottom:8px">
         <div class="ob-title">Say hello to 5pm. <span style="color:var(--muted-fg);font-weight:400">— Leave on time, every time.</span></div>
         <div class="ob-desc">Your work hour tracker. Track your work hours effortlessly. Got a backup? Import it to restore your data.</div>
         <label class="ob-import-zone" for="obImportFile" id="obImportZone">
