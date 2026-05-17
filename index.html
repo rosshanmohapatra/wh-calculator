@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <!-- Auth gate — block render entirely if not authenticated -->
   <script>if(!localStorage.getItem('wh_auth')){document.documentElement.style.visibility='hidden';window.location.replace('login.html');}else{document.documentElement.style.visibility='';}</script>
@@ -8,8 +8,35 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>5pm - Work Hour Tracker</title>
-  <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='%2309090b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='3' width='20' height='14' rx='2'/%3E%3Cpath d='M8 21h8m-4-4v4'/%3E%3Ccircle cx='12' cy='10' r='3' fill='%2309090b' stroke='none'/%3E%3Cpath d='M9 10c0-.8.4-1.5 1-2M15 10c0-.8-.4-1.5-1-2' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E">
+  <title>5pm — Work Hour Tracker</title>
+
+  <!-- Favicons (theme-aware; JS in applyTheme() swaps #favicon at runtime) -->
+  <link id="favicon" rel="icon" type="image/svg+xml" href="favicon-light.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.svg">
+
+  <!-- PWA / home-screen -->
+  <meta name="application-name" content="5pm">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="5pm">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://whtracker.vercel.app/">
+  <meta property="og:site_name"   content="5pm">
+  <meta property="og:title"       content="5pm — Work Hour Tracker">
+  <meta property="og:description" content="Real-time work hour tracking. Work your hours. Leave on time.">
+  <meta property="og:image"       content="https://whtracker.vercel.app/social-preview.svg">
+  <meta property="og:image:type"  content="image/svg+xml">
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="5pm — Work Hour Tracker">
+  <meta name="twitter:description" content="Real-time work hour tracking. Work your hours. Leave on time.">
+  <meta name="twitter:image"       content="https://whtracker.vercel.app/social-preview.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -5718,8 +5745,8 @@ ${sig}`
     }
 
     // ── THEME ──────────────────────────────────────────
-    const _faviconLight = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%2309090b'/%3E%3Crect x='2' y='3' width='20' height='14' rx='2' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8 21h8m-4-4v4' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='10' r='3' fill='%23ffffff'/%3E%3Cpath d='M9 10c0-.8.4-1.5 1-2M15 10c0-.8-.4-1.5-1-2' stroke='%2309090b' stroke-width='1' fill='none'/%3E%3C/svg%3E";
-    const _faviconDark  = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23fafafa'/%3E%3Crect x='2' y='3' width='20' height='14' rx='2' fill='none' stroke='%2309090b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8 21h8m-4-4v4' fill='none' stroke='%2309090b' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='10' r='3' fill='%2309090b'/%3E%3Cpath d='M9 10c0-.8.4-1.5 1-2M15 10c0-.8-.4-1.5-1-2' stroke='%23fafafa' stroke-width='1' fill='none'/%3E%3C/svg%3E";
+    const _faviconLight = 'favicon-light.svg';
+    const _faviconDark  = 'favicon-dark.svg';
     function applyTheme(d) {
       dark = d;
       document.documentElement.classList.toggle('dark', d);
@@ -5947,6 +5974,41 @@ ${sig}`
       if (h > 23 || m > 59) return;
       const suffix = h >= 13 ? '' : h === 12 ? ' PM' : ' AM';
       el('loginInput').value = `${p2(h)}:${p2(m)}${suffix}`;
+    });
+
+    // ── TAB TITLE COUNTDOWN ─────────────────────────
+    // While the tab is hidden and a session is running, show a live countdown
+    // in the browser tab title so the user knows how long they have left.
+    // Uses Date.now() to stay accurate even when the interval is throttled.
+    const _baseTitle = '5pm — Work Hour Tracker';
+    let _tabTitleTimer = null;
+
+    function _formatTabTitle() {
+      if (!loginDate) return;
+      const nowMs   = Date.now();
+      const worked  = _sessionAccSecs + Math.floor((nowMs - loginDate.getTime()) / 1000);
+      const target  = effSecs();
+      const remSecs = Math.max(0, target - worked);
+      const h = Math.floor(remSecs / 3600);
+      const m = Math.floor((remSecs % 3600) / 60);
+      if (remSecs <= 0) {
+        document.title = 'Target hit · 5pm';
+        return;
+      }
+      document.title = h > 0 ? `${h}hr ${m}mins left` : `${m}mins left`;
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (loginDate) { // only show countdown when a session is active
+          _formatTabTitle();
+          _tabTitleTimer = setInterval(_formatTabTitle, 1000);
+        }
+      } else {
+        clearInterval(_tabTitleTimer);
+        _tabTitleTimer = null;
+        document.title = _baseTitle;
+      }
     });
 
     // ── ONBOARDING ──────────────────────────────────
