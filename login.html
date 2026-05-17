@@ -572,7 +572,7 @@
     function handleOAuth(provider) {
       const btn = event.currentTarget;
       btn.disabled = true; btn.style.opacity = '.5';
-      setTimeout(() => showSuccess(`Signed in with ${provider}`), 700);
+      setTimeout(() => showSuccess(`Signing in with ${provider}`), 700);
     }
 
     // ── Success ────────────────────────────────────────
@@ -581,7 +581,7 @@
       $('authFooter').style.display = 'none';
       showView('authSuccess');
       $('successTitle').textContent = isSignup ? "You're all set!" : 'Signed in!';
-      $('successSub').textContent = msg ? `${msg} — opening workspace…` : 'Taking you to your workspace…';
+      $('successSub').textContent = msg || 'Taking you to your workspace…';
       localStorage.setItem('wh_auth', '1');
       setTimeout(() => { window.location.href = 'index.html'; }, 1400);
     }
