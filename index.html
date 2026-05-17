@@ -566,20 +566,24 @@
 
     /* Daily Report modal */
     .co-daily-head { display:flex; align-items:center; justify-content:space-between;
-      padding:16px 16px 0; }
+      padding:14px 16px 0; }
     .co-stats-row { display:flex; align-items:stretch;
-      background:var(--muted); border-radius:12px; overflow:hidden; }
-    .co-stat { flex:1; padding:16px 16px; display:flex; flex-direction:column; gap:5px; }
-    .co-stat-label { font-size:10px; font-weight:600; color:var(--muted-fg);
-      text-transform:uppercase; letter-spacing:.08em; }
-    .co-stat-val { font-size:20px; font-weight:700; color:var(--foreground);
-      letter-spacing:-.4px; line-height:1.2; }
-    .co-stat-divider { width:1px; background:var(--border); margin:16px 0; flex-shrink:0; }
+      background:var(--muted); border-radius:10px; overflow:hidden; }
+    .co-stat { flex:1; min-width:0; padding:12px 14px; display:flex; flex-direction:column; gap:4px; }
+    .co-stat-label { font-size:10px; font-weight:500; color:var(--muted-fg);
+      text-transform:uppercase; letter-spacing:.07em; }
+    .co-stat-val { font-size:16px; font-weight:600; color:var(--foreground);
+      letter-spacing:-.2px; line-height:1.25; white-space:nowrap; overflow:hidden;
+      text-overflow:ellipsis; }
+    .co-val-suf { font-size:12px; font-weight:500; color:var(--muted-fg); }
+    .co-stat-divider { width:1px; background:var(--border); margin:12px 0; flex-shrink:0; }
+    .co-footer-note { padding:9px 12px; background:var(--muted); border-radius:8px;
+      font-size:12px; font-weight:500; color:var(--muted-fg); line-height:1.45; }
     .co-insight { background: var(--success-bg); border: 1px solid var(--success-border);
-      border-radius: 8px; padding: 12px 14px; }
-    .co-insight-label { font-size: 11px; font-weight: 600; color: var(--success);
-      text-transform: uppercase; letter-spacing: .07em; margin-bottom: 5px; }
-    .co-insight-text { font-size: 13px; color: var(--foreground); line-height: 1.55; }
+      border-radius: 8px; padding: 10px 12px; }
+    .co-insight-label { font-size: 10px; font-weight: 600; color: var(--success);
+      text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+    .co-insight-text { font-size: 12px; color: var(--foreground); line-height: 1.5; }
 
     /* ── Analytics ── */
     .analytics-header { display: flex; align-items: center; justify-content: space-between; }
@@ -1090,26 +1094,25 @@
       <div class="dialog-body">
         <div class="co-stats-row">
           <div class="co-stat">
-            <div class="co-stat-label">Total WH</div>
+            <div class="co-stat-label">Total Hours</div>
             <div class="co-stat-val" id="coWorked">—</div>
           </div>
           <div class="co-stat-divider"></div>
           <div class="co-stat">
-            <div class="co-stat-label">Start - End</div>
+            <div class="co-stat-label">Duration</div>
             <div class="co-stat-val" id="coTimeRange">—</div>
           </div>
         </div>
-        <div id="coShouldLeaveWrap" style="display:none;padding:10px 14px;background:var(--muted);border-radius:8px;display:flex;align-items:center;justify-content:space-between">
-          <span style="font-size:12px;color:var(--muted-fg);font-weight:500">Should've left</span>
-          <span style="font-size:13px;font-weight:600;color:var(--foreground)" id="coShouldLeave">—</span>
+        <div class="co-footer-note" id="coShouldLeaveWrap" style="display:none">
+          <span id="coShouldLeave"></span>
         </div>
         <div class="co-insight" id="coInsight" style="display:none">
           <div class="co-insight-label">Tomorrow's Insight</div>
           <div class="co-insight-text" id="coInsightText"></div>
         </div>
       </div>
-      <div class="dialog-foot">
-        <button class="btn btn-primary" id="coDone">Done</button>
+      <div class="dialog-foot" style="flex-direction:row;justify-content:flex-end;padding-top:4px">
+        <button class="btn btn-primary" id="coDone" style="min-width:72px">Done</button>
       </div>
     </div>
   </div>
@@ -2489,6 +2492,20 @@
       if (m === 0) return `${h} hr`;
       return `${h} hr ${m} min`;
     }
+    // Returns HTML with grey unit suffixes (h / m) for the stats card
+    function durHtml(secs) {
+      const s = Math.abs(secs), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+      const sf = (u) => `<span class="co-val-suf">${u}</span>`;
+      if (h === 0) return `${m}${sf('m')}`;
+      if (m === 0) return `${h}${sf('h')}`;
+      return `${h}${sf('h')} ${m}${sf('m')}`;
+    }
+    // Returns HTML with grey AM/PM for a "H:MM AM" string
+    function timeHtml(t) {
+      const i = t.lastIndexOf(' ');
+      if (i < 0) return t;
+      return `${t.slice(0, i)}<span class="co-val-suf"> ${t.slice(i + 1)}</span>`;
+    }
 
     // ── TIME PARSER ────────────────────────────────────
     function parse(raw) {
@@ -2667,22 +2684,25 @@
     }
 
     function showCheckoutModal(punchInStr, checkoutTime, workedSecs) {
-      const checkInStr = typeof punchInStr === 'string' ? punchInStr : short(punchInStr);
+      const checkInStr  = typeof punchInStr === 'string' ? punchInStr : short(punchInStr);
       const checkOutStr = short(checkoutTime);
-      el('coWorked').textContent    = durLong(workedSecs);
-      el('coTimeRange').textContent = `${checkInStr} – ${checkOutStr}`;
-      // Should've left time
+      el('coWorked').innerHTML    = durHtml(workedSecs);
+      el('coTimeRange').innerHTML = `${timeHtml(checkInStr)} – ${timeHtml(checkOutStr)}`;
+      // Should've left note
       const eff = effSecs();
       const firstLoginLog = dayLog(todayKey());
-      const coShouldLeave = el('coShouldLeave');
+      const coShouldLeave    = el('coShouldLeave');
       const coShouldLeaveWrap = el('coShouldLeaveWrap');
       if (firstLoginLog?.loginDisplay && eff > 0) {
-        const firstLogin = parse(firstLoginLog.loginDisplay) || checkoutTime;
+        const firstLogin  = parse(firstLoginLog.loginDisplay) || checkoutTime;
         const shouldLeave = new Date(firstLogin.getTime() + eff * 1000);
-        const diff = workedSecs - eff;
-        const sign = diff >= 0 ? '+' : '−';
+        const diff    = workedSecs - eff;
         const absDiff = Math.abs(diff);
-        coShouldLeave.textContent = `${short(shouldLeave)} · ${sign}${dur(absDiff)} ${diff >= 0 ? 'OT' : 'short'}`;
+        if (diff >= 0) {
+          coShouldLeave.textContent = `Could've left ${dur(absDiff)} earlier — at ${short(shouldLeave)}.`;
+        } else {
+          coShouldLeave.textContent = `Left ${dur(absDiff)} short — target was ${short(shouldLeave)}.`;
+        }
         coShouldLeaveWrap.style.display = 'block';
       } else {
         coShouldLeaveWrap.style.display = 'none';
@@ -4833,7 +4853,7 @@ ${sig}`
       }
       if (isHalfDay && workedSecs > 0) {
         note.style.display = '';
-        confirmBtn.textContent = 'End & Mark Half Day';
+        confirmBtn.textContent = 'End Session';
       } else {
         note.style.display = 'none';
         confirmBtn.textContent = 'End Session';
