@@ -564,18 +564,17 @@
     .dialog-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
     .dialog-foot { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 8px; }
 
-    /* Checkout timeline */
-    .co-emoji { font-size: 30px; margin-bottom: 6px; display: block; }
-    .co-timeline { display: flex; align-items: center; gap: 0; }
-    .co-tnode { background: var(--muted); border-radius: 8px; padding: 12px 14px;
-      text-align: center; min-width: 100px; flex-shrink: 0; }
-    .co-tnode-label { font-size: 10px; font-weight: 600; color: var(--muted-fg);
-      text-transform: uppercase; letter-spacing: .08em; margin-bottom: 5px; }
-    .co-tnode-val { font-size: 17px; font-weight: 700; color: var(--foreground); letter-spacing: -.3px; }
-    .co-tmid { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 0 6px; }
-    .co-tline { width: 100%; height: 1px; background: var(--border); }
-    .co-ttotal { font-size: 13px; font-weight: 600; color: var(--foreground);
-      white-space: nowrap; background: var(--background); padding: 0 6px; }
+    /* Daily Report modal */
+    .co-daily-head { display:flex; align-items:center; justify-content:space-between;
+      padding:16px 16px 0; }
+    .co-stats-row { display:flex; align-items:stretch;
+      background:var(--muted); border-radius:12px; overflow:hidden; }
+    .co-stat { flex:1; padding:16px 16px; display:flex; flex-direction:column; gap:5px; }
+    .co-stat-label { font-size:10px; font-weight:600; color:var(--muted-fg);
+      text-transform:uppercase; letter-spacing:.08em; }
+    .co-stat-val { font-size:20px; font-weight:700; color:var(--foreground);
+      letter-spacing:-.4px; line-height:1.2; }
+    .co-stat-divider { width:1px; background:var(--border); margin:16px 0; flex-shrink:0; }
     .co-insight { background: var(--success-bg); border: 1px solid var(--success-border);
       border-radius: 8px; padding: 12px 14px; }
     .co-insight-label { font-size: 11px; font-weight: 600; color: var(--success);
@@ -882,7 +881,8 @@
       .navbar { display:none; }
       .mob-topbar { display:flex; }
       .mob-bottomnav { display:flex; }
-      #appWrap { padding-top:64px !important; padding-bottom:72px !important; padding-left:16px !important; padding-right:16px !important; }
+      #appWrap { padding-top:52px !important; padding-bottom:72px !important; padding-left:16px !important; padding-right:16px !important; }
+      .mob-topbar .btn-icon { width:44px; height:44px; border-radius:10px; }
     }
 
     /* ── Time picker icon button (inside text fields) ── */
@@ -1078,34 +1078,32 @@
 </head>
 <body>
 
-  <!-- ── Checkout success modal ── -->
+  <!-- ── Daily Report modal ── -->
   <div class="overlay" id="checkoutOverlay">
     <div class="dialog">
-      <div class="dialog-head" style="text-align:center">
-        <div class="dialog-title" id="coTitle">Done for today.</div>
-        <div class="dialog-desc" id="coSubtitle">Session saved.</div>
+      <div class="co-daily-head">
+        <div class="dialog-title">Daily Report</div>
+        <button class="btn-icon" onclick="closeCheckoutModal()" title="Close" style="margin:-4px -4px -4px 0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
       <div class="dialog-body">
-        <div class="co-timeline">
-          <div class="co-tnode">
-            <div class="co-tnode-label">Check In</div>
-            <div class="co-tnode-val" id="coCheckIn">—</div>
+        <div class="co-stats-row">
+          <div class="co-stat">
+            <div class="co-stat-label">Total WH</div>
+            <div class="co-stat-val" id="coWorked">—</div>
           </div>
-          <div class="co-tmid">
-            <div class="co-tline"></div>
-            <div class="co-ttotal" id="coWorked">—</div>
-            <div class="co-tline"></div>
-          </div>
-          <div class="co-tnode">
-            <div class="co-tnode-label">Check Out</div>
-            <div class="co-tnode-val" id="coTime">—</div>
+          <div class="co-stat-divider"></div>
+          <div class="co-stat">
+            <div class="co-stat-label">Start - End</div>
+            <div class="co-stat-val" id="coTimeRange">—</div>
           </div>
         </div>
-        <div id="coShouldLeaveWrap" style="display:none;margin-top:12px;padding:10px 14px;background:var(--muted);border-radius:8px;display:flex;align-items:center;justify-content:space-between">
+        <div id="coShouldLeaveWrap" style="display:none;padding:10px 14px;background:var(--muted);border-radius:8px;display:flex;align-items:center;justify-content:space-between">
           <span style="font-size:12px;color:var(--muted-fg);font-weight:500">Should've left</span>
           <span style="font-size:13px;font-weight:600;color:var(--foreground)" id="coShouldLeave">—</span>
         </div>
-        <div class="co-insight" id="coInsight" style="display:none;margin-top:10px">
+        <div class="co-insight" id="coInsight" style="display:none">
           <div class="co-insight-label">Tomorrow's Insight</div>
           <div class="co-insight-text" id="coInsightText"></div>
         </div>
@@ -1148,7 +1146,7 @@
       <div class="mob-actions">
         <button class="btn-icon" id="mobThemeBtn" title="Theme">
           <span id="mobSunIconWrap" class="theme-icon-wrap" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1ZM12 19a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1ZM24 12a1 1 0 0 1-1 1h-3a1 1 0 1 1 0-2h3a1 1 0 0 1 1 1ZM5 12a1 1 0 0 1-1 1H1a1 1 0 1 1 0-2h3a1 1 0 0 1 1 1ZM12 7a5 5 0 1 0 0 10A5 5 0 0 0 12 7ZM20.485 3.515a1 1 0 0 1 0 1.414l-2.121 2.122a1 1 0 1 1-1.415-1.415l2.122-2.121a1 1 0 0 1 1.414 0ZM7.051 16.95a1 1 0 0 1 0 1.413l-2.122 2.122a1 1 0 1 1-1.414-1.415l2.121-2.12a1 1 0 0 1 1.415 0ZM20.485 20.485a1 1 0 0 1-1.414 0l-2.122-2.121a1 1 0 1 1 1.415-1.415l2.121 2.122a1 1 0 0 1 0 1.414ZM7.051 7.05a1 1 0 0 1-1.415 0L3.515 4.93A1 1 0 0 1 4.929 3.515l2.122 2.121a1 1 0 0 1 0 1.415Z"/></svg></span>
-          <span id="mobMoonIconWrap" class="theme-icon-wrap" style="display:inline-flex"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.034 2.537a10 10 0 1 0 9.43 9.43 7 7 0 0 1-9.43-9.43Z"/></svg></span>
+          <span id="mobMoonIconWrap" class="theme-icon-wrap" style="display:inline-flex"><svg class="theme-icon-outline" width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.0972 2.53033C12.2913 2.86484 12.2752 3.2813 12.0557 3.59974C11.3898 4.56587 11 5.73589 11 6.99996C11 10.3137 13.6863 13 17 13C18.2641 13 19.4341 12.6102 20.4002 11.9443C20.7187 11.7248 21.1351 11.7086 21.4696 11.9027C21.8041 12.0968 21.9967 12.4664 21.9642 12.8518C21.5313 17.9764 17.236 22 12 22C6.47715 22 2 17.5228 2 12C2 6.76392 6.02351 2.46868 11.1481 2.03579C11.5335 2.00324 11.9031 2.19582 12.0972 2.53033ZM9.42424 4.42346C6.26994 5.49547 4 8.483 4 12C4 16.4182 7.58172 20 12 20C15.517 20 18.5045 17.73 19.5765 14.5757C18.7676 14.8508 17.9008 15 17 15C12.5817 15 9 11.4182 9 6.99996C9 6.09916 9.1492 5.23234 9.42424 4.42346Z" fill="currentColor"/></svg><svg class="theme-icon-solid" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12.0557 3.59974C12.2752 3.2813 12.2913 2.86484 12.0972 2.53033C11.9031 2.19582 11.5335 2.00324 11.1481 2.03579C6.02351 2.46868 2 6.76392 2 12C2 17.5228 6.47715 22 12 22C17.236 22 21.5313 17.9764 21.9642 12.8518C21.9967 12.4664 21.8041 12.0968 21.4696 11.9027C21.1351 11.7086 20.7187 11.7248 20.4002 11.9443C19.4341 12.6102 18.2641 13 17 13C13.6863 13 11 10.3137 11 6.99996C11 5.73589 11.3898 4.56587 12.0557 3.59974Z" fill="currentColor"/></svg></span>
         </button>
         <button class="btn-icon" id="mobNotifBtn" title="Notifications">
           <div class="notif-badge" id="mobNotifBadge" style="display:none"></div>
@@ -2485,6 +2483,12 @@
       const s = Math.abs(secs), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
       return `${h}h ${p2(m)}m`;
     }
+    function durLong(secs) {
+      const s = Math.abs(secs), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+      if (h === 0) return `${m} min`;
+      if (m === 0) return `${h} hr`;
+      return `${h} hr ${m} min`;
+    }
 
     // ── TIME PARSER ────────────────────────────────────
     function parse(raw) {
@@ -2663,12 +2667,10 @@
     }
 
     function showCheckoutModal(punchInStr, checkoutTime, workedSecs) {
-      const c = cfg(), name = (c.name || '').trim();
-      el('coTitle').textContent   = name ? `Done for today, ${name}.` : `Done for today.`;
-      el('coSubtitle').textContent = 'Session saved.';
-      el('coCheckIn').textContent = typeof punchInStr === 'string' ? punchInStr : short(punchInStr);
-      el('coTime').textContent    = short(checkoutTime);
-      el('coWorked').textContent  = dur(workedSecs);
+      const checkInStr = typeof punchInStr === 'string' ? punchInStr : short(punchInStr);
+      const checkOutStr = short(checkoutTime);
+      el('coWorked').textContent    = durLong(workedSecs);
+      el('coTimeRange').textContent = `${checkInStr} – ${checkOutStr}`;
       // Should've left time
       const eff = effSecs();
       const firstLoginLog = dayLog(todayKey());
