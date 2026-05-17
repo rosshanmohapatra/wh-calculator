@@ -589,9 +589,8 @@
       white-space:nowrap;overflow:hidden; }
     .vp-tagline { font-size:11px;font-weight:500;color:var(--muted-fg);
       max-width:0;overflow:hidden;opacity:0;
-      transition:max-width .35s cubic-bezier(.4,0,.2,1), opacity .25s ease; }
+      transition:max-width .55s cubic-bezier(.4,0,.2,1), opacity .45s ease; }
     .version-pill:hover .vp-tagline { max-width:160px;opacity:1; }
-    .version-pill:hover { border-color:var(--muted-fg); }
     @media (max-width:640px) { .version-pill { display:none !important; } }
     .dialog-title { font-size: 15px; font-weight: 600; color: var(--foreground); }
     .dialog-desc  { font-size: 12px; color: var(--muted-fg); margin-top: 3px; }
@@ -1265,7 +1264,7 @@
 
     <!-- Mobile top bar -->
     <div class="mob-topbar" id="mobTopbar">
-      <img id="mobLogo" src="favicon-light.svg" alt="5pm" height="28" style="display:block">
+      <img id="mobLogo" src="brand-light.svg" alt="5pm" height="32" style="display:block;border-radius:8px">
       <div class="mob-actions">
         <button class="btn-icon" id="mobThemeBtn" title="Theme">
           <span id="mobSunIconWrap" class="theme-icon-wrap" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1ZM12 19a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1ZM24 12a1 1 0 0 1-1 1h-3a1 1 0 1 1 0-2h3a1 1 0 0 1 1 1ZM5 12a1 1 0 0 1-1 1H1a1 1 0 1 1 0-2h3a1 1 0 0 1 1 1ZM12 7a5 5 0 1 0 0 10A5 5 0 0 0 12 7ZM20.485 3.515a1 1 0 0 1 0 1.414l-2.121 2.122a1 1 0 1 1-1.415-1.415l2.122-2.121a1 1 0 0 1 1.414 0ZM7.051 16.95a1 1 0 0 1 0 1.413l-2.122 2.122a1 1 0 1 1-1.414-1.415l2.121-2.12a1 1 0 0 1 1.415 0ZM20.485 20.485a1 1 0 0 1-1.414 0l-2.122-2.121a1 1 0 1 1 1.415-1.415l2.121 2.122a1 1 0 0 1 0 1.414ZM7.051 7.05a1 1 0 0 1-1.415 0L3.515 4.93A1 1 0 0 1 4.929 3.515l2.122 2.121a1 1 0 0 1 0 1.415Z"/></svg></span>
@@ -1923,7 +1922,7 @@
     <span style="font-size:11px;font-weight:600;color:var(--muted-fg);letter-spacing:.01em">5pm</span>
     <span class="vp-tagline">- Work Hour Tracker</span>
     <span style="font-size:10px;font-weight:600;letter-spacing:.05em;
-      background:var(--muted);color:var(--muted-fg);padding:4px 7px;border-radius:100px">(v.0.9.2)</span>
+      background:var(--muted);color:var(--muted-fg);padding:4px 7px;border-radius:100px">v0.9.2</span>
   </a>
 
   <!-- ── End Session Confirmation Modal ── -->
@@ -5753,7 +5752,7 @@ ${sig}`
       localStorage.setItem('wh_theme', d ? 'dark' : 'light');
       const fav = document.getElementById('favicon');
       if (fav) fav.href = d ? _faviconDark : _faviconLight;
-      const logoSrc = d ? _faviconDark : _faviconLight;
+      const logoSrc = d ? 'brand-dark.svg' : 'brand-light.svg';
       const mobLogo = document.getElementById('mobLogo');
       if (mobLogo) mobLogo.src = logoSrc;
       const obLogo = document.getElementById('obLogo');
@@ -6713,7 +6712,7 @@ ${sig}`
 
       <!-- Step 1: Import Data -->
       <div class="ob-panel active" id="obPanel1">
-        <img id="obLogo" src="favicon-light.svg" alt="5pm" height="48" style="display:block;margin-bottom:8px">
+        <img id="obLogo" src="brand-light.svg" alt="5pm" height="64" style="display:block;margin-bottom:12px;border-radius:16px">
         <div class="ob-title">Say hello to 5pm. <span style="color:var(--muted-fg);font-weight:400">— Leave on time, every time.</span></div>
         <div class="ob-desc">Your work hour tracker. Track your work hours effortlessly. Got a backup? Import it to restore your data.</div>
         <label class="ob-import-zone" for="obImportFile" id="obImportZone">
