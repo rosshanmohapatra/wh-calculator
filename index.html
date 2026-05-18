@@ -4,15 +4,15 @@
   <script>if(!localStorage.getItem('wh_auth')){document.documentElement.style.visibility='hidden';window.location.replace('login.html');}else{document.documentElement.style.visibility='';}</script>
   <!-- Apply theme before first paint to avoid flash -->
   <script>(function(){var s=localStorage.getItem('wh_theme');var p=window.matchMedia('(prefers-color-scheme:dark)').matches;if(s?s==='dark':p)document.documentElement.classList.add('dark');})()</script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>5pm - Work Hour Tracker</title>
 
   <!-- Favicons (theme-aware; JS in applyTheme() swaps #favicon at runtime) -->
-  <link id="favicon" rel="icon" type="image/svg+xml" href="favicon-light.svg">
-  <link rel="apple-touch-icon" href="brand-light.svg">
+  <link id="favicon" rel="icon" type="image/svg+xml" href="/favicon-light.svg">
 
   <!-- PWA / home-screen -->
   <meta name="application-name" content="5pm">
@@ -105,13 +105,17 @@
     .mob-brand { font-size:15px;font-weight:700;color:var(--foreground);letter-spacing:-.02em; }
     .mob-actions { display:flex;align-items:center;gap:4px; }
     /* ── Mobile bottom nav ── */
-    .mob-bottomnav { display:none;position:fixed;bottom:0;left:0;right:0;height:60px;
+    .mob-bottomnav { display:none;position:fixed;bottom:0;left:0;right:0;
+      /* bar: 49px interactive zone + home indicator safe area */
+      height:calc(49px + env(safe-area-inset-bottom));
       background:var(--background);border-top:1px solid var(--border);
-      align-items:center;justify-content:space-around;z-index:200; }
-    .mob-tab { flex:1;height:100%;display:flex;flex-direction:column;align-items:center;
+      align-items:flex-start;justify-content:space-around;z-index:200;
+      /* background stretches to absolute bottom; content sits above home indicator */
+      padding-bottom:env(safe-area-inset-bottom); }
+    .mob-tab { flex:1;height:49px;display:flex;flex-direction:column;align-items:center;
       justify-content:center;gap:3px;border:none;background:none;cursor:pointer;
       color:var(--muted-fg);font-family:var(--font);font-size:10px;font-weight:600;
-      letter-spacing:.04em;transition:color .12s; }
+      letter-spacing:.04em;transition:color .12s;min-height:44px; }
     .mob-tab.active { color:var(--foreground); }
     .mob-tab svg { flex-shrink:0; }
 
@@ -923,7 +927,7 @@
       .mob-topbar { display:flex; }
       .mob-bottomnav { display:flex; }
       /* padding-left/right set to 0 — .page handles its own 16px horizontal padding */
-      #appWrap { padding-top:52px !important; padding-bottom:72px !important; padding-left:0 !important; padding-right:0 !important; }
+      #appWrap { padding-top:52px !important; padding-bottom:calc(49px + env(safe-area-inset-bottom) + 16px) !important; padding-left:0 !important; padding-right:0 !important; }
       .mob-topbar .btn-icon { width:44px; height:44px; border-radius:10px; }
     }
 
@@ -6849,5 +6853,117 @@ ${sig}`
     </div>
   </div>
 </div>
+
+<!-- ═══ iOS INSTALL PROMPT ═══ -->
+<div id="iosInstallOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);" onclick="closeIosInstall(event)"></div>
+<div id="iosInstallSheet" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:9001;
+  background:var(--card);border-top:1px solid var(--border);border-radius:20px 20px 0 0;
+  padding:20px 24px calc(28px + env(safe-area-inset-bottom));
+  box-shadow:0 -8px 40px rgba(0,0,0,.18);
+  transform:translateY(100%);transition:transform .38s cubic-bezier(.32,0,.18,1);">
+
+  <!-- Handle + close -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div style="width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto;position:absolute;left:50%;transform:translateX(-50%)"></div>
+    <div style="flex:1"></div>
+    <button onclick="dismissIosInstall()" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--muted);color:var(--muted-fg);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Heading -->
+  <div style="margin-bottom:6px;font-size:17px;font-weight:700;color:var(--foreground);letter-spacing:-.3px">Add 5pm to your Home Screen</div>
+  <div style="font-size:13px;color:var(--muted-fg);margin-bottom:24px;line-height:1.5">Get the full app experience — works offline, no browser UI.</div>
+
+  <!-- Steps -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+
+    <!-- Step 1 -->
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--muted);color:var(--muted-fg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+      <div style="flex:1">
+        <div style="font-size:13px;color:var(--muted-fg);margin-bottom:5px">Press this button at the bottom of the screen</div>
+        <!-- iOS Share badge -->
+        <span style="display:inline-flex;align-items:center;gap:5px;background:var(--muted);border-radius:8px;padding:5px 10px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          <span style="font-size:12px;font-weight:600;color:var(--foreground)">Share</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--muted);color:var(--muted-fg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+      <div style="flex:1">
+        <div style="font-size:13px;color:var(--muted-fg);margin-bottom:5px">Scroll down and press this from the menu</div>
+        <!-- Add to Home Screen badge -->
+        <span style="display:inline-flex;align-items:center;gap:6px;background:var(--muted);border-radius:100px;padding:5px 12px 5px 8px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <span style="font-size:12px;font-weight:600;color:var(--foreground)">Add to Home Screen</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--muted);color:var(--muted-fg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+      <div style="flex:1">
+        <div style="font-size:13px;color:var(--muted-fg);margin-bottom:5px">Press this button at the top right corner</div>
+        <!-- Add badge -->
+        <span style="display:inline-flex;align-items:center;background:var(--muted);border-radius:8px;padding:5px 12px">
+          <span style="font-size:12px;font-weight:600;color:#007AFF">Add</span>
+        </span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── iOS Install Prompt ──────────────────────────────────────────
+  (function () {
+    // Only on iOS Safari (not Chrome/Firefox on iOS, not already standalone)
+    var ua = window.navigator.userAgent;
+    var isIOS = /iphone|ipad|ipod/i.test(ua);
+    var isSafari = /safari/i.test(ua) && !/chrome|crios|fxios/i.test(ua);
+    var isStandalone = ('standalone' in window.navigator) && window.navigator.standalone;
+    var seen = localStorage.getItem('wh_ios_install_seen');
+
+    if (isIOS && isSafari && !isStandalone && !seen) {
+      // Delay slightly so page content renders first
+      setTimeout(function () {
+        var overlay = document.getElementById('iosInstallOverlay');
+        var sheet   = document.getElementById('iosInstallSheet');
+        overlay.style.display = 'block';
+        sheet.style.display   = 'block';
+        // Trigger slide-up on next frame
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            sheet.style.transform = 'translateY(0)';
+          });
+        });
+      }, 1200);
+    }
+  })();
+
+  function dismissIosInstall() {
+    var overlay = document.getElementById('iosInstallOverlay');
+    var sheet   = document.getElementById('iosInstallSheet');
+    sheet.style.transform = 'translateY(100%)';
+    overlay.style.background = 'transparent';
+    setTimeout(function () {
+      overlay.style.display = 'none';
+      sheet.style.display   = 'none';
+    }, 400);
+    localStorage.setItem('wh_ios_install_seen', '1');
+  }
+
+  function closeIosInstall(e) {
+    // Close when tapping the overlay backdrop
+    if (e.target === document.getElementById('iosInstallOverlay')) {
+      dismissIosInstall();
+    }
+  }
+</script>
 
 </body></html>

@@ -2,8 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>5pm — Sign In</title>
+  <!-- Favicons (theme-aware; swapped by inline script below) -->
+  <link id="favicon" rel="icon" type="image/svg+xml" href="/favicon-light.svg">
+  <!-- PWA / home-screen -->
+  <meta name="application-name" content="5pm">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="5pm">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -313,14 +324,6 @@
       <div class="brand-tagline">Work Hour Tracker</div>
     </div>
   </div>
-  <script>
-    (function(){
-      var s = localStorage.getItem('wh_theme');
-      var dark = s ? s==='dark' : window.matchMedia('(prefers-color-scheme:dark)').matches;
-      if (dark) document.getElementById('loginLogo').src = 'brand-dark.svg';
-    })();
-  </script>
-
   <!-- Auth card -->
   <div class="auth-card">
 
@@ -476,6 +479,12 @@
       document.documentElement.classList.toggle('dark', isDark);
       document.getElementById('themeIconSun').style.display  = isDark ? '' : 'none';
       document.getElementById('themeIconMoon').style.display = isDark ? 'none' : '';
+      // Swap theme-aware favicon
+      const fav = document.getElementById('favicon');
+      if (fav) fav.href = isDark ? '/favicon-dark.svg' : '/favicon-light.svg';
+      // Swap brand logo on login screen
+      const logo = document.getElementById('loginLogo');
+      if (logo) logo.src = isDark ? '/brand-dark.svg' : '/brand-light.svg';
     }
     function toggleTheme() {
       isDark = !isDark;
