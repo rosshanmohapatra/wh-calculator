@@ -2753,21 +2753,27 @@
         icon:               '/apple-touch-icon.png',
         requireInteraction: !!msg.requireInteraction,
       };
-      // SW path — works for both installed PWA and regular website tabs.
-      // serviceWorker.ready waits until the SW is fully active (avoids the
-      // "installing but not yet active" race on first visit that broke Android).
+      // Path 1 — Notification constructor.
+      // Instant and reliable on Chrome/Firefox/Safari desktop (both browser tab
+      // and PWA). Chrome Android doesn't support it at all (throws TypeError),
+      // which lets us fall through to the SW path below.
+      try {
+        const n = new Notification(msg.title, opts);
+        n.onclick = () => window.focus();
+        return;
+      } catch (_) {}
+      // Path 2 — SW showNotification.
+      // Required on Chrome Android (new Notification() unavailable there).
+      // serviceWorker.ready waits for the SW to fully activate on first visit.
       if ('serviceWorker' in navigator) {
         try {
           const reg = await Promise.race([
             navigator.serviceWorker.ready,
-            new Promise((_, rej) => setTimeout(() => rej(new Error('sw timeout')), 3000)),
+            new Promise((_, rej) => setTimeout(() => rej(new Error('sw timeout')), 4000)),
           ]);
           await reg.showNotification(msg.title, opts);
-          return;
         } catch (_) {}
       }
-      // Fallback for desktop-only browsers where new Notification() is still valid
-      try { new Notification(msg.title, opts); } catch (_) {}
     }
 
     function scheduleNotifications(loginTimestamp) {
