@@ -915,7 +915,7 @@
 
     /* ── Mobile ── */
     @media (max-width: 640px) {
-      .page { padding: 8px 16px 80px; gap: 16px; }
+      .page { padding: 0 16px 80px; gap: 16px; }
       .day-clock { font-size: 28px; }
       .day-date { font-size: 14px; }
       .login-row { flex-wrap: wrap; }
@@ -1328,8 +1328,8 @@
       <!-- Notification permission warning -->
       <div class="notif-perm-bar" id="notifPermBar">
         <div style="flex:1;display:flex;flex-direction:column;gap:1px">
-          <span style="font-weight:600">Browser notifications blocked</span>
-          <span style="opacity:.75">Tracking accuracy may be affected.</span>
+          <span style="font-weight:600">Notifications are disabled.</span>
+          <span style="opacity:.75">You may miss work hour alerts.</span>
         </div>
         <button onclick="Notification.requestPermission().then(function(p){if(p==='granted')document.getElementById('notifPermBar').classList.remove('show')})" style="flex-shrink:0;height:26px;padding:0 10px;font-size:11px;font-weight:600;border-radius:6px;border:1px solid var(--warning-border);background:transparent;color:var(--warning);cursor:pointer;white-space:nowrap;font-family:var(--font)">Turn On</button>
       </div>
@@ -2689,6 +2689,23 @@
         tag:   'overtime',
         requireInteraction: true,
       },
+      // ── New notification types ────────────────────────
+      forgotStop: {
+        title: 'Still tracking? 🤔',
+        body:  "You've been working way past your target. Log out and take a break.",
+        tag:   'forgotStop',
+        requireInteraction: true,
+      },
+      earlyLeave: {
+        title: "You can leave early! 🏃",
+        body:  "You've already hit your target for today. Head out whenever you're ready.",
+        tag:   'earlyLeave',
+      },
+      morningReminder: {
+        title: 'Good morning ☀️',
+        body:  "Don't forget to log in and start tracking your hours.",
+        tag:   'morningReminder',
+      },
     };
 
     async function initServiceWorker() {
@@ -2734,9 +2751,11 @@
       const now        = Date.now();
 
       const jobs = [
-        { type: 'kickstart', offsetSecs: targetSecs - 300, enabled: c.notifKickstart !== false },
-        { type: 'target',    offsetSecs: targetSecs,       enabled: c.notifTarget    !== false },
-        { type: 'overtime',  offsetSecs: targetSecs + 300, enabled: c.notifOvertime  !== false },
+        { type: 'kickstart',      offsetSecs: targetSecs - 300,  enabled: c.notifKickstart !== false },
+        { type: 'target',         offsetSecs: targetSecs,         enabled: c.notifTarget    !== false },
+        { type: 'overtime',       offsetSecs: targetSecs + 300,   enabled: c.notifOvertime  !== false },
+        // 90 min past target — nudge to log out if still tracking
+        { type: 'forgotStop',     offsetSecs: targetSecs + 5400,  enabled: true },
       ];
 
       for (const job of jobs) {
@@ -2750,6 +2769,32 @@
     function cancelScheduledNotifications() {
       _notifTimers.forEach(id => clearTimeout(id));
       _notifTimers = [];
+    }
+
+    // ── MORNING REMINDER ───────────────────────────────────────────────────────
+    // Fires once per day at 9am if the user hasn't logged in yet that day.
+    // Skips weekends and respects notification permission.
+    function scheduleMorningReminder() {
+      if (!cfg().notifOn || Notification.permission !== 'granted') return;
+      const todayStr = todayKey();
+      const sentKey  = 'wh_morning_sent_' + todayStr;
+      if (localStorage.getItem(sentKey)) return;   // already sent today
+      if (dayLog(todayStr)?.loginTime) return;      // already logged in today
+      const now     = new Date();
+      const dow     = now.getDay();
+      if (dow === 0 || dow === 6) return;           // skip weekends
+      const target9 = new Date(now);
+      target9.setHours(9, 0, 0, 0);
+      const delay = target9.getTime() - now.getTime();
+      if (delay <= 0) return;                       // past 9am already
+      const id = setTimeout(() => {
+        // Re-check at fire time — user may have logged in since scheduling
+        if (!dayLog(todayKey())?.loginTime && Notification.permission === 'granted') {
+          _fireNotif('morningReminder');
+          localStorage.setItem(sentKey, '1');
+        }
+      }, delay);
+      _notifTimers.push(id);
     }
 
     // Toggle visibility of the inline remaining time display (next to elapsed label)
@@ -2852,6 +2897,12 @@
       const tk = todayKey(), ex = dayLog(tk) || {};
       const sessionSecs = Math.floor((now - loginDate) / 1000);
       const totalSecs   = _sessionAccSecs + sessionSecs;  // all sessions today
+      // Fire "early leave" notification if target met before 4pm
+      const targetSecs = effSecs();
+      if (totalSecs >= targetSecs && now.getHours() < 16
+          && cfg().notifOn && Notification.permission === 'granted') {
+        _fireNotif('earlyLeave');
+      }
       const punchInDisplay = ex.loginDisplay || short(loginDate); // first login of the day
       saveDayLog(tk, { ...ex,
         loginTime:       `${loginDate.getHours()}:${loginDate.getMinutes()}:${loginDate.getSeconds()}`,
@@ -5770,6 +5821,7 @@ ${sig}`
     applyTheme(_savedTheme ? _savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme:dark)').matches);
     el('themeBtn').addEventListener('click', () => applyTheme(!dark));
     initServiceWorker(); // register service worker for Web Push
+    scheduleMorningReminder();  // schedule next-day 9am nudge if not yet logged in
 
     // ── EVENTS ─────────────────────────────────────────
     document.querySelectorAll('.nav-tab').forEach(tab => {
