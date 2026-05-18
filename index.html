@@ -931,7 +931,7 @@
       .mob-topbar { display:flex; }
       .mob-bottomnav { display:flex; }
       /* padding-left/right set to 0 — .page handles its own 16px horizontal padding */
-      #appWrap { padding-top:calc(52px + env(safe-area-inset-top)) !important; padding-bottom:calc(49px + env(safe-area-inset-bottom) + 16px) !important; padding-left:0 !important; padding-right:0 !important; }
+      #appWrap { padding-top:calc(52px + env(safe-area-inset-top)) !important; padding-bottom:calc(12px + env(safe-area-inset-bottom) + 16px) !important; padding-left:0 !important; padding-right:0 !important; }
       .mob-topbar .btn-icon { width:44px; height:44px; border-radius:10px; }
     }
 
@@ -1921,6 +1921,28 @@
         </div>
 
 
+        <!-- Test Notifications (dev panel) -->
+        <div class="settings-card" id="notifTestCard">
+          <div class="settings-card-head" style="cursor:default">
+            <div class="section-label">Test Notifications</div>
+          </div>
+          <div class="settings-card-body" style="padding-top:0;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:12px;color:var(--muted-fg);line-height:1.5;margin-bottom:4px">
+              Fire each notification immediately to verify they work. Requires permission to be granted.
+            </div>
+            <div id="notifTestPermWarn" style="display:none;font-size:12px;color:var(--warning);font-weight:500;margin-bottom:4px">
+              Enable notifications in Settings → Allow Notifications first.
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <button class="btn btn-secondary" style="font-size:12px;height:34px;border-radius:8px" onclick="testNotif('target')">Daily Target Reached</button>
+              <button class="btn btn-secondary" style="font-size:12px;height:34px;border-radius:8px" onclick="testNotif('overtime')">Overworking Warning</button>
+              <button class="btn btn-secondary" style="font-size:12px;height:34px;border-radius:8px" onclick="testNotif('forgotStop')">Forgot to Stop</button>
+              <button class="btn btn-secondary" style="font-size:12px;height:34px;border-radius:8px" onclick="testNotif('morningReminder')">Morning Reminder</button>
+              <button class="btn btn-secondary" style="font-size:12px;height:34px;border-radius:8px;grid-column:1/-1" onclick="testNotif('earlyLeave')">Early Leave Achieved</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </main>
   </div>
@@ -1930,7 +1952,7 @@
     <span style="font-size:11px;font-weight:600;color:var(--muted-fg);letter-spacing:.01em">5pm</span>
     <span class="vp-tagline">- Work Hour Tracker</span>
     <span style="font-size:10px;font-weight:600;letter-spacing:.05em;
-      background:var(--muted);color:var(--muted-fg);padding:4px 7px;border-radius:100px">v0.9.3</span>
+      background:var(--muted);color:var(--muted-fg);padding:4px 7px;border-radius:100px">v0.9.5</span>
   </a>
 
   <!-- ── End Session Confirmation Modal ── -->
@@ -2774,6 +2796,15 @@
     // ── MORNING REMINDER ───────────────────────────────────────────────────────
     // Fires once per day at 9am if the user hasn't logged in yet that day.
     // Skips weekends and respects notification permission.
+    function testNotif(type) {
+      if (Notification.permission !== 'granted') {
+        document.getElementById('notifTestPermWarn').style.display = '';
+        return;
+      }
+      document.getElementById('notifTestPermWarn').style.display = 'none';
+      _fireNotif(type);
+    }
+
     function scheduleMorningReminder() {
       if (!cfg().notifOn || Notification.permission !== 'granted') return;
       const todayStr = todayKey();
