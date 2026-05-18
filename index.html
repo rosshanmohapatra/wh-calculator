@@ -99,9 +99,13 @@
     .nav-actions { display: flex; align-items: center; gap: 8px; }
 
     /* ── Mobile top bar ── */
-    .mob-topbar { display:none;position:fixed;top:0;left:0;right:0;height:52px;
+    .mob-topbar { display:none;position:fixed;top:0;left:0;right:0;
+      /* 52pt interactive bar + status bar / Dynamic Island clearance */
+      height:calc(52px + env(safe-area-inset-top));
+      padding-top:env(safe-area-inset-top);
       background:var(--background);border-bottom:1px solid var(--border);
-      align-items:center;justify-content:space-between;padding:0 16px;z-index:200; }
+      align-items:center;justify-content:space-between;padding-left:16px;padding-right:16px;
+      z-index:200; }
     .mob-brand { font-size:15px;font-weight:700;color:var(--foreground);letter-spacing:-.02em; }
     .mob-actions { display:flex;align-items:center;gap:4px; }
     /* ── Mobile bottom nav ── */
@@ -281,7 +285,7 @@
 
     /* ── Notification panel ── */
     .notif-panel { overflow: hidden; transition: max-height .28s ease, opacity .2s; }
-    .notif-panel.hidden { max-height: 0; opacity: 0; pointer-events: none; }
+    .notif-panel.hidden { max-height: 0; opacity: 0; pointer-events: none; padding-top: 0 !important; padding-bottom: 0 !important; }
     .notif-panel.open   { max-height: 900px; opacity: 1; }
     .notif-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
     .notif-head { padding: 12px 16px; border-bottom: 1px solid var(--border);
@@ -911,7 +915,7 @@
 
     /* ── Mobile ── */
     @media (max-width: 640px) {
-      .page { padding: 16px 16px 80px; gap: 16px; }
+      .page { padding: 8px 16px 80px; gap: 16px; }
       .day-clock { font-size: 28px; }
       .day-date { font-size: 14px; }
       .login-row { flex-wrap: wrap; }
@@ -927,7 +931,7 @@
       .mob-topbar { display:flex; }
       .mob-bottomnav { display:flex; }
       /* padding-left/right set to 0 — .page handles its own 16px horizontal padding */
-      #appWrap { padding-top:52px !important; padding-bottom:calc(49px + env(safe-area-inset-bottom) + 16px) !important; padding-left:0 !important; padding-right:0 !important; }
+      #appWrap { padding-top:calc(52px + env(safe-area-inset-top)) !important; padding-bottom:calc(49px + env(safe-area-inset-bottom) + 16px) !important; padding-left:0 !important; padding-right:0 !important; }
       .mob-topbar .btn-icon { width:44px; height:44px; border-radius:10px; }
     }
 
@@ -5759,6 +5763,8 @@ ${sig}`
       const logoSrc = d ? 'brand-dark.svg' : 'brand-light.svg';
       const mobLogo = document.getElementById('mobLogo');
       if (mobLogo) mobLogo.src = logoSrc;
+      const installLogo = document.getElementById('installPromptLogo');
+      if (installLogo) installLogo.src = logoSrc;
     }
     const _savedTheme = localStorage.getItem('wh_theme');
     applyTheme(_savedTheme ? _savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme:dark)').matches);
@@ -6872,8 +6878,13 @@ ${sig}`
   </div>
 
   <!-- Heading -->
-  <div style="margin-bottom:6px;font-size:17px;font-weight:700;color:var(--foreground);letter-spacing:-.3px">Add 5pm to your Home Screen</div>
-  <div style="font-size:13px;color:var(--muted-fg);margin-bottom:24px;line-height:1.5">Get the full app experience — works offline, no browser UI.</div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+    <img src="/brand-light.svg" id="installPromptLogo" alt="5pm" width="48" height="48" style="border-radius:12px;flex-shrink:0">
+    <div>
+      <div style="font-size:17px;font-weight:700;color:var(--foreground);letter-spacing:-.3px">Add 5pm to your Home Screen</div>
+      <div style="font-size:13px;color:var(--muted-fg);margin-top:2px;line-height:1.4">Get the full app experience.</div>
+    </div>
+  </div>
 
   <!-- Steps -->
   <div style="display:flex;flex-direction:column;gap:16px">
