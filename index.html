@@ -2746,7 +2746,7 @@
 
     async function _fireNotif(type) {
       const msg = _NOTIF_MSGS[type]; if (!msg) return;
-      if (Notification.permission !== 'granted') return;
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
       const opts = {
         body:               msg.body,
         tag:                msg.tag,
@@ -4662,6 +4662,9 @@
           v.classList.add(newIdx > oldIdx ? 'slide-from-right' : 'slide-from-left');
         }
       });
+      // Always snap back to the top of the new view — prevents the blank-page
+      // illusion where content exists but is above the current scroll position.
+      window.scrollTo({ top: 0, behavior: 'instant' });
       if (name === 'settings') populateSettings();
       if (name === 'analytics') renderAnalytics();
     }
@@ -5873,11 +5876,7 @@ ${sig}`
     });
     // Mobile nav tabs
     document.querySelectorAll('.mob-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        switchTab(tab.dataset.view);
-        document.querySelectorAll('.mob-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-      });
+      tab.addEventListener('click', () => switchTab(tab.dataset.view));
     });
     // Mobile theme + notif
     el('mobThemeBtn')?.addEventListener('click', () => applyTheme(!dark));
