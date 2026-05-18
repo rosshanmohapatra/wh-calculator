@@ -2751,15 +2751,20 @@
         body:               msg.body,
         tag:                msg.tag,
         icon:               '/brand-light.svg',
-        renotify:           true,
         requireInteraction: !!msg.requireInteraction,
       };
-      // Use SW showNotification when available — works even when tab is hidden
-      if (_swReg) {
-        try { await _swReg.showNotification(msg.title, opts); return; } catch (_) {}
+      // SW path: showNotification works when tab is hidden but needs an ACTIVE SW
+      if ('serviceWorker' in navigator) {
+        try {
+          const reg = _swReg || await navigator.serviceWorker.getRegistration('/');
+          if (reg && reg.active) {
+            await reg.showNotification(msg.title, opts);
+            return;
+          }
+        } catch (_) {}
       }
-      // Direct fallback — always works when tab is open
-      new Notification(msg.title, opts);
+      // Direct fallback — reliable on desktop when tab is open
+      try { new Notification(msg.title, opts); } catch (_) {}
     }
 
     function scheduleNotifications(loginTimestamp) {
