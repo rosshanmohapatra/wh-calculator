@@ -113,7 +113,7 @@
       /* bar: 49px interactive zone + home indicator safe area */
       height:calc(49px + env(safe-area-inset-bottom));
       background:var(--background);border-top:1px solid var(--border);
-      align-items:flex-start;justify-content:space-around;z-index:200;
+      align-items:flex-start;justify-content:space-around;z-index:9100;
       /* background stretches to absolute bottom; content sits above home indicator */
       padding-bottom:env(safe-area-inset-bottom); }
     .mob-tab { flex:1;height:49px;display:flex;flex-direction:column;align-items:center;
@@ -2522,7 +2522,13 @@
     function cfg() { const r=Store.getCfg(); return r?{...CFG_DEF,...r}:{...CFG_DEF}; }
 
     // ── ANON USER ID (persists across sessions, used as push subscription key) ──
-    if (!localStorage.getItem('wh_uid')) localStorage.setItem('wh_uid', crypto.randomUUID());
+    // crypto.randomUUID() requires Safari 15.4+; fall back to getRandomValues() on older iOS.
+    function _genUUID() {
+      if (crypto.randomUUID) return crypto.randomUUID();
+      return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+    }
+    if (!localStorage.getItem('wh_uid')) localStorage.setItem('wh_uid', _genUUID());
     const WH_UID = localStorage.getItem('wh_uid');
     // saveCfg defined in persistence layer
 
@@ -2696,36 +2702,35 @@
 
     const _NOTIF_MSGS = {
       kickstart: {
-        title: 'Almost there 👀',
-        body:  '5 minutes left in your shift. Time to start wrapping up.',
+        title: 'Almost done',
+        body:  'Start wrapping up.',
         tag:   'kickstart',
       },
       target: {
-        title: 'Time to go! 🎉',
-        body:  "You've hit your daily target. Head out — you've earned it.",
+        title: 'Done for today',
+        body:  'You can leave now.',
         tag:   'target',
       },
       overtime: {
-        title: 'You should leave now ⏰',
-        body:  "It's been 5 minutes past your target. Close the laptop and go.",
+        title: 'Still working',
+        body:  'Your hours are complete.',
         tag:   'overtime',
         requireInteraction: true,
       },
-      // ── New notification types ────────────────────────
       forgotStop: {
-        title: 'Still tracking? 🤔',
-        body:  "You've been working way past your target. Log out and take a break.",
+        title: 'Still there?',
+        body:  'Time to head out.',
         tag:   'forgotStop',
         requireInteraction: true,
       },
       earlyLeave: {
-        title: "You can leave early! 🏃",
-        body:  "You've already hit your target for today. Head out whenever you're ready.",
+        title: 'Done early',
+        body:  'You can leave anytime.',
         tag:   'earlyLeave',
       },
       morningReminder: {
-        title: 'Good morning ☀️',
-        body:  "Don't forget to log in and start tracking your hours.",
+        title: 'Good morning',
+        body:  "Start when you're ready.",
         tag:   'morningReminder',
       },
     };
@@ -4662,9 +4667,9 @@
           v.classList.add(newIdx > oldIdx ? 'slide-from-right' : 'slide-from-left');
         }
       });
-      // Always snap back to the top of the new view — prevents the blank-page
-      // illusion where content exists but is above the current scroll position.
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      // scrollTo(0,0) is universally supported and instant (no scroll-behavior:smooth set).
+      // The options-object form with behavior:'instant' silently fails on Safari < 15.4.
+      window.scrollTo(0, 0);
       if (name === 'settings') populateSettings();
       if (name === 'analytics') renderAnalytics();
     }
